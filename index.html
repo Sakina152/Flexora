@@ -7,6 +7,8 @@
     <title>FLEXORA - Flex your Aura</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <!-- AOS Animation CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
 </head>
 <body>
     <!-- Navigation -->
@@ -35,7 +37,7 @@
     </nav>
 
     <!-- Hero Section with Outfit Carousel -->
-    <section class="hero">
+    <section class="hero" data-aos="fade-up" data-aos-duration="1000">
         <div class="carousel-container">
             <div class="carousel">
                 <div class="carousel-slide active">
@@ -83,7 +85,7 @@
     <!-- Layout Container -->
     <div class="layout-container">
         <!-- Style Categories Sidebar -->
-        <aside class="categories-sidebar">
+        <aside class="categories-sidebar" data-aos="fade-right" data-aos-duration="1000">
             <h3>Style Categories</h3>
             <ul class="category-list">
                 <li><a href="#ethnic">Ethnic</a></li>
@@ -108,24 +110,24 @@
         </aside>
 
         <!-- Main Content -->
-        <main class="main-content">
+        <main class="main-content" data-aos="fade-up" data-aos-duration="1000">
             <!-- Trending Looks Section -->
-            <section id="trending" class="trending-section">
+            <section id="trending" class="trending-section" data-aos="fade-up" data-aos-duration="1000">
                 <h2>Trending Looks</h2>
                 <div class="trending-grid">
-                    <div class="trend-card">
+                    <div class="trend-card" data-aos="fade-up" data-aos-delay="100">
                         <div class="trend-image ethnic-trend"></div>
                         <h4>Ethnic</h4>
                     </div>
-                    <div class="trend-card">
+                    <div class="trend-card" data-aos="fade-up" data-aos-delay="200">
                         <div class="trend-image casual-trend"></div>
                         <h4>Casual</h4>
                     </div>
-                    <div class="trend-card">
+                    <div class="trend-card" data-aos="fade-up" data-aos-delay="300">
                         <div class="trend-image formal-trend"></div>
                         <h4>Formal</h4>
                     </div>
-                    <div class="trend-card">
+                    <div class="trend-card" data-aos="fade-up" data-aos-delay="400">
                         <div class="trend-image streetwear-trend"></div>
                         <h4>Streetwear</h4>
                     </div>
@@ -133,17 +135,17 @@
             </section>
 
             <!-- Student Spotlights Section -->
-            <section id="spotlights" class="spotlights-section">
+            <section id="spotlights" class="spotlights-section" data-aos="fade-up" data-aos-duration="1000">
                 <h2>Student Spotlights</h2>
                 <div class="spotlights-grid">
-                    <div class="spotlight-card large">
+                    <div class="spotlight-card large" data-aos="fade-up" data-aos-delay="100">
                         <div class="spotlight-image student-1"></div>
                         <div class="spotlight-info">
                             <h4>Emma Chen</h4>
                             <p>Sustainable Fashion Designer</p>
                         </div>
                     </div>
-                    <div class="spotlight-card">
+                    <div class="spotlight-card" data-aos="fade-up" data-aos-delay="200">
                         <div class="spotlight-image student-2"></div>
                         <div class="spotlight-info">
                             <h4>Marcus Rodriguez</h4>
@@ -154,20 +156,20 @@
             </section>
 
             <!-- Collections Grid -->
-            <section class="collections-grid">
-                <div class="collection-card small">
+            <section class="collections-grid" data-aos="fade-up" data-aos-duration="1000">
+                <div class="collection-card small" data-aos="fade-up" data-aos-delay="100">
                     <div class="collection-image collection-1"></div>
                     <h4>Autumn Essentials</h4>
                 </div>
-                <div class="collection-card small">
+                <div class="collection-card small" data-aos="fade-up" data-aos-delay="200">
                     <div class="collection-image collection-2"></div>
                     <h4>Festive Wear</h4>
                 </div>
-                <div class="collection-card small">
+                <div class="collection-card small" data-aos="fade-up" data-aos-delay="300">
                     <div class="collection-image collection-3"></div>
                     <h4>Minimalist Chic</h4>
                 </div>
-                <div class="collection-card small">
+                <div class="collection-card small" data-aos="fade-up" data-aos-delay="400">
                     <div class="collection-image collection-4"></div>
                     <h4>Bold Statements</h4>
                 </div>
@@ -200,7 +202,7 @@
     </div>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" data-aos="fade-up" data-aos-duration="1000">
         <div class="footer-content">
             <div class="footer-section">
                 <h4>FLEXORA</h4>
@@ -228,6 +230,16 @@
         </div>
     </footer>
 
+    <!-- AOS Animation JS -->
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <script>
+      AOS.init({
+        once: true,
+        duration: 800,
+        easing: 'ease-out',
+        offset: 100,
+      });
+    </script>
     <script>
         // Carousel functionality
         let slideIndex = 1;
