@@ -1,0 +1,214 @@
+
+/* Style Categories Page Styles */
+.categories-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing-xxl) var(--spacing-md);
+}
+
+/* Categories Main Grid */
+.categories-main-grid {
+    margin-bottom: var(--spacing-xxl);
+}
+
+.category-section {
+    margin-bottom: var(--spacing-xxl);
+    padding: var(--spacing-xl);
+    background: var(--off-white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+}
+
+.category-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+}
+
+.category-header h2 {
+    font-family: var(--font-display);
+    font-size: 2.5rem;
+    color: var(--charcoal);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.category-header p {
+    font-size: 1.1rem;
+    color: var(--rich-brown);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* Showcase Grid */
+.showcase-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+    grid-auto-rows: 300px;
+}
+
+.showcase-item {
+    position: relative;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.showcase-item:hover {
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
+}
+
+.showcase-item.large {
+    grid-row: span 2;
+}
+
+.showcase-image {
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+}
+
+/* Ethnic Style Images */
+.ethnic-style-1 {
+    background: linear-gradient(45deg, var(--soft-pink), var(--warm-brown));
+}
+
+.ethnic-style-2 {
+    background: linear-gradient(45deg, var(--warm-brown), var(--rich-brown));
+}
+
+.ethnic-style-3 {
+    background: linear-gradient(45deg, var(--primary-beige), var(--soft-pink));
+}
+
+/* Casual Style Images */
+.casual-style-1 {
+    background: linear-gradient(45deg, var(--primary-cream), var(--muted-green));
+}
+
+.casual-style-2 {
+    background: linear-gradient(45deg, var(--primary-beige), var(--warm-brown));
+}
+
+.casual-style-3 {
+    background: linear-gradient(45deg, var(--muted-green), var(--primary-beige));
+}
+
+/* Formal Style Images */
+.formal-style-1 {
+    background: linear-gradient(45deg, var(--charcoal), var(--deep-brown));
+}
+
+.formal-style-2 {
+    background: linear-gradient(45deg, var(--rich-brown), var(--charcoal));
+}
+
+.formal-style-3 {
+    background: linear-gradient(45deg, var(--deep-brown), var(--rich-brown));
+}
+
+/* Streetwear Style Images */
+.streetwear-style-1 {
+    background: linear-gradient(45deg, var(--muted-green), var(--charcoal));
+}
+
+.streetwear-style-2 {
+    background: linear-gradient(45deg, var(--charcoal), var(--deep-brown));
+}
+
+.streetwear-style-3 {
+    background: linear-gradient(45deg, var(--deep-brown), var(--muted-green));
+}
+
+.showcase-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+    color: white;
+    padding: var(--spacing-lg);
+}
+
+.showcase-info h4 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 600;
+}
+
+.showcase-info p {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    line-height: 1.4;
+}
+
+/* Style Guide Section */
+.style-guide-section {
+    background: var(--primary-cream);
+    padding: var(--spacing-xxl);
+    border-radius: var(--radius-lg);
+    text-align: center;
+}
+
+.style-guide-section h3 {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    color: var(--charcoal);
+    margin-bottom: var(--spacing-xl);
+    font-weight: 600;
+}
+
+.guide-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.guide-card {
+    background: var(--off-white);
+    padding: var(--spacing-xl);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.guide-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.guide-card h4 {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--charcoal);
+    margin-bottom: var(--spacing-sm);
+    font-weight: 600;
+}
+
+.guide-card p {
+    color: var(--rich-brown);
+    margin-bottom: var(--spacing-lg);
+    line-height: 1.6;
+}
+
+.guide-btn {
+    background: var(--rich-brown);
+    color: var(--off-white);
+    border: none;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    border-radius: var(--radius-sm);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+}
+
+.guide-btn:hover {
+    background: var(--deep-brown);
+    transform: translateY(-2px);
+}

@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trending Looks - FLEXORA</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo-section">
+                <img src="flexora-logo.png" alt="FLEXORA Logo" class="logo-image">
+                <div class="logo-text">
+                    <div class="logo-title">FLEXORA</div>
+                    <div class="logo-tagline">Flex your Aura</div>
+                </div>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Home</a></li>
+                <li><a href="trending-looks.html" class="nav-link active">Trending Looks</a></li>
+                <li><a href="style-categories.html" class="nav-link">Style Categories</a></li>
+                <li><a href="#spotlights" class="nav-link">Student Spotlights</a></li>
+                <li><a href="#collections" class="nav-link">Collections</a></li>
+            </ul>
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section for Trending Looks -->
+    <section class="trending-hero">
+        <div class="hero-content">
+            <h1>Trending Looks</h1>
+            <p>Discover the latest fashion trends and styles that are taking the world by storm</p>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="trending-container">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <h3>Filter by Style</h3>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="ethnic">Ethnic</button>
+                <button class="filter-btn" data-filter="casual">Casual</button>
+                <button class="filter-btn" data-filter="formal">Formal</button>
+                <button class="filter-btn" data-filter="streetwear">Streetwear</button>
+            </div>
+        </div>
+
+        <!-- Trending Looks Grid -->
+        <div class="trending-looks-grid">
+            <!-- Ethnic Looks -->
+            <div class="look-card" data-category="ethnic">
+                <div class="look-image ethnic-look-1"></div>
+                <div class="look-info">
+                    <h4>Traditional Elegance</h4>
+                    <p>Classic ethnic wear with modern touches</p>
+                    <div class="look-tags">
+                        <span class="tag">Ethnic</span>
+                        <span class="tag">Traditional</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="look-card" data-category="ethnic">
+                <div class="look-image ethnic-look-2"></div>
+                <div class="look-info">
+                    <h4>Festive Fusion</h4>
+                    <p>Contemporary ethnic styles for celebrations</p>
+                    <div class="look-tags">
+                        <span class="tag">Ethnic</span>
+                        <span class="tag">Festive</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Casual Looks -->
+            <div class="look-card" data-category="casual">
+                <div class="look-image casual-look-1"></div>
+                <div class="look-info">
+                    <h4>Relaxed Chic</h4>
+                    <p>Effortless everyday style that turns heads</p>
+                    <div class="look-tags">
+                        <span class="tag">Casual</span>
+                        <span class="tag">Comfort</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="look-card" data-category="casual">
+                <div class="look-image casual-look-2"></div>
+                <div class="look-info">
+                    <h4>Weekend Vibes</h4>
+                    <p>Perfect for brunch dates and casual outings</p>
+                    <div class="look-tags">
+                        <span class="tag">Casual</span>
+                        <span class="tag">Weekend</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formal Looks -->
+            <div class="look-card" data-category="formal">
+                <div class="look-image formal-look-1"></div>
+                <div class="look-info">
+                    <h4>Power Dressing</h4>
+                    <p>Sharp, sophisticated looks for the boardroom</p>
+                    <div class="look-tags">
+                        <span class="tag">Formal</span>
+                        <span class="tag">Professional</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="look-card" data-category="formal">
+                <div class="look-image formal-look-2"></div>
+                <div class="look-info">
+                    <h4>Evening Elegance</h4>
+                    <p>Graceful formal wear for special occasions</p>
+                    <div class="look-tags">
+                        <span class="tag">Formal</span>
+                        <span class="tag">Evening</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streetwear Looks -->
+            <div class="look-card" data-category="streetwear">
+                <div class="look-image streetwear-look-1"></div>
+                <div class="look-info">
+                    <h4>Urban Edge</h4>
+                    <p>Bold streetwear with attitude and flair</p>
+                    <div class="look-tags">
+                        <span class="tag">Streetwear</span>
+                        <span class="tag">Urban</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="look-card" data-category="streetwear">
+                <div class="look-image streetwear-look-2"></div>
+                <div class="look-info">
+                    <h4>Street Style</h4>
+                    <p>Fresh takes on contemporary street fashion</p>
+                    <div class="look-tags">
+                        <span class="tag">Streetwear</span>
+                        <span class="tag">Contemporary</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Looks -->
+            <div class="look-card featured" data-category="all">
+                <div class="look-image featured-look"></div>
+                <div class="look-info">
+                    <h4>Look of the Week</h4>
+                    <p>This week's most popular style choice</p>
+                    <div class="look-tags">
+                        <span class="tag featured-tag">Featured</span>
+                        <span class="tag">Trending</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trending Statistics -->
+        <div class="trending-stats">
+            <h3>Trending Statistics</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">45%</div>
+                    <div class="stat-label">Ethnic Wear Popularity</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">32%</div>
+                    <div class="stat-label">Casual Looks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">15%</div>
+                    <div class="stat-label">Formal Styles</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8%</div>
+                    <div class="stat-label">Streetwear</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>FLEXORA</h4>
+                <p>Flex your Aura - Your gateway to fashion innovation and student creativity</p>
+            </div>
+            <div class="footer-section">
+                <h4>Explore</h4>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="trending-looks.html">Trending Looks</a></li>
+                    <li><a href="#categories">Style Categories</a></li>
+                    <li><a href="#spotlights">Student Spotlights</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="#">Submit Your Design</a></li>
+                    <li><a href="#">Join Community</a></li>
+                    <li><a href="#">Newsletter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 FLEXORA. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const hamburger = document.querySelector('.hamburger');
+        const navMenu = document.querySelector('.nav-menu');
+
+        hamburger.addEventListener('click', () => {
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+        });
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const lookCards = document.querySelectorAll('.look-card');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const filterValue = button.getAttribute('data-filter');
+
+                lookCards.forEach(card => {
+                    if (filterValue === 'all' || card.getAttribute('data-category') === filterValue) {
+                        card.style.display = 'block';
+                        card.style.animation = 'fadeIn 0.5s ease-in';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Smooth scroll for navigation links - FIXED VERSION
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                // Only prevent default for anchor links (starting with #)
+                if (href && href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+                // For .html links, allow normal navigation (don't prevent default)
+            });
+        });
+    </script>
+</body>
+</html>
