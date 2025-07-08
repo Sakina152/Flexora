@@ -1,0 +1,62 @@
+.collections-hero {
+    margin-top: 80px;
+    height: 40vh;
+    background: linear-gradient(135deg, var(--primary-cream) 0%, var(--primary-beige) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.collections-grid .collection-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: auto;
+    min-height: 400px;
+    padding-bottom: var(--spacing-md);
+}
+
+.collections-grid .collection-card h4 {
+    margin-top: var(--spacing-md);
+    margin-bottom: var(--spacing-xs);
+}
+
+.collections-grid .collection-card p {
+    flex-grow: 1;
+    margin-bottom: var(--spacing-md);
+    padding: 0 var(--spacing-md);
+    font-size: 0.95rem;
+    text-align: center;
+}
+
+/* This rule is kept for the 'Style Journey' section buttons */
+.style-guide-section .guide-btn {
+    text-decoration: none;
+}
+
+.guide-card {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.guide-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+}
+
+.collection-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.collection-card-link:hover .collection-card {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-hover);
+}
+
+.collection-card h4,
+.collection-card p {
+    color: var(--text-color-dark);
+}
