@@ -15,6 +15,7 @@
 /* Pages */
 @import url('css/pages/trending.css');
 @import url('css/pages/categories.css');
+@import url('css/pages/collections.css');
 
 /* Responsive styles */
 @import url('css/responsive.css');
