@@ -41,7 +41,7 @@ const Navigation = ({ onMenuClick }: NavigationProps) => {
             <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary/20">
                 <img 
-                  src="/lovable-uploads/6bff4d38-6c30-40cb-b242-eb3789d0ecda.png" 
+                  src="/flexora-logo.png" 
                   alt="FLEXORA Logo" 
                   className="w-8 h-8 object-contain"
                 />
