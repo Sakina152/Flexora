@@ -1,262 +1,188 @@
-
+import { useState } from 'react';
 import Navigation from '../components/Navigation';
-import PageHero from '../components/PageHero';
 import Footer from '../components/Footer';
-import { Palette, Heart, Eye, BookmarkPlus, Users, Star, Calendar, ArrowRight } from 'lucide-react';
+import PageHero from '../components/PageHero';
+import { Heart, Eye, MessageCircle, BookmarkPlus, Palette, Layers } from 'lucide-react';
 
 const Collections = () => {
+  const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+
   const collections = [
     {
       id: 1,
-      title: "Minimalist Essentials",
-      curator: "Emma Chen",
-      description: "Timeless pieces that form the foundation of a minimalist wardrobe",
+      title: "Summer Vibes Collection",
+      designer: "Emma Chen",
+      category: "Casual",
+      season: "Summer 2024",
       itemCount: 24,
-      likes: 1250,
-      views: 8900,
-      followers: 450,
-      category: "Minimalist",
-      dateCreated: "March 2024",
-      gradient: "from-accent to-secondary",
-      featured: true
+      views: 1234,
+      likes: 234,
+      description: "A vibrant collection perfect for sunny days and warm nights.",
+      image: "from-primary/30 to-accent"
     },
     {
       id: 2,
-      title: "Vintage Revival",
-      curator: "Sophie Laurent",
-      description: "Carefully curated vintage pieces with a modern twist",
-      itemCount: 31,
-      likes: 980,
-      views: 6700,
-      followers: 320,
-      category: "Vintage",
-      dateCreated: "February 2024",
-      gradient: "from-primary/30 to-accent",
-      featured: false
+      title: "Elegant Evening Wear",
+      designer: "Alex Rivera",
+      category: "Formal",
+      season: "Fall 2023",
+      itemCount: 18,
+      views: 1876,
+      likes: 187,
+      description: "Sophisticated dresses and suits for your special occasions.",
+      image: "from-accent to-secondary"
     },
     {
       id: 3,
-      title: "Sustainable Future",
-      curator: "Alex Rivera",
-      description: "Eco-friendly fashion choices for conscious consumers",
-      itemCount: 18,
-      likes: 1580,
-      views: 11200,
-      followers: 670,
-      category: "Sustainable",
-      dateCreated: "April 2024",
-      gradient: "from-secondary to-primary/20",
-      featured: true
+      title: "Bohemian Dream",
+      designer: "Sophie Laurent",
+      category: "Bohemian",
+      season: "Spring 2024",
+      itemCount: 31,
+      views: 2987,
+      likes: 298,
+      description: "Flowing fabrics and earthy tones for the free-spirited soul.",
+      image: "from-secondary to-primary/20"
     },
     {
       id: 4,
-      title: "Street Style Icons",
-      curator: "Jordan Kim",
-      description: "Urban fashion inspiration from street style photography",
-      itemCount: 42,
-      likes: 750,
-      views: 5400,
-      followers: 280,
+      title: "Street Style Essentials",
+      designer: "David Kim",
       category: "Streetwear",
-      dateCreated: "January 2024",
-      gradient: "from-primary/40 to-secondary",
-      featured: false
+      season: "Winter 2023",
+      itemCount: 27,
+      views: 1567,
+      likes: 156,
+      description: "Urban-inspired outfits for the fashion-forward individual.",
+      image: "from-accent/20 to-secondary/30"
     },
     {
       id: 5,
-      title: "Bohemian Dreams",
-      curator: "Maya Patel",
-      description: "Free-spirited fashion with artistic flair and natural elements",
-      itemCount: 27,
-      likes: 1100,
-      views: 7800,
-      followers: 390,
-      category: "Bohemian",
-      dateCreated: "March 2024",
-      gradient: "from-accent/80 to-primary/30",
-      featured: false
+      title: "Minimalist Chic",
+      designer: "Olivia White",
+      category: "Minimalist",
+      season: "Summer 2024",
+      itemCount: 19,
+      views: 2145,
+      likes: 214,
+      description: "Clean lines and neutral colors for a timeless, understated look.",
+      image: "from-primary/20 to-accent/20"
     },
     {
       id: 6,
-      title: "Formal Elegance",
-      curator: "David Wilson",
-      description: "Sophisticated attire for professional and special occasions",
-      itemCount: 19,
-      likes: 890,
-      views: 6100,
-      followers: 240,
-      category: "Formal",
-      dateCreated: "February 2024",
-      gradient: "from-secondary/80 to-accent",
-      featured: true
+      title: "Vintage Revival",
+      designer: "Ryan Green",
+      category: "Vintage",
+      season: "Fall 2023",
+      itemCount: 35,
+      views: 3256,
+      likes: 325,
+      description: "Classic styles reimagined for the modern era.",
+      image: "from-secondary/10 to-primary/30"
     }
   ];
 
-  const stats = [
-    { label: "Total Collections", value: "156", icon: Palette },
-    { label: "Featured Items", value: "2.4K", icon: Star },
-    { label: "Community Curators", value: "89", icon: Users },
-    { label: "Monthly Views", value: "45K", icon: Eye }
-  ];
+  const handleLike = (collectionId: number) => {
+    setLikedPosts(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(collectionId)) {
+        newLiked.delete(collectionId);
+      } else {
+        newLiked.add(collectionId);
+      }
+      return newLiked;
+    });
+  };
 
-  const categories = ['All', 'Featured', 'Minimalist', 'Vintage', 'Sustainable', 'Streetwear', 'Bohemian', 'Formal'];
+  const handleFavorite = (collection: any) => {
+    const savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    const isAlreadyFavorite = savedFavorites.some((fav: any) => fav.id === collection.id);
+    
+    if (!isAlreadyFavorite) {
+      const updatedFavorites = [...savedFavorites, collection];
+      localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <PageHero
-        title="Fashion Collections"
-        description="Discover curated fashion collections created by our talented community of students and designers"
-        className="bg-gradient-to-br from-background to-card/50"
-      />
+      <main className="w-full">
+        <PageHero 
+          title="Collections"
+          subtitle="Curated fashion collections from talented designers and students"
+          backgroundGradient="from-accent/20 to-primary/30"
+        />
 
-      <main className="py-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Stats Section */}
-          <section className="mb-16 animate-fade-in">
-            <div className="grid md:grid-cols-4 gap-6">
-              {stats.map((stat, index) => {
-                const IconComponent = stat.icon;
-                return (
-                  <div
-                    key={stat.label}
-                    className="bg-card p-6 rounded-xl border border-border text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <IconComponent className="w-8 h-8 text-primary mx-auto mb-3" />
-                    <h3 className="font-display text-2xl font-bold text-foreground mb-1">
-                      {stat.value}
-                    </h3>
-                    <p className="text-muted-foreground">{stat.label}</p>
-                  </div>
-                );
-              })}
+        {/* Collections Grid */}
+        <section className="py-16 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center gap-2 mb-8">
+              <Palette className="w-6 h-6 text-primary" />
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Featured Collections
+              </h2>
             </div>
-          </section>
-
-          {/* Category Filter */}
-          <section className="mb-12 animate-fade-in">
-            <div className="flex flex-wrap justify-center gap-3">
-              {categories.map((category, index) => (
-                <button
-                  key={category}
-                  className={`px-6 py-2 rounded-full font-medium transition-all duration-300 hover:scale-105 animate-scale-in ${
-                    category === 'All'
-                      ? 'bg-primary text-primary-foreground shadow-md'
-                      : 'bg-card text-foreground border border-border hover:bg-accent hover:text-accent-foreground'
-                  }`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </section>
-
-          {/* Collections Grid */}
-          <section className="mb-16">
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {collections.map((collection, index) => (
-                <article
-                  key={collection.id}
-                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-fade-in group cursor-pointer"
+                <article 
+                  key={collection.id} 
+                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`h-48 bg-gradient-to-br ${collection.gradient} relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-                    
-                    {collection.featured && (
-                      <div className="absolute top-4 left-4">
-                        <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full flex items-center gap-1">
-                          <Star className="w-4 h-4" />
-                          <span className="text-sm font-medium">Featured</span>
-                        </div>
-                      </div>
-                    )}
-                    
-                    <div className="absolute top-4 right-4">
-                      <span className="bg-card/90 backdrop-blur-sm text-foreground px-3 py-1 rounded-full text-sm font-medium">
+                  <div className={`relative h-64 bg-gradient-to-br ${collection.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                    <Layers className="w-12 h-12 text-primary/60" />
+                    <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
+                      {collection.itemCount} items
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
                         {collection.category}
                       </span>
                     </div>
-                    
-                    <div className="absolute bottom-4 left-4 right-4">
-                      <h3 className="font-display text-xl font-bold text-foreground mb-1">
-                        {collection.title}
-                      </h3>
-                      <p className="text-foreground/80 text-sm">by {collection.curator}</p>
-                    </div>
-                  </div>
-                  
-                  <div className="p-6">
-                    <p className="text-muted-foreground mb-4 leading-relaxed text-sm">
+                    <h3 className="font-display text-xl font-semibold text-foreground mb-2">
+                      {collection.title}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {collection.description}
                     </p>
-                    
-                    <div className="flex items-center gap-4 mb-4 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Palette className="w-4 h-4" />
-                        <span>{collection.itemCount} items</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{collection.dateCreated}</span>
-                      </div>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
+                      <span>by {collection.designer}</span>
+                      <span>{collection.season}</span>
                     </div>
-                    
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-                          <Heart className="w-4 h-4" />
-                          <span>{collection.likes}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer">
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => handleLike(collection.id)}
+                          className={`flex items-center gap-1 transition-colors ${
+                            likedPosts.has(collection.id) ? 'text-primary' : 'hover:text-primary'
+                          }`}
+                        >
+                          <Heart className={`w-4 h-4 ${likedPosts.has(collection.id) ? 'fill-current' : ''}`} />
+                          <span>{collection.likes + (likedPosts.has(collection.id) ? 1 : 0)}</span>
+                        </button>
+                        <div className="flex items-center gap-1 hover:text-primary transition-colors">
                           <Eye className="w-4 h-4" />
                           <span>{collection.views}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer">
-                          <Users className="w-4 h-4" />
-                          <span>{collection.followers}</span>
-                        </div>
                       </div>
-                      <button className="text-primary hover:text-primary/80 transition-colors hover:scale-110 transform">
-                        <BookmarkPlus className="w-5 h-5" />
+                      <button 
+                        onClick={() => handleFavorite(collection)}
+                        className="transition-colors hover:scale-110 transform hover:text-primary"
+                      >
+                        <BookmarkPlus className="w-4 h-4" />
                       </button>
                     </div>
-                    
-                    <button className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2 group-hover:shadow-md">
-                      View Collection
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </button>
                   </div>
                 </article>
               ))}
             </div>
-          </section>
-
-          {/* Create Collection CTA */}
-          <section className="text-center animate-fade-in">
-            <div className="bg-card p-8 rounded-xl border border-border">
-              <Palette className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h2 className="font-display text-2xl font-bold text-foreground mb-4">
-                Create Your Own Collection
-              </h2>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Curate your favorite fashion pieces and share your unique style perspective with the community. 
-                Build collections that inspire others and showcase your creative vision.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg">
-                  Start Creating
-                </button>
-                <button className="px-8 py-3 border border-border text-foreground rounded-lg font-semibold hover:bg-accent hover:text-accent-foreground transition-all duration-300">
-                  Learn How
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

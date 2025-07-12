@@ -1,224 +1,185 @@
-
+import { useState } from 'react';
 import Navigation from '../components/Navigation';
-import PageHero from '../components/PageHero';
 import Footer from '../components/Footer';
-import { Star, Award, Users, Heart, MessageCircle, Share2, Instagram, Twitter, Globe } from 'lucide-react';
+import PageHero from '../components/PageHero';
+import { Heart, Eye, MessageCircle, BookmarkPlus, Star, Award, Users } from 'lucide-react';
 
 const StudentSpotlights = () => {
-  const spotlights = [
+  const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+
+  const students = [
     {
       id: 1,
-      name: "Emma Chen",
-      title: "Fashion Design Student",
-      school: "Parsons School of Design",
+      name: "Sarah Martinez",
       specialty: "Sustainable Fashion",
-      bio: "Passionate about creating eco-friendly fashion that doesn't compromise on style. Currently working on a zero-waste collection.",
-      achievements: ["CFDA Scholar", "Sustainability Award 2024"],
-      stats: { followers: 12500, likes: 8900, posts: 156 },
-      gradient: "from-accent to-secondary",
-      social: { instagram: "@emmachen_design", twitter: "@emmachen", website: "emmachen.design" }
+      year: "Senior",
+      bio: "A talented designer passionate about eco-friendly fashion.",
+      image: "from-primary/20 to-accent/30",
+      followers: 890,
+      designs: 32
     },
     {
       id: 2,
-      name: "Marcus Johnson",
-      title: "Fashion Marketing Student",
-      school: "Fashion Institute of Technology",
-      specialty: "Digital Fashion Marketing",
-      bio: "Combining traditional fashion knowledge with cutting-edge digital marketing strategies to help brands reach Gen Z consumers.",
-      achievements: ["Digital Innovation Award", "Top Marketing Campaign 2024"],
-      stats: { followers: 9800, likes: 6700, posts: 89 },
-      gradient: "from-primary/30 to-accent",
-      social: { instagram: "@marcus_fashion", twitter: "@marcusj_fashion", website: "marcusjohnson.co" }
+      name: "Alex Chen",
+      specialty: "Streetwear",
+      year: "Junior",
+      bio: "Creating urban-inspired designs with a unique cultural twist.",
+      image: "from-accent/30 to-secondary/20",
+      followers: 670,
+      designs: 28
     },
     {
       id: 3,
-      name: "Sofia Rodriguez",
-      title: "Textile Design Student",
-      school: "Central Saint Martins",
-      specialty: "Innovative Textiles",
-      bio: "Exploring the intersection of technology and textiles, creating smart fabrics that adapt to environmental conditions.",
-      achievements: ["Innovation Grant Winner", "Textile Excellence Award"],
-      stats: { followers: 15200, likes: 11300, posts: 203 },
-      gradient: "from-secondary to-primary/20",
-      social: { instagram: "@sofia_textiles", twitter: "@sofia_design", website: "sofiarodriguez.art" }
-    },
-    {
-      id: 4,
-      name: "David Kim",
-      title: "Fashion Photography Student",
-      school: "School of Visual Arts",
-      specialty: "Editorial Photography",
-      bio: "Capturing the essence of fashion through innovative photography techniques and storytelling.",
-      achievements: ["Young Photographer Award", "Editorial Excellence 2024"],
-      stats: { followers: 18700, likes: 14200, posts: 127 },
-      gradient: "from-primary/40 to-secondary",
-      social: { instagram: "@davidkim_photo", twitter: "@david_captures", website: "davidkim.photo" }
+      name: "Priya Sharma",
+      specialty: "Formal Wear",
+      year: "Sophomore",
+      bio: "Crafting elegant and timeless pieces for special occasions.",
+      image: "from-secondary/20 to-primary/20",
+      followers: 750,
+      designs: 25
     }
   ];
 
-  const categories = [
-    { name: "Design", count: 45, icon: Award },
-    { name: "Marketing", count: 28, icon: Users },
-    { name: "Photography", count: 32, icon: Star },
-    { name: "Styling", count: 19, icon: Heart }
-  ];
+  const handleLike = (studentId: number) => {
+    setLikedPosts(prev => {
+      const newLiked = new Set(prev);
+      if (newLiked.has(studentId)) {
+        newLiked.delete(studentId);
+      } else {
+        newLiked.add(studentId);
+      }
+      return newLiked;
+    });
+  };
+
+  const handleFavorite = (student: any) => {
+    const savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    const isAlreadyFavorite = savedFavorites.some((fav: any) => fav.id === student.id);
+    
+    if (!isAlreadyFavorite) {
+      const updatedFavorites = [...savedFavorites, student];
+      localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       
-      <PageHero
-        title="Student Spotlights"
-        description="Celebrating the next generation of fashion innovators and their creative journeys"
-        className="bg-gradient-to-br from-background to-card/50"
-      />
+      <main className="w-full">
+        <PageHero 
+          title="Student Spotlights"
+          subtitle="Celebrating creativity and talent from our fashion community"
+          backgroundGradient="from-secondary/30 to-primary/20"
+        />
 
-      <main className="py-16 px-6">
-        <div className="max-w-6xl mx-auto">
-          {/* Stats Section */}
-          <section className="mb-16 animate-fade-in">
-            <div className="grid md:grid-cols-4 gap-6">
-              {categories.map((category, index) => {
-                const IconComponent = category.icon;
-                return (
-                  <div
-                    key={category.name}
-                    className="bg-card p-6 rounded-xl border border-border text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <IconComponent className="w-8 h-8 text-primary mx-auto mb-3" />
-                    <h3 className="font-display text-2xl font-bold text-foreground mb-1">
-                      {category.count}
-                    </h3>
-                    <p className="text-muted-foreground">{category.name} Students</p>
-                  </div>
-                );
-              })}
+        {/* Featured Student */}
+        <section className="py-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center gap-2 mb-8">
+              <Award className="w-6 h-6 text-primary" />
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Featured Designer of the Month
+              </h2>
             </div>
-          </section>
+            
+            <div className="bg-card rounded-xl border border-border overflow-hidden shadow-lg animate-fade-in">
+              <div className="h-80 bg-gradient-to-br from-primary/20 to-accent/30 flex items-center justify-center">
+                <Users className="w-16 h-16 text-primary/60" />
+              </div>
+              <div className="p-8">
+                <div className="flex items-center gap-3 mb-4">
+                  <Star className="w-5 h-5 text-primary fill-current" />
+                  <span className="text-sm font-medium text-primary">Featured Designer</span>
+                </div>
+                <h3 className="font-display text-2xl font-bold text-foreground mb-3">
+                  Sarah Martinez
+                </h3>
+                <p className="text-muted-foreground mb-6 leading-relaxed">
+                  A talented fashion design student known for her innovative approach to sustainable fashion. 
+                  Sarah's work combines traditional craftsmanship with modern aesthetics, creating pieces that 
+                  are both beautiful and environmentally conscious.
+                </p>
+                <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Heart className="w-4 h-4" />
+                    <span>1.2K followers</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Eye className="w-4 h-4" />
+                    <span>24 designs</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Award className="w-4 h-4" />
+                    <span>5 awards</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
-          {/* Featured Students */}
-          <section className="mb-16">
+        {/* Student Grid */}
+        <section className="py-16 px-6 bg-card/50">
+          <div className="max-w-6xl mx-auto">
             <h2 className="font-display text-2xl font-bold text-foreground mb-8 text-center">
-              Featured Student Spotlights
+              Rising Stars
             </h2>
             
-            <div className="grid lg:grid-cols-2 gap-8">
-              {spotlights.map((student, index) => (
-                <article
-                  key={student.id}
-                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 animate-fade-in group"
-                  style={{ animationDelay: `${index * 150}ms` }}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {students.map((student, index) => (
+                <article 
+                  key={student.id} 
+                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
+                  style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`h-48 bg-gradient-to-br ${student.gradient} relative overflow-hidden`}>
-                    <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300"></div>
-                    <div className="absolute bottom-4 left-4">
-                      <h3 className="font-display text-2xl font-bold text-foreground mb-1">
-                        {student.name}
-                      </h3>
-                      <p className="text-foreground/80 font-medium">{student.title}</p>
-                    </div>
-                    <div className="absolute top-4 right-4">
-                      <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full">
-                        <span className="text-sm font-medium">Featured</span>
-                      </div>
-                    </div>
+                  <div className={`h-48 bg-gradient-to-br ${student.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
+                    <Users className="w-8 h-8 text-primary/60" />
                   </div>
-                  
-                  <div className="p-6">
-                    <div className="mb-4">
-                      <p className="text-primary font-medium mb-1">{student.school}</p>
-                      <p className="text-muted-foreground text-sm">Specialty: {student.specialty}</p>
+                  <div className="p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                        {student.specialty}
+                      </span>
+                      <span className="text-xs text-muted-foreground">
+                        {student.year}
+                      </span>
                     </div>
-                    
-                    <p className="text-muted-foreground mb-4 leading-relaxed">
+                    <h3 className="font-display font-semibold text-foreground mb-2">
+                      {student.name}
+                    </h3>
+                    <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
                       {student.bio}
                     </p>
-                    
-                    <div className="mb-4">
-                      <h4 className="font-semibold text-foreground mb-2">Achievements</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {student.achievements.map((achievement, idx) => (
-                          <span
-                            key={idx}
-                            className="bg-accent text-accent-foreground px-3 py-1 rounded-full text-sm"
-                          >
-                            {achievement}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
-                      <div className="flex items-center gap-4 text-sm">
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Users className="w-4 h-4" />
-                          <span>{student.stats.followers.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <Heart className="w-4 h-4" />
-                          <span>{student.stats.likes.toLocaleString()}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-muted-foreground">
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{student.stats.posts}</span>
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-4">
+                        <button
+                          onClick={() => handleLike(student.id)}
+                          className={`flex items-center gap-1 transition-colors ${
+                            likedPosts.has(student.id) ? 'text-primary' : 'hover:text-primary'
+                          }`}
+                        >
+                          <Heart className={`w-4 h-4 ${likedPosts.has(student.id) ? 'fill-current' : ''}`} />
+                          <span>{student.followers + (likedPosts.has(student.id) ? 1 : 0)}</span>
+                        </button>
+                        <div className="flex items-center gap-1 hover:text-primary transition-colors">
+                          <Eye className="w-4 h-4" />
+                          <span>{student.designs}</span>
                         </div>
                       </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <a
-                          href={`https://instagram.com/${student.social.instagram.replace('@', '')}`}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Instagram className="w-5 h-5" />
-                        </a>
-                        <a
-                          href={`https://twitter.com/${student.social.twitter.replace('@', '')}`}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Twitter className="w-5 h-5" />
-                        </a>
-                        <a
-                          href={`https://${student.social.website}`}
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          <Globe className="w-5 h-5" />
-                        </a>
-                      </div>
-                      <button className="text-primary hover:text-primary/80 transition-colors hover:scale-110 transform">
-                        <Share2 className="w-5 h-5" />
+                      <button 
+                        onClick={() => handleFavorite(student)}
+                        className="transition-colors hover:scale-110 transform hover:text-primary"
+                      >
+                        <BookmarkPlus className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 </article>
               ))}
             </div>
-          </section>
-
-          {/* Application CTA */}
-          <section className="text-center animate-fade-in">
-            <div className="bg-card p-8 rounded-xl border border-border">
-              <Star className="w-12 h-12 text-primary mx-auto mb-4" />
-              <h2 className="font-display text-2xl font-bold text-foreground mb-4">
-                Want to be Featured?
-              </h2>
-              <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
-                Submit your work and story to be considered for our Student Spotlight series. 
-                Share your creative journey with our community.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg">
-                  Submit Your Work
-                </button>
-                <button className="px-8 py-3 border border-border text-foreground rounded-lg font-semibold hover:bg-accent hover:text-accent-foreground transition-all duration-300">
-                  Learn More
-                </button>
-              </div>
-            </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
       <Footer />

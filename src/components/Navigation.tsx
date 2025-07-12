@@ -1,44 +1,25 @@
-
 import { useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Heart } from 'lucide-react';
+import { NavLink } from 'react-router-dom';
+import { Heart, X } from 'lucide-react';
 
-interface NavigationProps {
-  onMenuClick?: () => void;
-}
+const Navigation = () => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-const Navigation = ({ onMenuClick }: NavigationProps) => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
-
-  const isActive = (path: string) => location.pathname === path;
-
-  const navLinks = [
-    { path: '/', label: 'Home' },
-    { path: '/trending-looks', label: 'Trending Looks' },
-    { path: '/style-categories', label: 'Style Categories' },
-    { path: '/student-spotlights', label: 'Student Spotlights' },
-    { path: '/collections', label: 'Collections' },
-    { path: '/favorites', label: 'Favorites', icon: Heart },
+  const navItems = [
+    { name: 'Home', path: '/' },
+    { name: 'Trending', path: '/trending-looks' },
+    { name: 'Categories', path: '/style-categories' },
+    { name: 'Spotlights', path: '/student-spotlights' },
+    { name: 'Collections', path: '/collections' },
   ];
 
   return (
-    <nav className="fixed top-0 w-full bg-card/95 backdrop-blur-md z-40 border-b border-border shadow-sm">
+    <nav className="sticky top-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo Section */}
           <div className="flex items-center gap-3">
-            {/* Sidebar toggle for mobile */}
-            {onMenuClick && (
-              <button
-                onClick={onMenuClick}
-                className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors mr-2"
-              >
-                <Menu size={20} />
-              </button>
-            )}
-            
-            <Link to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
+            <NavLink to="/" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center border-2 border-primary/20">
                 <img 
                   src="/flexora-logo.png" 
@@ -54,61 +35,114 @@ const Navigation = ({ onMenuClick }: NavigationProps) => {
                   Flex your Aura
                 </div>
               </div>
-            </Link>
+            </NavLink>
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-8">
-            {navLinks.map((link) => (
-              <Link
-                key={link.path}
-                to={link.path}
-                className={`relative font-medium transition-all duration-300 flex items-center gap-2 ${
-                  isActive(link.path)
-                    ? 'text-primary'
-                    : 'text-foreground hover:text-primary'
-                } after:content-[''] after:absolute after:bottom-[-4px] after:left-0 after:w-0 after:h-0.5 after:bg-primary after:transition-all after:duration-300 ${
-                  isActive(link.path) ? 'after:w-full' : 'hover:after:w-full'
-                }`}
-              >
-                {link.icon && <link.icon size={18} />}
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden bg-card border-t border-border py-4">
-            <div className="flex flex-col gap-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  onClick={() => setIsMenuOpen(false)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 ${
-                    isActive(link.path)
-                      ? 'text-primary bg-accent'
-                      : 'text-foreground hover:text-primary hover:bg-accent/50'
-                  }`}
+          <div className="hidden md:block">
+            <div className="ml-10 flex items-baseline space-x-4">
+              {navItems.map((item) => (
+                <NavLink
+                  key={item.name}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`
+                  }
                 >
-                  {link.icon && <link.icon size={18} />}
-                  {link.label}
-                </Link>
+                  {item.name}
+                </NavLink>
               ))}
+              
+              {/* Favorites Heart Icon */}
+              <NavLink
+                to="/favorites"
+                className={({ isActive }) =>
+                  `p-2 rounded-md transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`
+                }
+              >
+                <Heart className="w-5 h-5" />
+              </NavLink>
             </div>
           </div>
-        )}
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-accent focus:outline-none"
+              aria-expanded="false"
+            >
+              <span className="sr-only">Open main menu</span>
+              {isMobileMenuOpen ? (
+                <X className="block h-6 w-6" />
+              ) : (
+                <svg
+                  className="block h-6 w-6"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </button>
+          </div>
+        </div>
       </div>
+
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-border">
+          <div className="px-2 pt-2 pb-3 space-y-1 bg-background/95 backdrop-blur-sm">
+            {navItems.map((item) => (
+              <NavLink
+                key={item.name}
+                to={item.path}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`
+                }
+              >
+                {item.name}
+              </NavLink>
+            ))}
+            
+            {/* Mobile Favorites Link */}
+            <NavLink
+              to="/favorites"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className={({ isActive }) =>
+                `flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                }`
+              }
+            >
+              <Heart className="w-5 h-5" />
+              Favorites
+            </NavLink>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };
