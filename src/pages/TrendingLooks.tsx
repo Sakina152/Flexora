@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
@@ -20,7 +21,8 @@ const TrendingLooks = () => {
       image: "from-primary/30 to-secondary",
       category: "Chic",
       timeAgo: "2 days ago",
-      trending: true
+      trending: true,
+      link: "/trending/parisian-chic"
     },
     {
       id: 2,
@@ -31,7 +33,8 @@ const TrendingLooks = () => {
       image: "from-accent to-muted-foreground",
       category: "Eco",
       timeAgo: "3 days ago",
-      trending: false
+      trending: false,
+      link: "/trending/sustainable-fashion"
     },
     {
       id: 3,
@@ -42,7 +45,8 @@ const TrendingLooks = () => {
       image: "from-secondary to-background",
       category: "Street",
       timeAgo: "4 days ago",
-      trending: true
+      trending: true,
+      link: "#"
     },
     {
       id: 4,
@@ -53,7 +57,8 @@ const TrendingLooks = () => {
       image: "from-background to-primary/30",
       category: "Boho",
       timeAgo: "5 days ago",
-      trending: false
+      trending: false,
+      link: "#"
     },
     {
       id: 5,
@@ -64,7 +69,8 @@ const TrendingLooks = () => {
       image: "from-muted-foreground to-accent",
       category: "Vintage",
       timeAgo: "6 days ago",
-      trending: true
+      trending: true,
+      link: "#"
     },
     {
       id: 6,
@@ -75,7 +81,8 @@ const TrendingLooks = () => {
       image: "from-secondary to-muted-foreground",
       category: "Minimal",
       timeAgo: "1 week ago",
-      trending: false
+      trending: false,
+      link: "#"
     }
   ];
 
@@ -149,60 +156,71 @@ const TrendingLooks = () => {
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trendingPosts.map((post, index) => (
-                <article 
-                  key={post.id} 
-                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                <Link 
+                  key={post.id}
+                  to={post.link}
+                  className="block"
                 >
-                  <div className={`relative h-64 bg-gradient-to-br ${post.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                    <Eye className="w-8 h-8 text-primary/60" />
-                    {post.trending && (
-                      <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
-                        <TrendingUp className="w-3 h-3" />
-                        Hot
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
-                        {post.category}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {post.timeAgo}
-                      </span>
-                    </div>
-                    <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      by {post.author}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center gap-1 transition-colors ${
-                            likedPosts.has(post.id) ? 'text-primary' : 'hover:text-primary'
-                          }`}
-                        >
-                          <Heart className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
-                          <span>{post.likes + (likedPosts.has(post.id) ? 1 : 0)}</span>
-                        </button>
-                        <div className="flex items-center gap-1 hover:text-primary transition-colors">
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{post.comments}</span>
+                  <article 
+                    className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className={`relative h-64 bg-gradient-to-br ${post.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                      <Eye className="w-8 h-8 text-primary/60" />
+                      {post.trending && (
+                        <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
+                          <TrendingUp className="w-3 h-3" />
+                          Hot
                         </div>
-                      </div>
-                      <button 
-                        onClick={() => handleFavorite(post)}
-                        className="transition-colors hover:scale-110 transform hover:text-primary"
-                      >
-                        <BookmarkPlus className="w-4 h-4" />
-                      </button>
+                      )}
                     </div>
-                  </div>
-                </article>
+                    <div className="p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                          {post.category}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {post.timeAgo}
+                        </span>
+                      </div>
+                      <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        by {post.author}
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleLike(post.id);
+                            }}
+                            className={`flex items-center gap-1 transition-colors ${
+                              likedPosts.has(post.id) ? 'text-primary' : 'hover:text-primary'
+                            }`}
+                          >
+                            <Heart className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+                            <span>{post.likes + (likedPosts.has(post.id) ? 1 : 0)}</span>
+                          </button>
+                          <div className="flex items-center gap-1 hover:text-primary transition-colors">
+                            <MessageCircle className="w-4 h-4" />
+                            <span>{post.comments}</span>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleFavorite(post);
+                          }}
+                          className="transition-colors hover:scale-110 transform hover:text-primary"
+                        >
+                          <BookmarkPlus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
               ))}
             </div>
           </div>

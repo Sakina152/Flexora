@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
@@ -15,6 +16,7 @@ const StyleCategories = () => {
       icon: Sparkles,
       count: 24,
       gradient: 'from-primary/30 to-accent/20',
+      link: '/categories/minimalist'
     },
     {
       name: 'Bohemian',
@@ -22,6 +24,7 @@ const StyleCategories = () => {
       icon: Leaf,
       count: 18,
       gradient: 'from-accent/20 to-secondary/30',
+      link: '/categories/bohemian'
     },
     {
       name: 'Vintage',
@@ -29,6 +32,7 @@ const StyleCategories = () => {
       icon: Camera,
       count: 31,
       gradient: 'from-secondary/30 to-primary/20',
+      link: '#'
     },
     {
       name: 'Streetwear',
@@ -36,6 +40,7 @@ const StyleCategories = () => {
       icon: Shirt,
       count: 27,
       gradient: 'from-accent/30 to-primary/20',
+      link: '#'
     },
     {
       name: 'Formal',
@@ -43,6 +48,7 @@ const StyleCategories = () => {
       icon: CheckCircle,
       count: 19,
       gradient: 'from-primary/20 to-secondary/30',
+      link: '#'
     },
     {
       name: 'Casual Chic',
@@ -50,6 +56,7 @@ const StyleCategories = () => {
       icon: Cloud,
       count: 35,
       gradient: 'from-secondary/20 to-accent/30',
+      link: '#'
     },
   ];
 
@@ -118,31 +125,35 @@ const StyleCategories = () => {
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {categories.map((category, index) => (
-                <div
+                <Link
                   key={index}
-                  className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
-                  style={{ animationDelay: `${index * 100}ms` }}
+                  to={category.link}
+                  className="block"
                 >
-                  <div className={`h-48 bg-gradient-to-br ${category.gradient} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                    <category.icon className="w-12 h-12 text-primary/80" />
-                  </div>
-                  <div className="p-6">
-                    <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                      {category.name}
-                    </h3>
-                    <p className="text-muted-foreground mb-4">
-                      {category.description}
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-primary">
-                        {category.count} items
-                      </span>
-                      <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
-                        Explore
-                      </button>
+                  <div className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
+                    style={{ animationDelay: `${index * 100}ms` }}
+                  >
+                    <div className={`h-48 bg-gradient-to-br ${category.gradient} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                      <category.icon className="w-12 h-12 text-primary/80" />
+                    </div>
+                    <div className="p-6">
+                      <h3 className="font-display text-xl font-semibold text-foreground mb-2">
+                        {category.name}
+                      </h3>
+                      <p className="text-muted-foreground mb-4">
+                        {category.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-primary">
+                          {category.count} items
+                        </span>
+                        <button className="px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">
+                          Explore
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

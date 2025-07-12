@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -12,7 +11,35 @@ import StyleCategories from "./pages/StyleCategories";
 import StudentSpotlights from "./pages/StudentSpotlights";
 import Collections from "./pages/Collections";
 import Favorites from "./pages/Favorites";
+import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
+import CategoryProducts from "./pages/CategoryProducts";
+import CollectionProducts from "./pages/CollectionProducts";
 import NotFound from "./pages/NotFound";
+
+// Trending pages
+import ParisianChic from "./pages/trending/ParisianChic";
+import SustainableFashion from "./pages/trending/SustainableFashion";
+
+// Category pages
+import MinimalistStyle from "./pages/categories/MinimalistStyle";
+import BohemianStyle from "./pages/categories/BohemianStyle";
+import FormalStyle from "./pages/categories/FormalStyle";
+import VintageStyle from "./pages/categories/VintageStyle";
+import CasualStyle from "./pages/categories/CasualStyle";
+import StreetwearStyle from "./pages/categories/StreetwearStyle";
+
+// Student pages
+import SarahMartinez from "./pages/students/SarahMartinez";
+
+// Collection pages
+import SummerVibes from "./pages/collections/SummerVibes";
+import ElegantEveningWear from "./pages/collections/ElegantEveningWear";
+import BohemianDream from "./pages/collections/BohemianDream";
+import StreetStyleEssentials from "./pages/collections/StreetStyleEssentials";
+import MinimalistChic from "./pages/collections/MinimalistChic";
+import VintageRevival from "./pages/collections/VintageRevival";
+
 import "./styles/main.css";
 
 const queryClient = new QueryClient();
@@ -32,6 +59,36 @@ const App = () => {
             <Route path="/student-spotlights" element={<StudentSpotlights />} />
             <Route path="/collections" element={<Collections />} />
             <Route path="/favorites" element={<Favorites />} />
+            
+            {/* Product routes */}
+            <Route path="/products" element={<Products />} />
+            <Route path="/products/:id" element={<ProductDetail />} />
+            <Route path="/categories/:category/products" element={<CategoryProducts />} />
+            <Route path="/collections/:collection/products" element={<CollectionProducts />} />
+            
+            {/* Individual trending pages */}
+            <Route path="/trending/parisian-chic" element={<ParisianChic />} />
+            <Route path="/trending/sustainable-fashion" element={<SustainableFashion />} />
+            
+            {/* Individual category pages */}
+            <Route path="/categories/minimalist" element={<MinimalistStyle />} />
+            <Route path="/categories/bohemian" element={<BohemianStyle />} />
+            <Route path="/categories/formal" element={<FormalStyle />} />
+            <Route path="/categories/vintage" element={<VintageStyle />} />
+            <Route path="/categories/casual" element={<CasualStyle />} />
+            <Route path="/categories/streetwear" element={<StreetwearStyle />} />
+            
+            {/* Individual student pages */}
+            <Route path="/students/sarah-martinez" element={<SarahMartinez />} />
+            
+            {/* Individual collection pages */}
+            <Route path="/collections/summer-vibes" element={<SummerVibes />} />
+            <Route path="/collections/elegant-evening-wear" element={<ElegantEveningWear />} />
+            <Route path="/collections/bohemian-dream" element={<BohemianDream />} />
+            <Route path="/collections/street-style-essentials" element={<StreetStyleEssentials />} />
+            <Route path="/collections/minimalist-chic" element={<MinimalistChic />} />
+            <Route path="/collections/vintage-revival" element={<VintageRevival />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

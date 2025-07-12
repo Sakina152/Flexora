@@ -1,8 +1,10 @@
+
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { Heart, Eye, MessageCircle, BookmarkPlus, Palette, Layers } from 'lucide-react';
+import { Heart, Eye, MessageCircle, BookmarkPlus, Palette, Layers, ShoppingBag } from 'lucide-react';
 
 const Collections = () => {
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
@@ -18,7 +20,8 @@ const Collections = () => {
       views: 1234,
       likes: 234,
       description: "A vibrant collection perfect for sunny days and warm nights.",
-      image: "from-primary/30 to-accent"
+      image: "from-primary/30 to-accent",
+      slug: "summer-vibes"
     },
     {
       id: 2,
@@ -30,7 +33,8 @@ const Collections = () => {
       views: 1876,
       likes: 187,
       description: "Sophisticated dresses and suits for your special occasions.",
-      image: "from-accent to-secondary"
+      image: "from-accent to-secondary",
+      slug: "elegant-evening-wear"
     },
     {
       id: 3,
@@ -42,7 +46,8 @@ const Collections = () => {
       views: 2987,
       likes: 298,
       description: "Flowing fabrics and earthy tones for the free-spirited soul.",
-      image: "from-secondary to-primary/20"
+      image: "from-secondary to-primary/20",
+      slug: "bohemian-dream"
     },
     {
       id: 4,
@@ -54,7 +59,8 @@ const Collections = () => {
       views: 1567,
       likes: 156,
       description: "Urban-inspired outfits for the fashion-forward individual.",
-      image: "from-accent/20 to-secondary/30"
+      image: "from-accent/20 to-secondary/30",
+      slug: "street-style-essentials"
     },
     {
       id: 5,
@@ -66,7 +72,8 @@ const Collections = () => {
       views: 2145,
       likes: 214,
       description: "Clean lines and neutral colors for a timeless, understated look.",
-      image: "from-primary/20 to-accent/20"
+      image: "from-primary/20 to-accent/20",
+      slug: "minimalist-chic"
     },
     {
       id: 6,
@@ -78,7 +85,8 @@ const Collections = () => {
       views: 3256,
       likes: 325,
       description: "Classic styles reimagined for the modern era.",
-      image: "from-secondary/10 to-primary/30"
+      image: "from-secondary/10 to-primary/30",
+      slug: "vintage-revival"
     }
   ];
 
@@ -132,21 +140,28 @@ const Collections = () => {
                   className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`relative h-64 bg-gradient-to-br ${collection.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                    <Layers className="w-12 h-12 text-primary/60" />
-                    <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
-                      {collection.itemCount} items
+                  <Link to={`/collections/${collection.slug}`}>
+                    <div className={`relative h-64 bg-gradient-to-br ${collection.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                      <Layers className="w-12 h-12 text-primary/60" />
+                      <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
+                        {collection.itemCount} items
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                   <div className="p-6">
                     <div className="flex items-center gap-2 mb-3">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+                      <Link 
+                        to={`/categories/${collection.category.toLowerCase()}/products`}
+                        className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full hover:bg-primary/20 transition-colors"
+                      >
                         {collection.category}
-                      </span>
+                      </Link>
                     </div>
-                    <h3 className="font-display text-xl font-semibold text-foreground mb-2">
-                      {collection.title}
-                    </h3>
+                    <Link to={`/collections/${collection.slug}`}>
+                      <h3 className="font-display text-xl font-semibold text-foreground mb-2 hover:text-primary transition-colors">
+                        {collection.title}
+                      </h3>
+                    </Link>
                     <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
                       {collection.description}
                     </p>
@@ -154,8 +169,9 @@ const Collections = () => {
                       <span>by {collection.designer}</span>
                       <span>{collection.season}</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
+                    
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
                         <button
                           onClick={() => handleLike(collection.id)}
                           className={`flex items-center gap-1 transition-colors ${
@@ -177,6 +193,14 @@ const Collections = () => {
                         <BookmarkPlus className="w-4 h-4" />
                       </button>
                     </div>
+
+                    <Link 
+                      to={`/categories/${collection.category.toLowerCase()}/products`}
+                      className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      <ShoppingBag className="w-4 h-4" />
+                      View {collection.category} Products
+                    </Link>
                   </div>
                 </article>
               ))}

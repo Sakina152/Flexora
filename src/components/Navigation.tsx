@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Heart, X } from 'lucide-react';
@@ -11,6 +12,7 @@ const Navigation = () => {
     { name: 'Categories', path: '/style-categories' },
     { name: 'Spotlights', path: '/student-spotlights' },
     { name: 'Collections', path: '/collections' },
+    { name: 'Products', path: '/products' },
   ];
 
   return (
