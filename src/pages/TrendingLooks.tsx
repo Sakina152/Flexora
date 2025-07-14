@@ -58,7 +58,7 @@ const TrendingLooks = () => {
       category: "Boho",
       timeAgo: "5 days ago",
       trending: false,
-      link: "#"
+      link: "/trending/bohemian-vibes"
     },
     {
       id: 5,
