@@ -47,6 +47,16 @@ const Footer = () => {
                   Products
                 </Link>
               </li>
+              <li>
+                <Link to="/login" className="text-muted-foreground hover:text-primary transition-colors">
+                  Login
+                </Link>
+              </li>
+              <li>
+                <Link to="/signup" className="text-muted-foreground hover:text-primary transition-colors">
+                  Sign Up
+                </Link>
+              </li>
             </ul>
           </div>
           
@@ -54,14 +64,14 @@ const Footer = () => {
             <h4 className="text-lg font-semibold text-foreground mb-6">Connect</h4>
             <ul className="space-y-3">
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/submit-design" className="text-muted-foreground hover:text-primary transition-colors">
                   Submit Your Design
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link to="/join-community" className="text-muted-foreground hover:text-primary transition-colors">
                   Join Community
-                </a>
+                </Link>
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">

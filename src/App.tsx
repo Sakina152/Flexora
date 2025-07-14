@@ -16,6 +16,10 @@ import ProductDetail from "./pages/ProductDetail";
 import CategoryProducts from "./pages/CategoryProducts";
 import CollectionProducts from "./pages/CollectionProducts";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import SubmitDesign from "./pages/SubmitDesign";
+import JoinCommunity from "./pages/JoinCommunity";
 
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
@@ -64,6 +68,10 @@ const App = () => {
             <Route path="/collections" element={<Collections />} />
             <Route path="/favorites" element={<Favorites />} />
             
+            {/* Auth pages */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
+            
             {/* Product routes */}
             <Route path="/products" element={<Products />} />
             <Route path="/products/:id" element={<ProductDetail />} />
@@ -96,6 +104,10 @@ const App = () => {
             <Route path="/collections/street-style-essentials" element={<StreetStyleEssentials />} />
             <Route path="/collections/minimalist-chic" element={<MinimalistChic />} />
             <Route path="/collections/vintage-revival" element={<VintageRevival />} />
+            
+            {/* Connect pages */}
+            <Route path="/submit-design" element={<SubmitDesign />} />
+            <Route path="/join-community" element={<JoinCommunity />} />
             
             <Route path="*" element={<NotFound />} />
           </Routes>
