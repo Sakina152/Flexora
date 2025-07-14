@@ -47,16 +47,7 @@ const Footer = () => {
                   Products
                 </Link>
               </li>
-              <li>
-                <Link to="/login" className="text-muted-foreground hover:text-primary transition-colors">
-                  Login
-                </Link>
-              </li>
-              <li>
-                <Link to="/signup" className="text-muted-foreground hover:text-primary transition-colors">
-                  Sign Up
-                </Link>
-              </li>
+              {/* Login and Sign Up links removed. Use account icon in navigation. */}
             </ul>
           </div>
           

@@ -2,9 +2,14 @@
 import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { Heart, X } from 'lucide-react';
+import { Avatar, AvatarFallback } from './ui/avatar';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
+import { User } from 'lucide-react';
+import { useAuth } from '../App';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -13,8 +18,6 @@ const Navigation = () => {
     { name: 'Spotlights', path: '/student-spotlights' },
     { name: 'Collections', path: '/collections' },
     { name: 'Products', path: '/products' },
-    { name: 'Login', path: '/login' },
-    { name: 'Sign Up', path: '/signup' },
   ];
 
   return (
@@ -74,6 +77,36 @@ const Navigation = () => {
               >
                 <Heart className="w-5 h-5" />
               </NavLink>
+              {/* Account Avatar Dropdown */}
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <div className="ml-4 cursor-pointer">
+                    <Avatar>
+                      <AvatarFallback>
+                        <User className="w-5 h-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {user ? (
+                    <>
+                      <DropdownMenuItem disabled>Signed in as  <b>{user.username}</b></DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                    </>
+                  ) : (
+                    <>
+                      <DropdownMenuItem asChild>
+                        <NavLink to="/login">Login</NavLink>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <NavLink to="/signup">Sign Up</NavLink>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
 
@@ -144,6 +177,36 @@ const Navigation = () => {
               <Heart className="w-5 h-5" />
               Favorites
             </NavLink>
+            {/* Mobile Account Avatar Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <div className="ml-4 cursor-pointer">
+                  <Avatar>
+                    <AvatarFallback>
+                      <User className="w-5 h-5" />
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                {user ? (
+                  <>
+                    <DropdownMenuItem disabled>Signed in as <b>{user.username}</b></DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <NavLink to="/login">Login</NavLink>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <NavLink to="/signup">Sign Up</NavLink>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       )}
