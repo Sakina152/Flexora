@@ -70,7 +70,7 @@ const TrendingLooks = () => {
       category: "Vintage",
       timeAgo: "6 days ago",
       trending: true,
-      link: "#"
+      link: "/trending/vintage-revivalT"
     },
     {
       id: 6,

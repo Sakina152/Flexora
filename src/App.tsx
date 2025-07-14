@@ -22,6 +22,7 @@ import ParisianChic from "./pages/trending/ParisianChic";
 import SustainableFashion from "./pages/trending/SustainableFashion";
 import StreetStyle from "./pages/trending/StreetStyle";
 import BohemianVibes from "./pages/trending/BohemianVibes";
+import VintageRevivalT from "./pages/trending/VintageRevivalT";
 
 // Category pages
 import MinimalistStyle from "./pages/categories/MinimalistStyle";
@@ -73,6 +74,7 @@ const App = () => {
             <Route path="/trending/sustainable-fashion" element={<SustainableFashion />} />
             <Route path="/trending/street-style" element={<StreetStyle />} />
             <Route path="/trending/bohemian-vibes" element={<BohemianVibes />} />
+            <Route path="/trending/vintage-revivalT" element={<VintageRevivalT />} />
             
             {/* Individual category pages */}
             <Route path="/categories/minimalist" element={<MinimalistStyle />} />
