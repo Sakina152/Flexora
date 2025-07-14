@@ -46,7 +46,7 @@ const TrendingLooks = () => {
       category: "Street",
       timeAgo: "4 days ago",
       trending: true,
-      link: "#"
+      link: "/trending/street-style"
     },
     {
       id: 4,

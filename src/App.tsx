@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
 import SustainableFashion from "./pages/trending/SustainableFashion";
+import StreetStyle from "./pages/trending/StreetStyle";
 
 // Category pages
 import MinimalistStyle from "./pages/categories/MinimalistStyle";
@@ -69,6 +70,7 @@ const App = () => {
             {/* Individual trending pages */}
             <Route path="/trending/parisian-chic" element={<ParisianChic />} />
             <Route path="/trending/sustainable-fashion" element={<SustainableFashion />} />
+            <Route path="/trending/street-style" element={<StreetStyle />} />
             
             {/* Individual category pages */}
             <Route path="/categories/minimalist" element={<MinimalistStyle />} />
