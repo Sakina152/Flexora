@@ -82,7 +82,7 @@ const TrendingLooks = () => {
       category: "Minimal",
       timeAgo: "1 week ago",
       trending: false,
-      link: "#"
+      link: "/trending/minimalist-wardrobe"
     }
   ];
 
