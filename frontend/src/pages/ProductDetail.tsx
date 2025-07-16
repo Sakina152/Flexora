@@ -4,7 +4,8 @@ import { useParams, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import { getProductById } from '../data/products';
-import { Heart, Star, ShoppingBag, Truck, Shield, RotateCcw, ArrowLeft } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Truck, Shield, RotateCcw, ArrowLeft, BookmarkPlus } from 'lucide-react';
+import { toast } from "sonner";
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +14,10 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [quantity, setQuantity] = useState<number>(1);
   const [isLiked, setIsLiked] = useState<boolean>(false);
+  const [isFavorite, setIsFavorite] = useState(() => {
+    const saved = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    return saved.some((fav: any) => fav.id === product.id && fav.type === 'product');
+  });
 
   if (!product) {
     return (
@@ -32,13 +37,37 @@ const ProductDetail = () => {
   }
 
   const handleAddToCart = () => {
-    // Add to cart functionality would go here
-    console.log('Added to cart:', {
-      product: product.name,
-      size: selectedSize,
-      color: selectedColor,
-      quantity
-    });
+    const cart = JSON.parse(localStorage.getItem('flexora-cart') || '[]');
+    const existing = cart.find((item: any) => item.id === product.id && item.size === selectedSize && item.color === selectedColor);
+    if (existing) {
+      existing.quantity += quantity;
+    } else {
+      cart.push({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        images: product.images,
+        category: product.category,
+        size: selectedSize,
+        color: selectedColor,
+        quantity: quantity
+      });
+    }
+    localStorage.setItem('flexora-cart', JSON.stringify(cart));
+    toast.success("Added to cart!");
+    window.dispatchEvent(new Event('cart-updated'));
+  };
+
+  const handleFavorite = () => {
+    let savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    const isAlreadyFavorite = savedFavorites.some((fav: any) => fav.id === product.id && fav.type === 'product');
+    if (isAlreadyFavorite) {
+      savedFavorites = savedFavorites.filter((fav: any) => !(fav.id === product.id && fav.type === 'product'));
+    } else {
+      savedFavorites.push({ ...product, type: 'product' });
+    }
+    localStorage.setItem('flexora-favorites', JSON.stringify(savedFavorites));
+    setIsFavorite(!isFavorite);
   };
 
   return (
@@ -217,6 +246,15 @@ const ProductDetail = () => {
                     }`}
                   >
                     <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                  </button>
+                  <button
+                    onClick={handleFavorite}
+                    className={`px-4 py-3 border rounded-lg transition-colors ml-2 ${
+                      isFavorite ? 'border-primary text-primary' : 'border-border hover:border-primary'
+                    }`}
+                    aria-label="Favorite"
+                  >
+                    <BookmarkPlus className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
                   </button>
                 </div>
 

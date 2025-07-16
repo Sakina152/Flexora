@@ -16,8 +16,8 @@ const Favorites = () => {
     }
   }, []);
 
-  const handleRemoveFromFavorites = (itemId: number) => {
-    const updatedFavorites = favorites.filter(item => item.id !== itemId);
+  const handleRemoveFromFavorites = (itemId: number, itemType?: string) => {
+    const updatedFavorites = favorites.filter(item => !(item.id === itemId && (itemType ? item.type === itemType : true)));
     setFavorites(updatedFavorites);
     localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
   };
@@ -57,25 +57,48 @@ const Favorites = () => {
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {favorites.map((item, index) => (
-                  <article 
-                    key={item.id}
-                    className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
-                    style={{ animationDelay: `${index * 100}ms` }}
-                  >
-                    <div className="relative">
-                      <div className={`h-64 bg-gradient-to-br ${item.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
-                        <Eye className="w-8 h-8 text-primary/60" />
-                      </div>
-                      
+                  item.type === 'product' ? (
+                    <article 
+                      key={item.id}
+                      className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <a href={`/products/${item.id}`} className="block">
+                        <div className={`h-64 bg-gradient-to-br ${item.images?.[0] || 'from-primary/20 to-accent/30'} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
+                          <ShoppingBag className="w-8 h-8 text-primary/60" />
+                        </div>
+                        <div className="p-4">
+                          <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">
+                            {item.name}
+                          </h3>
+                          <div className="text-lg font-bold text-primary mb-2">${item.price}</div>
+                        </div>
+                      </a>
                       <button
-                        onClick={() => handleRemoveFromFavorites(item.id)}
+                        onClick={() => handleRemoveFromFavorites(item.id, 'product')}
                         className="absolute top-3 right-3 p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors opacity-0 group-hover:opacity-100"
+                        style={{ position: 'absolute', top: 12, right: 12 }}
                       >
                         <Heart className="w-4 h-4 fill-current" />
                       </button>
-                    </div>
-
-                    <div className="p-4">
+                    </article>
+                  ) : (
+                    <article 
+                      key={item.id}
+                      className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
+                      <div className="relative">
+                        <div className={`h-64 bg-gradient-to-br ${item.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
+                          <Eye className="w-8 h-8 text-primary/60" />
+                        </div>
+                        <button
+                          onClick={() => handleRemoveFromFavorites(item.id, item.type)}
+                          className="absolute top-3 right-3 p-2 bg-primary text-primary-foreground rounded-full hover:bg-primary/90 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Heart className="w-4 h-4 fill-current" />
+                        </button>
+                      </div>
                       <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">
                         {item.title}
                       </h3>
@@ -98,8 +121,8 @@ const Favorites = () => {
                           )}
                         </div>
                       </div>
-                    </div>
-                  </article>
+                    </article>
+                  )
                 ))}
               </div>
             )}

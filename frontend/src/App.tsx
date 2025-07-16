@@ -1,5 +1,3 @@
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -19,6 +17,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import SubmitDesign from "./pages/SubmitDesign";
 import JoinCommunity from "./pages/JoinCommunity";
+import Cart from "./pages/Cart";
 
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
@@ -27,6 +26,9 @@ import StreetStyle from "./pages/trending/StreetStyle";
 import BohemianVibes from "./pages/trending/BohemianVibes";
 import VintageRevivalT from "./pages/trending/VintageRevivalT";
 import MinimalistWardrobe from "./pages/trending/MinimalistWardrobe";
+import CasualSummer from "./pages/trending/CasualSummer";
+import WeekendCasual from "./pages/trending/WeekendCasual";
+import CasualChic from "./pages/trending/CasualChic";
 
 // Category pages
 import MinimalistStyle from "./pages/categories/MinimalistStyle";
@@ -46,10 +48,14 @@ import BohemianDream from "./pages/collections/BohemianDream";
 import StreetStyleEssentials from "./pages/collections/StreetStyleEssentials";
 import MinimalistChic from "./pages/collections/MinimalistChic";
 import VintageRevival from "./pages/collections/VintageRevival";
+import MinimalistElegance from "./pages/collections/MinimalistElegance";
+import ConsciousChoices from "./pages/collections/ConsciousChoices";
+import HandcraftedBeauty from "./pages/collections/HandcraftedBeauty";
 
 import "./styles/main.css";
 
 import React, { useEffect, useState, createContext, useContext } from "react";
+import { Toaster } from "sonner";
 
 // AuthContext setup
 const AuthContext = createContext(null);
@@ -104,7 +110,6 @@ const App = () => {
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Toaster />
-          <Sonner />
           <LoadingAnimation />
           <BrowserRouter>
             <Routes>
@@ -114,6 +119,7 @@ const App = () => {
               <Route path="/student-spotlights" element={<StudentSpotlights />} />
               <Route path="/collections" element={<Collections />} />
               <Route path="/favorites" element={<Favorites />} />
+              <Route path="/cart" element={<Cart />} />
               
               {/* Auth pages */}
               <Route path="/login" element={<Login />} />
@@ -132,6 +138,9 @@ const App = () => {
               <Route path="/trending/bohemian-vibes" element={<BohemianVibes />} />
               <Route path="/trending/vintage-revivalT" element={<VintageRevivalT />} />
               <Route path="/trending/minimalist-wardrobe" element={<MinimalistWardrobe />} />
+              <Route path="/trending/casual-summer" element={<CasualSummer />} />
+              <Route path="/trending/weekend-casual" element={<WeekendCasual />} />
+              <Route path="/trending/casual-chic" element={<CasualChic />} />
               
               {/* Individual category pages */}
               <Route path="/categories/minimalist" element={<MinimalistStyle />} />
@@ -151,6 +160,9 @@ const App = () => {
               <Route path="/collections/street-style-essentials" element={<StreetStyleEssentials />} />
               <Route path="/collections/minimalist-chic" element={<MinimalistChic />} />
               <Route path="/collections/vintage-revival" element={<VintageRevival />} />
+              <Route path="/collections/minimalist-elegance" element={<MinimalistElegance />} />
+              <Route path="/collections/conscious-choices" element={<ConsciousChoices />} />
+              <Route path="/collections/handcrafted-beauty" element={<HandcraftedBeauty />} />
               
               {/* Connect pages */}
               <Route path="/submit-design" element={<SubmitDesign />} />

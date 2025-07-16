@@ -19,6 +19,22 @@ const StyleCategories = () => {
       link: '/categories/minimalist'
     },
     {
+      name: 'Vintage',
+      description: 'Classic cuts, retro prints, and timeless accessories inspired by past decades.',
+      icon: Camera,
+      count: 31,
+      gradient: 'from-secondary/30 to-primary/20',
+      link: '/categories/vintage'
+    },
+    {
+      name: 'Streetwear',
+      description: 'Bold graphics, oversized fits, and urban-inspired elements for a trendy and edgy style.',
+      icon: Shirt,
+      count: 27,
+      gradient: 'from-accent/30 to-primary/20',
+      link: '/categories/streetwear'
+    },
+    {
       name: 'Bohemian',
       description: 'Earthy tones, vintage patterns, and relaxed silhouettes for a free-spirited and eclectic style.',
       icon: Leaf,
@@ -27,36 +43,20 @@ const StyleCategories = () => {
       link: '/categories/bohemian'
     },
     {
-      name: 'Vintage',
-      description: 'Classic cuts, retro prints, and timeless accessories inspired by past decades.',
-      icon: Camera,
-      count: 31,
-      gradient: 'from-secondary/30 to-primary/20',
-      link: '#'
-    },
-    {
-      name: 'Streetwear',
-      description: 'Bold graphics, oversized fits, and urban-inspired elements for a trendy and edgy style.',
-      icon: Shirt,
-      count: 27,
-      gradient: 'from-accent/30 to-primary/20',
-      link: '#'
-    },
-    {
       name: 'Formal',
       description: 'Sophisticated fabrics, tailored designs, and elegant details for a polished and refined style.',
       icon: CheckCircle,
       count: 19,
       gradient: 'from-primary/20 to-secondary/30',
-      link: '#'
+      link: '/categories/formal'
     },
     {
-      name: 'Casual Chic',
+      name: 'Casual',
       description: 'Comfortable fabrics, effortless silhouettes, and stylish accents for a relaxed yet put-together style.',
       icon: Cloud,
       count: 35,
       gradient: 'from-secondary/20 to-accent/30',
-      link: '#'
+      link: '/categories/casual'
     },
   ];
 

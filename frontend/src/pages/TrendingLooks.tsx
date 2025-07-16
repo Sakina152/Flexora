@@ -9,7 +9,7 @@ const TrendingLooks = () => {
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const filters = ['All', 'Minimalist', 'Vintage', 'Streetwear', 'Bohemian', 'Formal'];
+  const filters = ['All', 'Minimalist', 'Vintage', 'Streetwear', 'Bohemian', 'Formal', 'Casual'];
 
   const trendingPosts = [
     {
@@ -19,7 +19,7 @@ const TrendingLooks = () => {
       likes: 321,
       comments: 45,
       image: "from-primary/30 to-secondary",
-      category: "Chic",
+      category: "Minimalist",
       timeAgo: "2 days ago",
       trending: true,
       link: "/trending/parisian-chic"
@@ -31,7 +31,7 @@ const TrendingLooks = () => {
       likes: 267,
       comments: 32,
       image: "from-accent to-muted-foreground",
-      category: "Eco",
+      category: "Vintage",
       timeAgo: "3 days ago",
       trending: false,
       link: "/trending/sustainable-fashion"
@@ -43,7 +43,7 @@ const TrendingLooks = () => {
       likes: 456,
       comments: 67,
       image: "from-secondary to-background",
-      category: "Street",
+      category: "Streetwear",
       timeAgo: "4 days ago",
       trending: true,
       link: "/trending/street-style"
@@ -55,7 +55,7 @@ const TrendingLooks = () => {
       likes: 298,
       comments: 23,
       image: "from-background to-primary/30",
-      category: "Boho",
+      category: "Bohemian",
       timeAgo: "5 days ago",
       trending: false,
       link: "/trending/bohemian-vibes"
@@ -79,12 +79,239 @@ const TrendingLooks = () => {
       likes: 245,
       comments: 12,
       image: "from-secondary to-muted-foreground",
-      category: "Minimal",
+      category: "Minimalist",
       timeAgo: "1 week ago",
       trending: false,
       link: "/trending/minimalist-wardrobe"
+    },
+    {
+      id: 7,
+      title: "Minimalist Essentials: Clean Lines & Calm Colors",
+      author: "Sophia Lin",
+      likes: 210,
+      comments: 15,
+      image: "from-primary/20 to-accent/20",
+      category: "Minimalist",
+      timeAgo: "2 days ago",
+      trending: false,
+      link: "/trending/minimalist-wardrobe"
+    },
+    {
+      id: 8,
+      title: "Vintage Glam: Old Hollywood Revival",
+      author: "Grace Kelly",
+      likes: 330,
+      comments: 28,
+      image: "from-secondary/20 to-primary/30",
+      category: "Vintage",
+      timeAgo: "3 days ago",
+      trending: true,
+      link: "/trending/vintage-revivalT"
+    },
+    {
+      id: 9,
+      title: "Streetwear Icons: Urban Edge",
+      author: "Jayden Park",
+      likes: 180,
+      comments: 10,
+      image: "from-accent/30 to-primary/20",
+      category: "Streetwear",
+      timeAgo: "4 days ago",
+      trending: false,
+      link: "/trending/street-style"
+    },
+    {
+      id: 10,
+      title: "Bohemian Dream: Festival Ready",
+      author: "Lila Rose",
+      likes: 275,
+      comments: 19,
+      image: "from-accent/20 to-secondary/30",
+      category: "Bohemian",
+      timeAgo: "5 days ago",
+      trending: false,
+      link: "/trending/bohemian-vibes"
+    },
+    {
+      id: 11,
+      title: "Formal Affair: Evening Elegance",
+      author: "Oliver Stone",
+      likes: 195,
+      comments: 8,
+      image: "from-primary/20 to-secondary/30",
+      category: "Formal",
+      timeAgo: "6 days ago",
+      trending: false,
+      link: "/collections/elegant-evening-wear"
+    },
+    // Minimalist
+    {
+      id: 12,
+      title: "Minimalist Layers: Winter Whites",
+      author: "Ava Lee",
+      likes: 180,
+      comments: 9,
+      image: "from-primary/10 to-accent/10",
+      category: "Minimalist",
+      timeAgo: "1 day ago",
+      trending: false,
+      link: "/trending/minimalist-wardrobe"
+    },
+    {
+      id: 13,
+      title: "Minimalist Summer: Linen Staples",
+      author: "Noah Kim",
+      likes: 160,
+      comments: 7,
+      image: "from-primary/20 to-secondary/10",
+      category: "Minimalist",
+      timeAgo: "3 days ago",
+      trending: false,
+      link: "/trending/minimalist-wardrobe"
+    },
+    // Vintage
+    {
+      id: 14,
+      title: "Vintage Denim: 90s Throwback",
+      author: "Ella Brown",
+      likes: 220,
+      comments: 14,
+      image: "from-secondary/10 to-accent/20",
+      category: "Vintage",
+      timeAgo: "2 days ago",
+      trending: false,
+      link: "/trending/vintage-revivalT"
+    },
+    {
+      id: 15,
+      title: "Retro Prints: Colorful Comeback",
+      author: "Mason Clark",
+      likes: 210,
+      comments: 11,
+      image: "from-accent/10 to-primary/20",
+      category: "Vintage",
+      timeAgo: "4 days ago",
+      trending: false,
+      link: "/trending/vintage-revivalT"
+    },
+    // Streetwear
+    {
+      id: 16,
+      title: "Streetwear Staples: Graphic Tees",
+      author: "Liam Smith",
+      likes: 170,
+      comments: 8,
+      image: "from-accent/20 to-secondary/20",
+      category: "Streetwear",
+      timeAgo: "2 days ago",
+      trending: false,
+      link: "/trending/street-style"
+    },
+    {
+      id: 17,
+      title: "Sneaker Culture: Hottest Drops",
+      author: "Zoe Martinez",
+      likes: 200,
+      comments: 13,
+      image: "from-primary/10 to-accent/30",
+      category: "Streetwear",
+      timeAgo: "5 days ago",
+      trending: true,
+      link: "/trending/street-style"
+    },
+    // Bohemian
+    {
+      id: 18,
+      title: "Boho Maxi Dresses: Summer Breeze",
+      author: "Chloe Patel",
+      likes: 190,
+      comments: 10,
+      image: "from-accent/30 to-secondary/10",
+      category: "Bohemian",
+      timeAgo: "1 day ago",
+      trending: false,
+      link: "/trending/bohemian-vibes"
+    },
+    {
+      id: 19,
+      title: "Layered Jewelry: Boho Accessories",
+      author: "Lucas Green",
+      likes: 175,
+      comments: 6,
+      image: "from-secondary/20 to-primary/10",
+      category: "Bohemian",
+      timeAgo: "3 days ago",
+      trending: false,
+      link: "/trending/bohemian-vibes"
+    },
+    // Formal
+    {
+      id: 20,
+      title: "Black Tie: Classic Tuxedos",
+      author: "Olivia Turner",
+      likes: 230,
+      comments: 16,
+      image: "from-primary/30 to-secondary/30",
+      category: "Formal",
+      timeAgo: "2 days ago",
+      trending: true,
+      link: "/collections/elegant-evening-wear"
+    },
+    {
+      id: 21,
+      title: "Evening Gowns: Red Carpet Ready",
+      author: "Benjamin Scott",
+      likes: 215,
+      comments: 12,
+      image: "from-accent/30 to-primary/10",
+      category: "Formal",
+      timeAgo: "4 days ago",
+      trending: false,
+      link: "/collections/elegant-evening-wear"
+    },
+    {
+      id: 22,
+      title: "Effortless Summer: Casual Staples",
+      author: "Emma Chen",
+      likes: 175,
+      comments: 14,
+      image: "from-primary/30 to-accent/20",
+      category: "Casual",
+      timeAgo: "2 days ago",
+      trending: true,
+      link: "/trending/casual-summer"
+    },
+    {
+      id: 23,
+      title: "Weekend Comfort: Relaxed Denim & Tees",
+      author: "Noah Kim",
+      likes: 142,
+      comments: 10,
+      image: "from-accent/10 to-secondary/20",
+      category: "Casual",
+      timeAgo: "3 days ago",
+      trending: false,
+      link: "/trending/weekend-casual"
+    },
+    {
+      id: 24,
+      title: "Casual Chic: Everyday Essentials",
+      author: "Ava Lee",
+      likes: 160,
+      comments: 12,
+      image: "from-secondary/20 to-primary/10",
+      category: "Casual",
+      timeAgo: "1 day ago",
+      trending: false,
+      link: "/trending/casual-chic"
     }
   ];
+
+  const filteredPosts = activeFilter === 'All'
+    ? trendingPosts
+    : trendingPosts.filter(post =>
+        post.category && post.category.toLowerCase().includes(activeFilter.toLowerCase())
+      );
 
   const handleLike = (postId: number) => {
     setLikedPosts(prev => {
@@ -155,7 +382,7 @@ const TrendingLooks = () => {
             </div>
             
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {trendingPosts.map((post, index) => (
+              {filteredPosts.map((post, index) => (
                 <Link 
                   key={post.id}
                   to={post.link}

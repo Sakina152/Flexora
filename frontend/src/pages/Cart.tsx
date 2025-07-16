@@ -1,0 +1,212 @@
+import { useState, useEffect } from 'react';
+import Navigation from '../components/Navigation';
+import Footer from '../components/Footer';
+import { ShoppingBag, X, CheckCircle } from 'lucide-react';
+import { toast } from "sonner";
+
+const Cart = () => {
+  const [cartItems, setCartItems] = useState<any[]>([]);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    address: '',
+    phone: ''
+  });
+  const [formError, setFormError] = useState('');
+
+  useEffect(() => {
+    const savedCart = localStorage.getItem('flexora-cart');
+    if (savedCart) {
+      setCartItems(JSON.parse(savedCart));
+    }
+  }, []);
+
+  const updateCart = (items: any[]) => {
+    setCartItems(items);
+    localStorage.setItem('flexora-cart', JSON.stringify(items));
+    window.dispatchEvent(new Event('cart-updated'));
+  };
+
+  const handleRemove = (id: number, size?: string, color?: string) => {
+    const updated = cartItems.filter(item => !(item.id === id && item.size === size && item.color === color));
+    updateCart(updated);
+    toast.success("Product removed from cart!");
+  };
+
+  const handleQuantity = (id: number, delta: number) => {
+    const updated = cartItems.map(item =>
+      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
+    );
+    updateCart(updated);
+  };
+
+  const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleCheckout = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    if (!form.name || !form.email || !form.address || !form.phone) {
+      setFormError('Please fill in all fields.');
+      return;
+    }
+    if (!/^\d{10}$/.test(form.phone)) {
+      setFormError('Phone number must be exactly 10 digits.');
+      return;
+    }
+    setCheckoutSuccess(true);
+    setCartItems([]);
+    localStorage.removeItem('flexora-cart');
+    window.dispatchEvent(new Event('cart-updated'));
+  };
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      <main className="w-full">
+        <section className="py-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-3xl font-bold mb-8 text-foreground font-display">Your Cart</h1>
+            {checkoutSuccess ? (
+              <div className="text-center py-20 animate-fade-in">
+                <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                <h3 className="text-3xl font-bold text-green-600 mb-2">Payment Successful</h3>
+                <h4 className="text-2xl font-semibold text-foreground mb-2">Order Placed</h4>
+                <p className="text-muted-foreground text-lg max-w-md mx-auto mb-6">Your order has been placed successfully. We will contact you soon.</p>
+                <a href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                  <ShoppingBag className="w-5 h-5" />
+                  Continue Shopping
+                </a>
+              </div>
+            ) : cartItems.length === 0 ? (
+              <div className="text-center py-20 animate-fade-in">
+                <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-foreground mb-2">Your cart is empty</h3>
+                <p className="text-muted-foreground text-lg max-w-md mx-auto mb-6">Browse products and add your favorite items to your cart.</p>
+                <a href="/products" className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                  <ShoppingBag className="w-5 h-5" />
+                  Shop Now
+                </a>
+              </div>
+            ) : (
+              <div className="space-y-8">
+                {/* Cart Items */}
+                {cartItems.map(item => (
+                  <div key={item.id + (item.size || '') + (item.color || '')} className="flex items-center gap-6 bg-card rounded-xl p-6 border border-border">
+                    <div className={`w-24 h-24 rounded-lg flex items-center justify-center bg-gradient-to-br ${item.images?.[0] || 'from-primary/20 to-accent/30'}`}>
+                      <ShoppingBag className="w-10 h-10 text-primary/60" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h2 className="text-lg font-bold text-foreground">{item.name}</h2>
+                          <div className="text-sm text-muted-foreground">{item.category}</div>
+                          {item.size && <div className="text-xs text-muted-foreground">Size: {item.size}</div>}
+                          {item.color && <div className="text-xs text-muted-foreground">Color: {item.color}</div>}
+                        </div>
+                        <button onClick={() => handleRemove(item.id, item.size, item.color)} className="p-2 hover:bg-accent rounded-full transition-colors">
+                          <X className="w-5 h-5" />
+                        </button>
+                      </div>
+                      <div className="flex items-center gap-4 mt-4">
+                        <span className="font-medium text-primary">${item.price}</span>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleQuantity(item.id, -1)} className="w-8 h-8 border border-border rounded flex items-center justify-center hover:bg-accent transition-colors">-</button>
+                          <span className="w-8 text-center">{item.quantity}</span>
+                          <button onClick={() => handleQuantity(item.id, 1)} className="w-8 h-8 border border-border rounded flex items-center justify-center hover:bg-accent transition-colors">+</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {/* Cart Summary & Checkout */}
+                <div className="bg-card rounded-xl p-6 border border-border mt-8">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+                    <div>
+                      <div className="text-xl font-bold text-foreground">Total: ${total.toFixed(2)}</div>
+                      <div className="text-sm text-muted-foreground mt-1">Shipping and taxes calculated at checkout.</div>
+                    </div>
+                    <button
+                      className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors mt-4 md:mt-0"
+                      onClick={() => setShowCheckout(true)}
+                    >
+                      Proceed to Checkout
+                    </button>
+                  </div>
+                </div>
+                {/* Checkout Form */}
+                {showCheckout && (
+                  <form onSubmit={handleCheckout} className="bg-card rounded-xl p-6 border border-border mt-8 space-y-6 animate-fade-in">
+                    <h2 className="text-2xl font-bold text-foreground mb-4">Checkout</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Name</label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={form.name}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-foreground mb-1">Email</label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={form.email}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-foreground mb-1">Address</label>
+                        <textarea
+                          name="address"
+                          value={form.address}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          required
+                        />
+                      </div>
+                      <div className="md:col-span-2">
+                        <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={form.phone}
+                          onChange={handleInputChange}
+                          className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                          required
+                          pattern="\d{10}"
+                          maxLength={10}
+                        />
+                      </div>
+                    </div>
+                    {formError && <div className="text-red-500 text-sm text-center">{formError}</div>}
+                    <button
+                      type="submit"
+                      className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      Place Order
+                    </button>
+                  </form>
+                )}
+              </div>
+            )}
+          </div>
+        </section>
+      </main>
+      <Footer />
+    </div>
+  );
+};
+
+export default Cart; 

@@ -1,7 +1,7 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Heart, X } from 'lucide-react';
+import { Heart, X, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { User } from 'lucide-react';
@@ -10,6 +10,22 @@ import { useAuth } from '../App';
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    const updateCartCount = () => {
+      const cart = JSON.parse(localStorage.getItem('flexora-cart') || '[]');
+      setCartCount(cart.reduce((sum, item) => sum + (item.quantity || 1), 0));
+    };
+    updateCartCount();
+    window.addEventListener('storage', updateCartCount);
+    // Listen for custom event in case cart is updated in same tab
+    window.addEventListener('cart-updated', updateCartCount);
+    return () => {
+      window.removeEventListener('storage', updateCartCount);
+      window.removeEventListener('cart-updated', updateCartCount);
+    };
+  }, []);
 
   const navItems = [
     { name: 'Home', path: '/' },
@@ -65,18 +81,39 @@ const Navigation = () => {
               ))}
               
               {/* Favorites Heart Icon */}
-              <NavLink
-                to="/favorites"
-                className={({ isActive }) =>
-                  `p-2 rounded-md transition-colors duration-200 ${
-                    isActive
-                      ? 'bg-primary text-primary-foreground'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                  }`
-                }
-              >
-                <Heart className="w-5 h-5" />
-              </NavLink>
+              <div className="flex items-center gap-2 align-middle h-full">
+                <NavLink
+                  to="/favorites"
+                  className={({ isActive }) =>
+                    `flex items-center justify-center p-2 rounded-md transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`
+                  }
+                  aria-label="Favorites"
+                >
+                  <Heart className="w-5 h-5" />
+                </NavLink>
+                <NavLink
+                  to="/cart"
+                  className={({ isActive }) =>
+                    `relative flex items-center justify-center p-2 rounded-md transition-colors duration-200 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                    }`
+                  }
+                  aria-label="Cart"
+                >
+                  <ShoppingCart className="w-5 h-5" />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs font-bold rounded-full px-1.5 py-0.5 min-w-[20px] text-center border border-background shadow">
+                      {cartCount}
+                    </span>
+                  )}
+                </NavLink>
+              </div>
               {/* Account Avatar Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -162,21 +199,39 @@ const Navigation = () => {
               </NavLink>
             ))}
             
-            {/* Mobile Favorites Link */}
-            <NavLink
-              to="/favorites"
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={({ isActive }) =>
-                `flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
-                  isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-                }`
-              }
-            >
-              <Heart className="w-5 h-5" />
-              Favorites
-            </NavLink>
+            {/* Mobile Favorites and Cart Links */}
+            <div className="flex items-center gap-2">
+              <NavLink
+                to="/favorites"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`
+                }
+                aria-label="Favorites"
+              >
+                <Heart className="w-5 h-5" />
+                Favorites
+              </NavLink>
+              <NavLink
+                to="/cart"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center gap-2 px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  }`
+                }
+                aria-label="Cart"
+              >
+                <ShoppingCart className="w-5 h-5" />
+                Cart
+              </NavLink>
+            </div>
             {/* Mobile Account Avatar Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Sparkles } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface HeroSlide {
   id: number;
@@ -34,8 +35,13 @@ const heroSlides: HeroSlide[] = [
   }
 ];
 
+function slugify(text: string) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -90,10 +96,16 @@ const Hero = () => {
                 </p>
                 
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <button className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-300 hover:scale-105">
+                  <button
+                    className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-300 hover:scale-105"
+                    onClick={() => navigate('/collections')}
+                  >
                     Explore Collection
                   </button>
-                  <button className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-accent transition-colors">
+                  <button
+                    className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-accent transition-colors"
+                    onClick={() => navigate(`/collections/${slugify(heroSlides[currentSlide].subtitle || heroSlides[currentSlide].title)}`)}
+                  >
                     View Details
                   </button>
                 </div>
