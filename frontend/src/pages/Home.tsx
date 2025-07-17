@@ -1,14 +1,44 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Navigation from '../components/Navigation';
 import Hero from '../components/Hero';
 import Footer from '../components/Footer';
-import StyleQuiz from '../components/StyleQuiz';
-import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, BookmarkPlus } from 'lucide-react';
+import FashionStyleQuiz from '../components/FashionStyleQuiz';
+import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, BookmarkPlus, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
-const Home = () => {
-  const [isQuizOpen, setIsQuizOpen] = useState(false);
+interface HomeProps {
+  openQuiz?: boolean;
+}
+
+const Home = ({ openQuiz = false }: HomeProps) => {
+  const [isQuizOpen, setIsQuizOpen] = useState(openQuiz);
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+  const [lookbookPersona, setLookbookPersona] = useState<string | null>(null);
+  const [showLookbookPopup, setShowLookbookPopup] = useState(true);
+
+  useEffect(() => {
+    setLookbookPersona(localStorage.getItem('flexora-last-persona'));
+    const onStorage = () => setLookbookPersona(localStorage.getItem('flexora-last-persona'));
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, []);
+
+  useEffect(() => {
+    if (openQuiz) setIsQuizOpen(true);
+  }, [openQuiz]);
+
+  // Only show popup once per session
+  useEffect(() => {
+    if (sessionStorage.getItem('flexora-lookbook-popup-dismissed')) {
+      setShowLookbookPopup(false);
+    }
+  }, []);
+
+  const handleDismissPopup = () => {
+    setShowLookbookPopup(false);
+    sessionStorage.setItem('flexora-lookbook-popup-dismissed', '1');
+  };
 
   const features = [
     {
@@ -40,7 +70,8 @@ const Home = () => {
       author: "Emma Chen",
       likes: 234,
       comments: 18,
-      image: "from-accent to-secondary"
+      image: "from-accent to-secondary",
+      link: "/trending/minimalist-wardrobe"
     },
     {
       id: 2,
@@ -48,7 +79,8 @@ const Home = () => {
       author: "Alex Rivera",
       likes: 187,
       comments: 23,
-      image: "from-primary/30 to-accent"
+      image: "from-primary/30 to-accent",
+      link: "/trending/sustainable-fashion"
     },
     {
       id: 3,
@@ -56,7 +88,8 @@ const Home = () => {
       author: "Sophie Laurent",
       likes: 298,
       comments: 31,
-      image: "from-secondary to-primary/20"
+      image: "from-secondary to-primary/20",
+      link: "/trending/vintage-revivalT"
     }
   ];
 
@@ -87,6 +120,32 @@ const Home = () => {
       <Navigation />
       
       <main className="w-full">
+        {/* Resume Lookbook Popup */}
+        {lookbookPersona && showLookbookPopup && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 animate-fade-in">
+            <div className="relative bg-background border border-primary/20 rounded-xl shadow-2xl p-8 max-w-md w-full mx-4">
+              <button
+                className="absolute top-3 right-3 text-muted-foreground hover:text-foreground p-1 rounded-full transition-colors"
+                onClick={handleDismissPopup}
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+              <div className="flex flex-col items-center gap-3">
+                <div className="text-5xl mb-2">✨</div>
+                <h3 className="font-display text-2xl font-bold text-foreground mb-1 text-center">Resume Your Lookbook</h3>
+                <p className="text-muted-foreground mb-4 text-center">Jump back into your personalized style recommendations and curated products.</p>
+                <Link
+                  to={`/lookbook/${lookbookPersona}`}
+                  className="inline-block px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold text-lg transition-all duration-300 hover:scale-105 hover:bg-primary/90 shadow"
+                  onClick={handleDismissPopup}
+                >
+                  Go to Your Lookbook
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
         <Hero />
         
         {/* Features Section */}
@@ -137,46 +196,46 @@ const Home = () => {
             
             <div className="grid md:grid-cols-3 gap-6">
               {trendingPosts.map((post, index) => (
-                <article 
-                  key={post.id} 
-                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className={`h-48 bg-gradient-to-br ${post.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
-                    <Eye className="w-8 h-8 text-primary/60" />
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">
-                      {post.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      by {post.author}
-                    </p>
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <button
-                          onClick={() => handleLike(post.id)}
-                          className={`flex items-center gap-1 transition-colors ${
-                            likedPosts.has(post.id) ? 'text-primary' : 'hover:text-primary'
-                          }`}
-                        >
-                          <Heart className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
-                          <span>{post.likes + (likedPosts.has(post.id) ? 1 : 0)}</span>
-                        </button>
-                        <div className="flex items-center gap-1 hover:text-primary transition-colors">
-                          <MessageCircle className="w-4 h-4" />
-                          <span>{post.comments}</span>
-                        </div>
-                      </div>
-                      <button 
-                        onClick={() => handleFavorite(post)}
-                        className="transition-colors hover:scale-110 transform hover:text-primary"
-                      >
-                        <BookmarkPlus className="w-4 h-4" />
-                      </button>
+                <Link to={post.link} key={post.id} style={{ animationDelay: `${index * 150}ms` }} className="block animate-fade-in">
+                  <article
+                    className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
+                  >
+                    <div className={`h-48 bg-gradient-to-br ${post.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
+                      <Eye className="w-8 h-8 text-primary/60" />
                     </div>
-                  </div>
-                </article>
+                    <div className="p-4">
+                      <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
+                        {post.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-3">
+                        by {post.author}
+                      </p>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center gap-4">
+                          <button
+                            onClick={e => { e.preventDefault(); handleLike(post.id); }}
+                            className={`flex items-center gap-1 transition-colors ${
+                              likedPosts.has(post.id) ? 'text-primary' : 'hover:text-primary'
+                            }`}
+                          >
+                            <Heart className={`w-4 h-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} />
+                            <span>{post.likes + (likedPosts.has(post.id) ? 1 : 0)}</span>
+                          </button>
+                          <div className="flex items-center gap-1 hover:text-primary transition-colors">
+                            <MessageCircle className="w-4 h-4" />
+                            <span>{post.comments}</span>
+                          </div>
+                        </div>
+                        <button
+                          onClick={e => { e.preventDefault(); handleFavorite(post); }}
+                          className="transition-colors hover:scale-110 transform hover:text-primary"
+                        >
+                          <BookmarkPlus className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                  </article>
+                </Link>
               ))}
             </div>
           </div>
@@ -201,7 +260,7 @@ const Home = () => {
         </section>
       </main>
 
-      <StyleQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      <FashionStyleQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
       <Footer />
     </div>
   );

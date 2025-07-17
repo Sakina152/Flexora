@@ -12,6 +12,7 @@ import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
 import CategoryProducts from "./pages/CategoryProducts";
 import CollectionProducts from "./pages/CollectionProducts";
+import Lookbook from "./pages/Lookbook";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -97,14 +98,6 @@ const AuthProvider = ({ children }) => {
 const queryClient = new QueryClient();
 
 const App = () => {
-
-  useEffect(() => {
-  fetch("http://127.0.0.1:8000/api/hello/")
-    .then((res) => res.json())
-    .then((data) => console.log(data));
-}, []);
-
-
   return (
     <AuthProvider>
       <QueryClientProvider client={queryClient}>
@@ -114,6 +107,7 @@ const App = () => {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/quiz" element={<Home openQuiz={true} />} />
               <Route path="/trending-looks" element={<TrendingLooks />} />
               <Route path="/style-categories" element={<StyleCategories />} />
               <Route path="/student-spotlights" element={<StudentSpotlights />} />
@@ -130,6 +124,9 @@ const App = () => {
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/categories/:category/products" element={<CategoryProducts />} />
               <Route path="/collections/:collection/products" element={<CollectionProducts />} />
+              
+              {/* Lookbook route */}
+              <Route path="/lookbook/:persona" element={<Lookbook />} />
               
               {/* Individual trending pages */}
               <Route path="/trending/parisian-chic" element={<ParisianChic />} />

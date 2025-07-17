@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { Heart, X, ShoppingCart } from 'lucide-react';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
@@ -11,6 +11,7 @@ const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
+  const [lookbookPersona, setLookbookPersona] = useState<string | null>(null);
 
   useEffect(() => {
     const updateCartCount = () => {
@@ -19,12 +20,19 @@ const Navigation = () => {
     };
     updateCartCount();
     window.addEventListener('storage', updateCartCount);
-    // Listen for custom event in case cart is updated in same tab
     window.addEventListener('cart-updated', updateCartCount);
     return () => {
       window.removeEventListener('storage', updateCartCount);
       window.removeEventListener('cart-updated', updateCartCount);
     };
+  }, []);
+
+  // Lookbook persona from localStorage
+  useEffect(() => {
+    setLookbookPersona(localStorage.getItem('flexora-last-persona'));
+    const onStorage = () => setLookbookPersona(localStorage.getItem('flexora-last-persona'));
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, []);
 
   const navItems = [
@@ -79,7 +87,36 @@ const Navigation = () => {
                   {item.name}
                 </NavLink>
               ))}
-              
+
+              {/* Lookbook Button */}
+              {lookbookPersona ? (
+                <NavLink
+                  to={`/lookbook/${lookbookPersona}`}
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-accent-foreground hover:text-primary hover:bg-accent'
+                    }`
+                  }
+                >
+                  <span role="img" aria-label="lookbook">✨</span> Your Lookbook
+                </NavLink>
+              ) : (
+                <NavLink
+                  to="/quiz"
+                  className={({ isActive }) =>
+                    `px-3 py-2 rounded-md text-sm font-semibold transition-colors duration-200 flex items-center gap-1 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-accent-foreground hover:text-primary hover:bg-accent'
+                    }`
+                  }
+                >
+                  <span role="img" aria-label="quiz">📝</span> Take the Quiz
+                </NavLink>
+              )}
+
               {/* Favorites Heart Icon */}
               <div className="flex items-center gap-2 align-middle h-full">
                 <NavLink
@@ -198,7 +235,36 @@ const Navigation = () => {
                 {item.name}
               </NavLink>
             ))}
-            
+            {/* Lookbook Button Mobile */}
+            {lookbookPersona ? (
+              <NavLink
+                to={`/lookbook/${lookbookPersona}`}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200 flex items-center gap-1 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-accent-foreground hover:text-primary hover:bg-accent'
+                  }`
+                }
+              >
+                <span role="img" aria-label="lookbook">✨</span> Your Lookbook
+              </NavLink>
+            ) : (
+              <NavLink
+                to="/quiz"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={({ isActive }) =>
+                  `block px-3 py-2 rounded-md text-base font-semibold transition-colors duration-200 flex items-center gap-1 ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-accent-foreground hover:text-primary hover:bg-accent'
+                  }`
+                }
+              >
+                <span role="img" aria-label="quiz">📝</span> Take the Quiz
+              </NavLink>
+            )}
             {/* Mobile Favorites and Cart Links */}
             <div className="flex items-center gap-2">
               <NavLink

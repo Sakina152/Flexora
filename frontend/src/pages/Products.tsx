@@ -9,7 +9,6 @@ import { toast } from "sonner";
 import { Toaster } from "sonner";
 
 const Products = () => {
-  useEffect(() => { toast.success("Test toast!"); }, []);
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [sortBy, setSortBy] = useState<string>('featured');
   const [likedProducts, setLikedProducts] = useState<Set<number>>(new Set());
