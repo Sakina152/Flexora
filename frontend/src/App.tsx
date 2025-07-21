@@ -19,6 +19,10 @@ import Signup from "./pages/Signup";
 import SubmitDesign from "./pages/SubmitDesign";
 import JoinCommunity from "./pages/JoinCommunity";
 import Cart from "./pages/Cart";
+import Profile from "./pages/Profile";
+import EditProfile from "./pages/EditProfile";
+import DeleteAccount from "./pages/DeleteAccount";
+import PastOrders from "./pages/PastOrders";
 
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
@@ -114,6 +118,10 @@ const App = () => {
               <Route path="/collections" element={<Collections />} />
               <Route path="/favorites" element={<Favorites />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/edit-profile" element={<EditProfile />} />
+              <Route path="/delete-account" element={<DeleteAccount />} />
+              <Route path="/past-orders" element={<PastOrders />} />
               
               {/* Auth pages */}
               <Route path="/login" element={<Login />} />

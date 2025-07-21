@@ -2,20 +2,45 @@
 import { useState, useEffect } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { Heart, X, ShoppingCart } from 'lucide-react';
-import { Avatar, AvatarFallback } from './ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from './ui/dropdown-menu';
-import { User } from 'lucide-react';
+import { User, Users, UserCheck, UserPlus, UserX, UserMinus } from 'lucide-react';
 import { useAuth } from '../App';
+import { getStorageData, STORAGE_KEYS } from '../lib/storage';
 
 const Navigation = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const [cartCount, setCartCount] = useState(0);
   const [lookbookPersona, setLookbookPersona] = useState<string | null>(null);
+  const [profilePicture, setProfilePicture] = useState<string>('');
+  const [selectedAvatar, setSelectedAvatar] = useState<string>('');
+
+  // Default avatar options
+  const defaultAvatars = [
+    { id: 'avatar1', emoji: '😊', color: 'bg-gradient-to-br from-blue-400 to-blue-600', name: 'Happy' },
+    { id: 'avatar2', emoji: '🤖', color: 'bg-gradient-to-br from-purple-400 to-purple-600', name: 'Robot' },
+    { id: 'avatar3', emoji: '🦄', color: 'bg-gradient-to-br from-pink-400 to-pink-600', name: 'Unicorn' },
+    { id: 'avatar4', emoji: '🐱', color: 'bg-gradient-to-br from-orange-400 to-orange-600', name: 'Cat' },
+    { id: 'avatar5', emoji: '🦁', color: 'bg-gradient-to-br from-yellow-400 to-yellow-600', name: 'Lion' },
+    { id: 'avatar6', emoji: '🐼', color: 'bg-gradient-to-br from-gray-400 to-gray-600', name: 'Panda' },
+    { id: 'avatar7', emoji: '🦊', color: 'bg-gradient-to-br from-red-400 to-red-600', name: 'Fox' },
+    { id: 'avatar8', emoji: '🐸', color: 'bg-gradient-to-br from-green-400 to-green-600', name: 'Frog' },
+    { id: 'avatar9', emoji: '🐙', color: 'bg-gradient-to-br from-indigo-400 to-indigo-600', name: 'Octopus' },
+    { id: 'avatar10', emoji: '🦋', color: 'bg-gradient-to-br from-teal-400 to-teal-600', name: 'Butterfly' },
+    { id: 'avatar11', emoji: '🦅', color: 'bg-gradient-to-br from-sky-400 to-sky-600', name: 'Eagle' },
+    { id: 'avatar12', emoji: '🐬', color: 'bg-gradient-to-br from-cyan-400 to-cyan-600', name: 'Dolphin' },
+    { id: 'avatar13', emoji: '🦕', color: 'bg-gradient-to-br from-emerald-400 to-emerald-600', name: 'Dinosaur' },
+    { id: 'avatar14', emoji: '🦒', color: 'bg-gradient-to-br from-amber-400 to-amber-600', name: 'Giraffe' },
+    { id: 'avatar15', emoji: '🦘', color: 'bg-gradient-to-br from-rose-400 to-rose-600', name: 'Kangaroo' },
+    { id: 'avatar16', emoji: '🦥', color: 'bg-gradient-to-br from-lime-400 to-lime-600', name: 'Sloth' },
+  ];
 
   useEffect(() => {
     const updateCartCount = () => {
-      const cart = JSON.parse(localStorage.getItem('flexora-cart') || '[]');
+      if (!user?.username) return;
+      
+      const cart = getStorageData(STORAGE_KEYS.CART, user.username, []);
       setCartCount(cart.reduce((sum, item) => sum + (item.quantity || 1), 0));
     };
     updateCartCount();
@@ -25,7 +50,99 @@ const Navigation = () => {
       window.removeEventListener('storage', updateCartCount);
       window.removeEventListener('cart-updated', updateCartCount);
     };
-  }, []);
+  }, [user?.username]);
+
+  // Fetch profile picture when user is logged in
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      if (user) {
+        try {
+          const token = localStorage.getItem('accessToken');
+          if (!token) {
+            console.log('No access token found');
+            return;
+          }
+          
+          const res = await fetch('http://localhost:8000/api/profile/', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+          });
+          
+          if (res.ok) {
+            const data = await res.json();
+            console.log('Profile data received:', data);
+            if (data.profile_picture) {
+              console.log('Setting profile picture:', data.profile_picture);
+              setProfilePicture(data.profile_picture);
+            } else {
+              console.log('No profile picture found in response');
+              setProfilePicture('');
+            }
+            if (data.selected_avatar) {
+              setSelectedAvatar(data.selected_avatar);
+            } else {
+              setSelectedAvatar('');
+            }
+          } else {
+            console.error('Failed to fetch profile:', res.status);
+            setProfilePicture('');
+          }
+        } catch (error) {
+          console.error('Error fetching profile picture:', error);
+          setProfilePicture('');
+        }
+      } else {
+        setProfilePicture('');
+      }
+    };
+
+    fetchProfilePicture();
+  }, [user]);
+
+  // Debug: Log current profile picture state
+  useEffect(() => {
+    console.log('Current profile picture state:', profilePicture);
+  }, [profilePicture]);
+
+  // Listen for profile updates
+  useEffect(() => {
+    const handleProfileUpdate = () => {
+      if (user) {
+        // Refetch profile picture when profile is updated
+        const fetchProfilePicture = async () => {
+          try {
+            const token = localStorage.getItem('accessToken');
+            if (!token) return;
+            
+            const res = await fetch('http://localhost:8000/api/profile/', {
+              headers: {
+                'Authorization': `Bearer ${token}`,
+              },
+            });
+            
+            if (res.ok) {
+              const data = await res.json();
+              if (data.profile_picture) {
+                setProfilePicture(data.profile_picture);
+              }
+            }
+          } catch (error) {
+            console.error('Error refetching profile picture:', error);
+          }
+        };
+        
+        fetchProfilePicture();
+      }
+    };
+
+    // Listen for custom event when profile is updated
+    window.addEventListener('profile-updated', handleProfileUpdate);
+    
+    return () => {
+      window.removeEventListener('profile-updated', handleProfileUpdate);
+    };
+  }, [user]);
 
   // Lookbook persona from localStorage
   useEffect(() => {
@@ -71,7 +188,7 @@ const Navigation = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex items-center space-x-4">
               {navItems.map((item) => (
                 <NavLink
                   key={item.name}
@@ -118,7 +235,7 @@ const Navigation = () => {
               )}
 
               {/* Favorites Heart Icon */}
-              <div className="flex items-center gap-2 align-middle h-full">
+              <div className="flex items-center gap-4 align-middle h-full">
                 <NavLink
                   to="/favorites"
                   className={({ isActive }) =>
@@ -155,9 +272,29 @@ const Navigation = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <div className="ml-4 cursor-pointer">
-                    <Avatar>
+                    <Avatar className="w-12 h-12 border-2 border-primary shadow-lg">
+                      <AvatarImage 
+                        src={profilePicture} 
+                        alt={user?.username}
+                        onError={(e) => {
+                          console.error('Failed to load profile picture:', profilePicture);
+                          setProfilePicture('');
+                        }}
+                        onLoad={() => {
+                          console.log('Profile picture loaded successfully:', profilePicture);
+                        }}
+                        className="object-cover w-full h-full"
+                      />
                       <AvatarFallback>
-                        <User className="w-5 h-5" />
+                        {profilePicture ? (
+                          user?.username?.[0]?.toUpperCase() || <User className="w-5 h-5" />
+                        ) : selectedAvatar ? (
+                          <div className={`w-full h-full flex items-center justify-center ${defaultAvatars.find(av => av.id === selectedAvatar)?.color}`}>
+                            {defaultAvatars.find(av => av.id === selectedAvatar)?.emoji}
+                          </div>
+                        ) : (
+                          user?.username?.[0]?.toUpperCase() || <User className="w-5 h-5" />
+                        )}
                       </AvatarFallback>
                     </Avatar>
                   </div>
@@ -165,8 +302,11 @@ const Navigation = () => {
                 <DropdownMenuContent align="end">
                   {user ? (
                     <>
-                      <DropdownMenuItem disabled>Signed in as  <b>{user.username}</b></DropdownMenuItem>
+                      <DropdownMenuItem disabled>Signed in as <b className="ml-1">{user.username}</b></DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      <DropdownMenuItem asChild>
+                        <NavLink to="/profile">Profile</NavLink>
+                      </DropdownMenuItem>
                       <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
                     </>
                   ) : (
@@ -302,9 +442,29 @@ const Navigation = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <div className="ml-4 cursor-pointer">
-                  <Avatar>
+                  <Avatar className="w-12 h-12 border-2 border-primary shadow-lg">
+                    <AvatarImage 
+                      src={profilePicture} 
+                      alt={user?.username}
+                      onError={(e) => {
+                        console.error('Failed to load profile picture (mobile):', profilePicture);
+                        setProfilePicture('');
+                      }}
+                      onLoad={() => {
+                        console.log('Profile picture loaded successfully (mobile):', profilePicture);
+                      }}
+                      className="object-cover w-full h-full"
+                    />
                     <AvatarFallback>
-                      <User className="w-5 h-5" />
+                      {profilePicture ? (
+                        user?.username?.[0]?.toUpperCase() || <User className="w-5 h-5" />
+                      ) : selectedAvatar ? (
+                        <div className={`w-full h-full flex items-center justify-center ${defaultAvatars.find(av => av.id === selectedAvatar)?.color}`}>
+                          {defaultAvatars.find(av => av.id === selectedAvatar)?.emoji}
+                        </div>
+                      ) : (
+                        user?.username?.[0]?.toUpperCase() || <User className="w-5 h-5" />
+                      )}
                     </AvatarFallback>
                   </Avatar>
                 </div>
@@ -314,6 +474,9 @@ const Navigation = () => {
                   <>
                     <DropdownMenuItem disabled>Signed in as <b>{user.username}</b></DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <NavLink to="/profile">Profile</NavLink>
+                    </DropdownMenuItem>
                     <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
                   </>
                 ) : (

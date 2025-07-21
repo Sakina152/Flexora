@@ -3,11 +3,17 @@ import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import { ShoppingBag, X, CheckCircle } from 'lucide-react';
 import { toast } from "sonner";
+import Suggestions from '../components/Suggestions';
+import AddressManager from '../components/AddressManager';
+import { useAuth } from '../App';
+import { getStorageData, setStorageData, removeStorageData, getStorageKey, STORAGE_KEYS } from '../lib/storage';
 
 const Cart = () => {
+  const { user } = useAuth();
   const [cartItems, setCartItems] = useState<any[]>([]);
   const [showCheckout, setShowCheckout] = useState(false);
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
+  const [showAddressManager, setShowAddressManager] = useState(false);
   const [form, setForm] = useState({
     name: '',
     email: '',
@@ -17,15 +23,23 @@ const Cart = () => {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    const savedCart = localStorage.getItem('flexora-cart');
-    if (savedCart) {
-      setCartItems(JSON.parse(savedCart));
+    if (!user?.username) {
+      console.log('Cart: No user username available');
+      return;
     }
-  }, []);
+    
+    console.log('Cart: Loading data for user:', user.username);
+    const savedCart = getStorageData(STORAGE_KEYS.CART, user.username, []);
+    console.log('Cart: Loaded cart data:', savedCart);
+    console.log('Cart: Storage key used:', getStorageKey(STORAGE_KEYS.CART, user.username));
+    setCartItems(savedCart);
+  }, [user?.username]);
 
   const updateCart = (items: any[]) => {
+    if (!user?.username) return;
+    
     setCartItems(items);
-    localStorage.setItem('flexora-cart', JSON.stringify(items));
+    setStorageData(STORAGE_KEYS.CART, items, user.username);
     window.dispatchEvent(new Event('cart-updated'));
   };
 
@@ -59,10 +73,30 @@ const Cart = () => {
       setFormError('Phone number must be exactly 10 digits.');
       return;
     }
+
+    // Save the completed order to localStorage (username-specific)
+    if (!user?.username) return;
+    
+    const orders = getStorageData(STORAGE_KEYS.ORDERS, user.username, []);
+    const newOrder = {
+      id: `order-${Date.now()}`,
+      items: cartItems,
+      total: total,
+      customerInfo: form,
+      date: new Date().toISOString(),
+      status: 'completed'
+    };
+    
+    orders.push(newOrder);
+    setStorageData(STORAGE_KEYS.ORDERS, orders, user.username);
+
+    // Clear cart and show success
     setCheckoutSuccess(true);
     setCartItems([]);
-    localStorage.removeItem('flexora-cart');
+    removeStorageData(STORAGE_KEYS.CART, user.username);
     window.dispatchEvent(new Event('cart-updated'));
+    
+    toast.success('Order placed successfully!');
   };
 
   return (
@@ -167,14 +201,38 @@ const Cart = () => {
                         />
                       </div>
                       <div className="md:col-span-2">
-                        <label className="block text-sm font-medium text-foreground mb-1">Address</label>
-                        <textarea
-                          name="address"
-                          value={form.address}
-                          onChange={handleInputChange}
-                          className="w-full px-4 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                          required
-                        />
+                        <div className="flex items-center justify-between mb-2">
+                          <label className="block text-sm font-medium text-foreground">Address</label>
+                          <button
+                            type="button"
+                            onClick={() => setShowAddressManager(!showAddressManager)}
+                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                          >
+                            {showAddressManager ? 'Hide Saved Addresses' : 'Use Saved Addresses'}
+                          </button>
+                        </div>
+                        
+                        {showAddressManager ? (
+                          <AddressManager
+                            selectedAddress={form.address}
+                            onAddressSelect={(address) => setForm({ ...form, address })}
+                            onAddressesChange={() => {}}
+                            className="mb-4"
+                          />
+                        ) : (
+                          <>
+                            <Suggestions
+                              value={form.address}
+                              onChange={(address) => setForm({ ...form, address })}
+                              placeholder="Start typing your address for suggestions..."
+                              className="w-full"
+                              type="address"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                              Type at least 3 characters to see address suggestions
+                            </p>
+                          </>
+                        )}
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-foreground mb-1">Phone</label>

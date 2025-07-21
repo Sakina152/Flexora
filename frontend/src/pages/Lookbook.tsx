@@ -6,6 +6,8 @@ import PageHero from '../components/PageHero';
 import { ArrowLeft, Heart, Share2, BookmarkPlus, Sparkles, ShoppingBag, Star, Eye } from 'lucide-react';
 import { toast } from "sonner";
 import { products, Product } from '../data/products';
+import { useAuth } from '../App';
+import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
 
 interface LookbookItem {
   id: number;
@@ -173,6 +175,7 @@ const personaData: Record<string, PersonaData> = {
 const Lookbook = () => {
   const { persona } = useParams<{ persona: string }>();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [favoriteItems, setFavoriteItems] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
@@ -234,17 +237,19 @@ const Lookbook = () => {
   };
 
   const handleFavorite = (item: LookbookItem) => {
-    const savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    if (!user?.username) return;
+    
+    const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
     const isAlreadyFavorite = savedFavorites.some((fav: any) => fav.id === item.id);
     
     if (!isAlreadyFavorite) {
       const updatedFavorites = [...savedFavorites, { ...item, type: 'product' }];
-      localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+      setStorageData(STORAGE_KEYS.FAVORITES, updatedFavorites, user.username);
       setFavoriteItems(prev => new Set([...prev, item.id]));
       toast.success("Added to favorites!");
     } else {
       const updatedFavorites = savedFavorites.filter((fav: any) => fav.id !== item.id);
-      localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+      setStorageData(STORAGE_KEYS.FAVORITES, updatedFavorites, user.username);
       setFavoriteItems(prev => {
         const newFavs = new Set(prev);
         newFavs.delete(item.id);
@@ -255,7 +260,12 @@ const Lookbook = () => {
   };
 
   const handleAddToCart = (item: LookbookItem) => {
-    const cart = JSON.parse(localStorage.getItem('flexora-cart') || '[]');
+    if (!user?.username) {
+      toast.error('Please login to add items to your cart.');
+      return;
+    }
+    
+    const cart = getStorageData(STORAGE_KEYS.CART, user.username, []);
     const existing = cart.find((cartItem: any) => cartItem.id === item.id);
     
     if (existing) {
@@ -271,17 +281,19 @@ const Lookbook = () => {
       });
     }
     
-    localStorage.setItem('flexora-cart', JSON.stringify(cart));
+    setStorageData(STORAGE_KEYS.CART, cart, user.username);
     toast.success("Added to cart!");
     window.dispatchEvent(new Event('cart-updated'));
   };
 
   useEffect(() => {
-    // Load favorite items from localStorage
-    const savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
-    const favoriteIds = new Set(savedFavorites.map((fav: any) => fav.id).filter((id: any) => typeof id === 'number')) as Set<number>;
-    setFavoriteItems(favoriteIds);
-  }, []);
+    // Load favorite items from localStorage (username-specific)
+    if (user?.username) {
+      const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
+      const favoriteIds = new Set(savedFavorites.map((fav: any) => fav.id).filter((id: any) => typeof id === 'number')) as Set<number>;
+      setFavoriteItems(favoriteIds);
+    }
+  }, [user?.username]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -4,22 +4,27 @@ import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
 import { Heart, Eye, MessageCircle, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../App';
+import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
 
 const Favorites = () => {
+  const { user } = useAuth();
   const [favorites, setFavorites] = useState<any[]>([]);
 
   useEffect(() => {
-    // Get favorites from localStorage
-    const savedFavorites = localStorage.getItem('flexora-favorites');
-    if (savedFavorites) {
-      setFavorites(JSON.parse(savedFavorites));
-    }
-  }, []);
+    // Get favorites from localStorage (username-specific)
+    if (!user?.username) return;
+    
+    const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
+    setFavorites(savedFavorites);
+  }, [user?.username]);
 
   const handleRemoveFromFavorites = (itemId: number, itemType?: string) => {
+    if (!user?.username) return;
+    
     const updatedFavorites = favorites.filter(item => !(item.id === itemId && (itemType ? item.type === itemType : true)));
     setFavorites(updatedFavorites);
-    localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+    setStorageData(STORAGE_KEYS.FAVORITES, updatedFavorites, user.username);
   };
 
   return (

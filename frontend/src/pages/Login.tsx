@@ -4,9 +4,9 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../compone
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '../App';
+import Suggestions from '../components/Suggestions';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [loading, setLoading] = useState(false);
@@ -25,7 +25,7 @@ const Login = () => {
       return;
     }
     try {
-      const response = await fetch('http://localhost:8000/api/login/', {
+      const response = await fetch('http://localhost:8000/api/token/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
@@ -36,7 +36,7 @@ const Login = () => {
         setError('');
         navigate('/');
       } else {
-        setError(data.detail || 'Login failed.');
+        setError(data.detail || data.error || 'Login failed.');
       }
     } catch (err) {
       setError('An error occurred.');
@@ -53,27 +53,30 @@ const Login = () => {
             <CardTitle className="text-center">Login to Flexora</CardTitle>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6" autoComplete="off">
               <div>
                 <label htmlFor="username" className="block text-sm font-medium text-foreground mb-1">Username</label>
-                <input
-                  id="username"
-                  type="text"
+                <Suggestions
                   value={username}
-                  onChange={e => setUsername(e.target.value)}
-                  className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                  required
+                  onChange={setUsername}
+                  placeholder=""
+                  className="w-full"
+                  type="username"
                 />
               </div>
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-foreground mb-1">Password</label>
                 <input
                   id="password"
+                  name="password"
                   type="password"
                   value={password}
-                  onChange={e => setPassword(e.target.value)}
+                  onChange={e => { setPassword(e.target.value); setError(''); }}
                   className="w-full px-4 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                   required
+                  autoComplete="new-password"
+                  data-lpignore="true"
+                  data-form-type="other"
                 />
               </div>
               {error && <div className="text-red-500 text-sm text-center">{error}</div>}

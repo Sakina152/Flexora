@@ -1,13 +1,17 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
 import { Heart, Eye, MessageCircle, BookmarkPlus, Palette, Layers, ShoppingBag } from 'lucide-react';
+import { useAuth } from '../App';
+import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
 
 const Collections = () => {
+  const { user } = useAuth();
   const [likedPosts, setLikedPosts] = useState<Set<number>>(new Set());
+  const [favoriteCollections, setFavoriteCollections] = useState<Set<number>>(new Set());
 
   const collections = [
     {
@@ -102,13 +106,33 @@ const Collections = () => {
     });
   };
 
+  // Load favorites when user is available
+  useEffect(() => {
+    if (user?.username) {
+      const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
+      const favoriteIds = new Set(savedFavorites.map((fav: any) => fav.id).filter((id: any) => typeof id === 'number')) as Set<number>;
+      setFavoriteCollections(favoriteIds);
+    }
+  }, [user?.username]);
+
   const handleFavorite = (collection: any) => {
-    const savedFavorites = JSON.parse(localStorage.getItem('flexora-favorites') || '[]');
+    if (!user?.username) return;
+    
+    const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
     const isAlreadyFavorite = savedFavorites.some((fav: any) => fav.id === collection.id);
     
     if (!isAlreadyFavorite) {
-      const updatedFavorites = [...savedFavorites, collection];
-      localStorage.setItem('flexora-favorites', JSON.stringify(updatedFavorites));
+      const updatedFavorites = [...savedFavorites, { ...collection, type: 'collection' }];
+      setStorageData(STORAGE_KEYS.FAVORITES, updatedFavorites, user.username);
+      setFavoriteCollections(prev => new Set([...prev, collection.id]));
+    } else {
+      const updatedFavorites = savedFavorites.filter((fav: any) => fav.id !== collection.id);
+      setStorageData(STORAGE_KEYS.FAVORITES, updatedFavorites, user.username);
+      setFavoriteCollections(prev => {
+        const newFavs = new Set(prev);
+        newFavs.delete(collection.id);
+        return newFavs;
+      });
     }
   };
 
