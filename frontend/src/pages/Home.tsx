@@ -4,10 +4,12 @@ import Navigation from '../components/Navigation';
 import Hero from '../components/Hero';
 import Footer from '../components/Footer';
 import FashionStyleQuiz from '../components/FashionStyleQuiz';
+import TrendSwipePopup from '../components/TrendSwipePopup';
 import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, BookmarkPlus, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
+import { products as allProducts } from '../data/products';
 
 interface HomeProps {
   openQuiz?: boolean;
@@ -20,6 +22,10 @@ const Home = ({ openQuiz = false }: HomeProps) => {
   const [favoritePosts, setFavoritePosts] = useState<Set<number>>(new Set());
   const [lookbookPersona, setLookbookPersona] = useState<string | null>(null);
   const [showLookbookPopup, setShowLookbookPopup] = useState(true);
+  const [showSwipe, setShowSwipe] = useState(false);
+  const [swipePersona, setSwipePersona] = useState<string | null>(null);
+  const [swipeProducts, setSwipeProducts] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     setLookbookPersona(localStorage.getItem('flexora-last-persona'));
@@ -137,6 +143,34 @@ const Home = ({ openQuiz = false }: HomeProps) => {
         return newFavs;
       });
     }
+  };
+
+  const handleOpenSwipe = () => {
+    const persona = localStorage.getItem('flexora-last-persona');
+    setSwipePersona(persona);
+    let filtered;
+    if (persona) {
+      // mimic Lookbook persona filtering
+      const personaMap: Record<string, string> = {
+        'minimalist-style': 'Minimalist',
+        'bohemian-style': 'Bohemian',
+        'vintage-style': 'Vintage',
+        'casual-style': 'Casual',
+        'streetwear-style': 'Streetwear',
+        'formal-style': 'Formal',
+      };
+      const style = personaMap[persona] || '';
+      filtered = allProducts.filter(p => p.category === style);
+    } else {
+      filtered = allProducts;
+    }
+    setSwipeProducts(filtered.map(p => ({
+      id: p.id,
+      name: p.name,
+      images: p.images,
+      tags: [p.category, ...(p.tags || [])],
+    })));
+    setShowSwipe(true);
   };
 
   return (
@@ -282,6 +316,29 @@ const Home = ({ openQuiz = false }: HomeProps) => {
             </button>
           </div>
         </section>
+        {/* Floating Action Button for Trend Swipe */}
+        <TrendSwipePopup
+          persona={swipePersona || 'minimalist-style'}
+          products={swipeProducts}
+          isOpen={showSwipe}
+          onClose={() => setShowSwipe(false)}
+          onComplete={(liked, skipped) => {
+            localStorage.setItem(`flexora-swipe-results-${swipePersona || 'minimalist-style'}`, JSON.stringify({ liked, skipped }));
+            setShowSwipe(false);
+            if (swipePersona) navigate(`/lookbook/${swipePersona}`);
+            else navigate('/lookbook/minimalist-style');
+          }}
+        />
+        <button
+          className="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center hover:scale-110 transition-all group"
+          style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
+          onClick={handleOpenSwipe}
+          title="Try Trend Swipe"
+          aria-label="Try Trend Swipe"
+        >
+          <Sparkles className="w-8 h-8 text-primary-foreground group-hover:animate-pulse" />
+          <span className="absolute bottom-20 right-0 bg-background text-foreground text-xs rounded px-3 py-1 shadow opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Try Trend Swipe</span>
+        </button>
       </main>
 
       <FashionStyleQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />

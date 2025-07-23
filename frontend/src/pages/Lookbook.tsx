@@ -1,13 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { ArrowLeft, Heart, Share2, BookmarkPlus, Sparkles, ShoppingBag, Star, Eye } from 'lucide-react';
+import { ArrowLeft, Share2, BookmarkPlus, Sparkles, ShoppingBag, Star} from 'lucide-react';
 import { toast } from "sonner";
 import { products, Product } from '../data/products';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
+import TrendSwipePopup from '../components/TrendSwipePopup';
+import { ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react';
 
 interface LookbookItem {
   id: number;
@@ -172,6 +174,173 @@ const personaData: Record<string, PersonaData> = {
   }
 };
 
+// Add a local type for swipe products
+interface SwipeProduct {
+  id: number;
+  name: string;
+  images: string[];
+  tags: string[];
+}
+
+function getSwipeResults(persona: string): { liked: SwipeProduct[]; skipped: SwipeProduct[] } {
+  try {
+    const raw = localStorage.getItem(`flexora-swipe-results-${persona}`);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { liked: [], skipped: [] };
+}
+
+function setSwipeResults(persona: string, liked: SwipeProduct[], skipped: SwipeProduct[]) {
+  try {
+    localStorage.setItem(`flexora-swipe-results-${persona}`, JSON.stringify({ liked, skipped }));
+  } catch {}
+}
+
+// Carousel for liked products
+const LikedCarousel = ({ items }: { items: SwipeProduct[] }) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollBy = 320;
+  const handleScroll = (dir: 'left' | 'right') => {
+    if (!scrollRef.current) return;
+    const newScroll = dir === 'left' ? scrollRef.current.scrollLeft - scrollBy : scrollRef.current.scrollLeft + scrollBy;
+    scrollRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
+  };
+  return (
+    <div className="relative">
+      <button
+        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 rounded-full p-2 shadow hover:bg-accent transition disabled:opacity-30"
+        onClick={() => handleScroll('left')}
+        disabled={!scrollRef.current || scrollRef.current.scrollLeft === 0}
+        aria-label="Scroll left"
+        style={{ display: items.length > 2 ? 'block' : 'none' }}
+      >
+        <ChevronLeft className="w-6 h-6" />
+      </button>
+      <div
+        ref={scrollRef}
+        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-thumb-accent/40 scrollbar-track-transparent"
+        style={{ scrollBehavior: 'smooth' }}
+      >
+        {items.map((item, index) => (
+          <Link
+            to={`/products/${item.id}`}
+            key={item.id}
+            className="min-w-[280px] max-w-[320px] snap-center bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group flex-shrink-0 relative"
+            style={{ animationDelay: `${index * 80}ms` }}
+          >
+            <div className={`h-48 bg-gradient-to-br ${item.images[0]} flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative`}></div>
+            {/* Red heart icon for liked */}
+            <div className="absolute top-3 right-3 bg-white/90 rounded-full p-1 shadow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="#ef4444" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ef4444" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.239-4.5-5-4.5-1.657 0-3.156.832-4 2.086C10.156 4.582 8.657 3.75 7 3.75c-2.761 0-5 2.015-5 4.5 0 7.25 10 12.5 10 12.5s10-5.25 10-12.5z" />
+              </svg>
+            </div>
+            <div className="p-4">
+              <h3 className="font-display text-lg font-semibold text-foreground mb-2 hover:text-primary transition-colors">{item.name}</h3>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {item.tags.map(tag => (
+                  <span key={tag} className="px-3 py-1 bg-accent/20 text-primary rounded-full text-xs font-medium border border-border">{tag}</span>
+                ))}
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+      <button
+        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 rounded-full p-2 shadow hover:bg-accent transition disabled:opacity-30"
+        onClick={() => handleScroll('right')}
+        disabled={!scrollRef.current || (scrollRef.current.scrollLeft + scrollRef.current.offsetWidth) >= (scrollRef.current.scrollWidth - 10)}
+        aria-label="Scroll right"
+        style={{ display: items.length > 2 ? 'block' : 'none' }}
+      >
+        <ChevronRight className="w-6 h-6" />
+      </button>
+    </div>
+  );
+};
+
+// Extracted ProductCard for reuse
+const ProductCard = ({ item, likedItems, favoriteItems, onLike, onFavorite, onAddToCart, user }: {
+  item: LookbookItem,
+  likedItems: Set<number>,
+  favoriteItems: Set<number>,
+  onLike: (id: number) => void,
+  onFavorite: (item: LookbookItem) => void,
+  onAddToCart: (item: LookbookItem) => void,
+  user: any
+}) => (
+  <article
+    className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
+  >
+    <Link to={`/products/${item.id}`} className="block">
+      <div className="h-64 bg-gradient-to-br from-primary-cream to-soft-pink flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative"></div>
+      <div className="p-4">
+        <div className="flex items-center gap-2 mb-2">
+          <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
+            {item.category}
+          </span>
+        </div>
+        <h3 className="font-display text-lg font-semibold text-foreground mb-2 hover:text-primary transition-colors">
+          {item.title}
+        </h3>
+        <p className="text-sm text-muted-foreground mb-2">
+          by {item.designer}
+        </p>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium">{item.rating}</span>
+          </div>
+          <span className="text-sm text-muted-foreground">
+            ({item.reviews} reviews)
+          </span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-lg font-bold text-foreground">
+              ${item.price}
+            </span>
+            {item.originalPrice && (
+              <span className="text-sm text-muted-foreground line-through">
+                ${item.originalPrice}
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+    </Link>
+    <div className="flex items-center gap-2 p-4 pt-0">
+      <button
+        onClick={() => onLike(item.id)}
+        className={`p-2 rounded-full transition-colors ${
+          likedItems.has(item.id) 
+            ? 'text-red-500 bg-red-50' 
+            : 'text-muted-foreground hover:text-red-500 hover:bg-red-50'
+        }`}
+      >
+        <Heart className={`w-4 h-4 ${likedItems.has(item.id) ? 'fill-current' : ''}`} />
+      </button>
+      <button
+        onClick={() => onFavorite(item)}
+        className={`p-2 rounded-full transition-colors ${
+          favoriteItems.has(item.id)
+            ? 'text-primary bg-primary/10'
+            : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
+        }`}
+      >
+        <BookmarkPlus className={`w-4 h-4 ${favoriteItems.has(item.id) ? 'fill-current' : ''}`} />
+      </button>
+      <button
+        onClick={() => onAddToCart(item)}
+        className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors flex items-center gap-1"
+      >
+        <ShoppingBag className="w-3 h-3" />
+        Add to Cart
+      </button>
+    </div>
+  </article>
+);
+
 const Lookbook = () => {
   const { persona } = useParams<{ persona: string }>();
   const navigate = useNavigate();
@@ -179,6 +348,21 @@ const Lookbook = () => {
   const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
   const [favoriteItems, setFavoriteItems] = useState<Set<number>>(new Set());
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  // Swipe popup state
+  const [showSwipe, setShowSwipe] = useState(false);
+  const [swipeLiked, setSwipeLiked] = useState<SwipeProduct[]>([]);
+  const [swipeSkipped, setSwipeSkipped] = useState<SwipeProduct[]>([]);
+  const [hasSwipeResults, setHasSwipeResults] = useState(false);
+  // Collapsible skipped section
+  const [showSkipped, setShowSkipped] = useState(false);
+
+  // Restore swipe results from localStorage on mount/persona change
+  useEffect(() => {
+    const { liked, skipped } = getSwipeResults(persona || 'minimalist-style');
+    setSwipeLiked(liked);
+    setSwipeSkipped(skipped);
+    setHasSwipeResults((liked.length > 0 || skipped.length > 0));
+  }, [persona]);
 
   // Persist persona to localStorage if present
   useEffect(() => {
@@ -295,11 +479,168 @@ const Lookbook = () => {
     }
   }, [user?.username]);
 
+  const swipeProducts: SwipeProduct[] = data.items.map(item => ({
+    id: item.id,
+    name: item.title,
+    images: [item.image],
+    tags: item.category ? [item.category, ...(item.sizes || []), ...(item.colors || []), ...(item.featured ? ['featured'] : [])] : [],
+  }));
+
+  // Only show main grid for products not in liked/skipped
+  const likedIds = new Set(swipeLiked.map(p => p.id));
+  const skippedIds = new Set(swipeSkipped.map(p => p.id));
+  const remainingItems = filteredItems.filter(item => !likedIds.has(item.id) && !skippedIds.has(item.id));
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main className="w-full">
+    <>
+      <TrendSwipePopup
+        persona={persona || 'minimalist-style'}
+        products={swipeProducts}
+        isOpen={showSwipe}
+        onClose={() => setShowSwipe(false)}
+        onComplete={(liked, skipped) => {
+          setSwipeLiked(liked);
+          setSwipeSkipped(skipped);
+          setSwipeResults(persona || 'minimalist-style', liked, skipped);
+          setShowSwipe(false);
+        }}
+      />
+      <button
+        className="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center hover:scale-110 transition-all group"
+        style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
+        onClick={() => setShowSwipe(true)}
+        title="Try Trend Swipe"
+        aria-label="Try Trend Swipe"
+      >
+        <Sparkles className="w-8 h-8 text-primary-foreground group-hover:animate-pulse" />
+        <span className="absolute bottom-20 right-0 bg-background text-foreground text-xs rounded px-3 py-1 shadow opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Try Trend Swipe</span>
+      </button>
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        {/* Show See Your Swipe Results button if results exist and not currently shown */}
+        {hasSwipeResults && swipeLiked.length === 0 && swipeSkipped.length === 0 && (
+          <div className="flex justify-center mt-4">
+            <button
+              className="px-5 py-2 bg-accent text-accent-foreground rounded-lg font-medium shadow hover:scale-105 transition-all"
+              onClick={() => {
+                const { liked, skipped } = getSwipeResults(persona || 'minimalist-style');
+                setSwipeLiked(liked);
+                setSwipeSkipped(skipped);
+              }}
+            >
+              See Your Swipe Results
+            </button>
+          </div>
+        )}
+        {/* Liked Products Carousel (now vertical grid) */}
+        {swipeLiked.length > 0 && (
+          <section className="py-8 px-6">
+            <div className="max-w-6xl mx-auto">
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="w-6 h-6 text-primary" />
+                <h2 className="font-display text-xl font-bold text-foreground">You Liked These!</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {swipeLiked
+                  .map(item => data.items.find(i => i.id === item.id))
+                  .filter((item): item is LookbookItem => !!item)
+                  .map(item => (
+                    <ProductCard
+                      key={item.id}
+                      item={item}
+                      likedItems={likedItems}
+                      favoriteItems={favoriteItems}
+                      onLike={handleLike}
+                      onFavorite={handleFavorite}
+                      onAddToCart={handleAddToCart}
+                      user={user}
+                    />
+                  ))}
+              </div>
+            </div>
+          </section>
+        )}
+        {/* Skipped Products Collapsible (now vertical grid) */}
+        {swipeSkipped.length > 0 && (
+          <section className="py-4 px-6 mb-12">
+            <div className="max-w-6xl mx-auto">
+              <button
+                className="flex items-center gap-2 mb-2 text-muted-foreground hover:text-foreground text-sm font-medium"
+                onClick={() => setShowSkipped(v => !v)}
+                aria-expanded={showSkipped}
+              >
+                <ChevronLeft className={`w-4 h-4 transition-transform ${showSkipped ? 'rotate-[-90deg]' : 'rotate-180'}`} />
+                {showSkipped ? 'Hide' : 'Show'} Skipped Products ({swipeSkipped.length})
+              </button>
+              {showSkipped && (
+                <div className="mt-4">
+                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 opacity-60">
+                    {swipeSkipped
+                      .map(item => data.items.find(i => i.id === item.id))
+                      .filter((item): item is LookbookItem => !!item)
+                      .map(item => (
+                        <ProductCard
+                          key={item.id}
+                          item={item}
+                          likedItems={likedItems}
+                          favoriteItems={favoriteItems}
+                          onLike={handleLike}
+                          onFavorite={handleFavorite}
+                          onAddToCart={handleAddToCart}
+                          user={user}
+                        />
+                      ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
+        {/* Main grid: if no trend swipe, show all products as before */}
+        {(swipeLiked.length === 0 && swipeSkipped.length === 0) && (
+          <section className="py-16 px-6 bg-background">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-8">
+                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+                  Your Personalized Collection
+                </h2>
+                <p className="text-muted-foreground mb-6">
+                  {filteredItems.length} products curated for your {data.title.toLowerCase().replace(' lookbook', '')} style
+                </p>
+                {/* Category Filter */}
+                <div className="flex flex-wrap justify-center gap-4">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
+                        selectedCategory === category
+                          ? 'bg-primary text-primary-foreground border-primary'
+                          : 'bg-card text-muted-foreground hover:text-foreground border-border'
+                      }`}
+                    >
+                      {category} ({data.items.filter(item => category === 'All' || item.category === category).length})
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredItems.map((item, index) => (
+                  <ProductCard
+                    key={item.id}
+                    item={item}
+                    likedItems={likedItems}
+                    favoriteItems={favoriteItems}
+                    onLike={handleLike}
+                    onFavorite={handleFavorite}
+                    onAddToCart={handleAddToCart}
+                    user={user}
+                  />
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
         <PageHero 
           title={data.title}
           subtitle={data.description}
@@ -339,140 +680,6 @@ const Lookbook = () => {
                 >
                   <p className="text-sm text-muted-foreground">{recommendation}</p>
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Products Section */}
-        <section className="py-16 px-6 bg-background">
-          <div className="max-w-6xl mx-auto">
-            {/* Products Count and Category Filter */}
-            <div className="text-center mb-8">
-              <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                Your Personalized Collection
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                {filteredItems.length} products curated for your {data.title.toLowerCase().replace(' lookbook', '')} style
-              </p>
-              
-              {/* Category Filter */}
-              <div className="flex flex-wrap justify-center gap-4">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
-                      selectedCategory === category
-                        ? 'bg-primary text-primary-foreground border-primary'
-                        : 'bg-card text-muted-foreground hover:text-foreground border-border'
-                    }`}
-                  >
-                    {category} ({data.items.filter(item => category === 'All' || item.category === category).length})
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Products Grid */}
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {filteredItems.map((item, index) => (
-                <article 
-                  key={item.id} 
-                  className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
-                  <Link to={`/products/${item.id}`}>
-                    <div className="h-64 bg-gradient-to-br from-primary-cream to-soft-pink flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative">
-                      <div className="grid grid-cols-3 gap-1 w-24 h-24">
-                        <div className="bg-gradient-to-br from-amber-200 to-rose-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-green-200 to-teal-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-pink-200 to-orange-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-yellow-200 to-amber-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-indigo-200 to-blue-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-red-200 to-pink-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-purple-200 to-indigo-200 rounded"></div>
-                        <div className="bg-gradient-to-br from-teal-200 to-green-200 rounded"></div>
-                      </div>
-                      {item.featured && (
-                        <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
-                          Featured
-                        </div>
-                      )}
-                      {item.trending && (
-                        <div className="absolute top-3 right-3 bg-accent text-white px-2 py-1 rounded-full text-xs font-medium">
-                          Trending
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                  <div className="p-4">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
-                        {item.category}
-                      </span>
-                    </div>
-                    <Link to={`/products/${item.id}`}>
-                      <h3 className="font-display text-lg font-semibold text-foreground mb-2 hover:text-primary transition-colors">
-                        {item.title}
-                      </h3>
-                    </Link>
-                    <p className="text-sm text-muted-foreground mb-2">
-                      by {item.designer}
-                    </p>
-                    <div className="flex items-center gap-2 mb-3">
-                      <div className="flex items-center gap-1">
-                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                        <span className="text-sm font-medium">{item.rating}</span>
-                      </div>
-                      <span className="text-sm text-muted-foreground">
-                        ({item.reviews} reviews)
-                      </span>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg font-bold text-foreground">
-                          ${item.price}
-                        </span>
-                        {item.originalPrice && (
-                          <span className="text-sm text-muted-foreground line-through">
-                            ${item.originalPrice}
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => handleLike(item.id)}
-                          className={`p-2 rounded-full transition-colors ${
-                            likedItems.has(item.id) 
-                              ? 'text-red-500 bg-red-50' 
-                              : 'text-muted-foreground hover:text-red-500 hover:bg-red-50'
-                          }`}
-                        >
-                          <Heart className={`w-4 h-4 ${likedItems.has(item.id) ? 'fill-current' : ''}`} />
-                        </button>
-                        <button
-                          onClick={() => handleFavorite(item)}
-                          className={`p-2 rounded-full transition-colors ${
-                            favoriteItems.has(item.id)
-                              ? 'text-primary bg-primary/10'
-                              : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
-                          }`}
-                        >
-                          <BookmarkPlus className={`w-4 h-4 ${favoriteItems.has(item.id) ? 'fill-current' : ''}`} />
-                        </button>
-                        <button
-                          onClick={() => handleAddToCart(item)}
-                          className="px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors flex items-center gap-1"
-                        >
-                          <ShoppingBag className="w-3 h-3" />
-                          Add to Cart
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </article>
               ))}
             </div>
           </div>
@@ -549,10 +756,8 @@ const Lookbook = () => {
             </div>
           </div>
         </section>
-      </main>
-
-      <Footer />
-    </div>
+      </div>
+    </>
   );
 };
 
