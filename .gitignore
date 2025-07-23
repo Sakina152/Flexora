@@ -24,6 +24,10 @@ dist-ssr
 *.sw?
 
 *.sqlite3
+*.pyc
+__pycache__/
+
+node_modules/
 
 venv/
 backend/venv/
