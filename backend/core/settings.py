@@ -43,6 +43,18 @@ INSTALLED_APPS = [
     'api',
 ]
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'flexora_db',
+#         'USER': 'flexora_user',
+#         'PASSWORD': 'Yahoo@&$5253',
+#         'HOST': 'localhost',
+#         'PORT': '5432',
+#     }
+# }
+
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -80,9 +92,13 @@ WSGI_APPLICATION = "core.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'flexora_db',
+        'USER': 'flexora_user',
+        'PASSWORD': 'flexora_pass123',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
