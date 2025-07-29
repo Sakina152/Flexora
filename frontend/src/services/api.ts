@@ -1,0 +1,97 @@
+const API_BASE_URL = 'http://127.0.0.1:8000/api';
+
+export interface Product {
+  id: string;
+  name: string;
+  price: string;
+  description: string;
+  image_url?: string;
+  image?: string;
+  category: string;
+  brand?: string;
+  stock_quantity: number;
+  sku?: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApiResponse<T> {
+  data?: T;
+  error?: string;
+  details?: string;
+}
+
+class ApiService {
+  private async makeRequest<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
+    try {
+      console.log(`API Request: ${API_BASE_URL}${endpoint}`);
+      
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          ...options?.headers,
+        },
+        ...options,
+      });
+
+      console.log(`API Response Status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('API Error Response:', errorData);
+        return {
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+          details: errorData.details,
+        };
+      }
+
+      const data = await response.json();
+      console.log('API Success Response:', data);
+      return { data };
+    } catch (error) {
+      console.error('API Network Error:', error);
+      return {
+        error: 'Network error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  // Get all products
+  async getProducts(category?: string, featured?: boolean): Promise<ApiResponse<Product[]>> {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (featured) params.append('featured', 'true');
+    
+    return this.makeRequest<Product[]>(`/products/?${params.toString()}`);
+  }
+
+  // Get a single product by ID
+  async getProduct(id: string): Promise<ApiResponse<Product>> {
+    console.log(`Fetching product with ID: ${id}`);
+    return this.makeRequest<Product>(`/products/${id}/`);
+  }
+
+  // Get all categories
+  async getCategories(): Promise<ApiResponse<{ categories: string[] }>> {
+    return this.makeRequest<{ categories: string[] }>('/products/categories/');
+  }
+
+  // Get featured products
+  async getFeaturedProducts(): Promise<ApiResponse<Product[]>> {
+    return this.getProducts(undefined, true);
+  }
+
+  // Get products by category
+  async getProductsByCategory(category: string): Promise<ApiResponse<Product[]>> {
+    return this.getProducts(category);
+  }
+
+  // Test API connection
+  async testConnection(): Promise<ApiResponse<{ message: string }>> {
+    return this.makeRequest<{ message: string }>('/hello/');
+  }
+}
+
+export const apiService = new ApiService(); 

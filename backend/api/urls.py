@@ -1,5 +1,9 @@
 from django.urls import path
-from .views import hello, RegisterView, QuizSubmissionView, ProfileView, ChangePasswordView, DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView
+from .views import (
+    hello, RegisterView, QuizSubmissionView, ProfileView, ChangePasswordView, 
+    DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView,
+    ProductListView, ProductDetailView, ProductCategoriesView
+)
 
 urlpatterns = [
     path('hello/', hello),
@@ -11,4 +15,9 @@ urlpatterns = [
     path('delete-account/', DeleteAccountView.as_view(), name='delete-account'),
     path('quiz/submit/', QuizSubmissionView.as_view(), name='quiz-submit'),
     path('usernames/', UsernameSuggestionsView.as_view(), name='username-suggestions'),
+    
+    # Product API endpoints
+    path('products/', ProductListView.as_view(), name='product-list'),
+    path('products/<str:product_id>/', ProductDetailView.as_view(), name='product-detail'),
+    path('products/categories/', ProductCategoriesView.as_view(), name='product-categories'),
 ]

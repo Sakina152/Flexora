@@ -11,11 +11,84 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from .models import UserProfile
+from .models import UserProfile, Product
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.conf import settings
 import os
+from rest_framework import serializers
+
+# Product Serializer
+class ProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'name', 'price', 'description', 'image_url', 'image', 'category', 'brand', 'stock_quantity', 'sku', 'is_active', 'created_at', 'updated_at']
+
+# Product API Views
+class ProductListView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """Get all products or filter by category"""
+        try:
+            category = request.GET.get('category')
+            featured = request.GET.get('featured')
+            
+            products = Product.objects.filter(is_active=True)
+            
+            if category:
+                products = products.filter(category=category)
+            
+            if featured:
+                # For now, we'll consider products with higher stock as featured
+                # You can add a featured field to the Product model later
+                products = products.filter(stock_quantity__gt=20)
+            
+            serializer = ProductSerializer(products, many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch products',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProductDetailView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, product_id):
+        """Get a specific product by ID"""
+        try:
+            product = Product.objects.get(id=product_id, is_active=True)
+            serializer = ProductSerializer(product)
+            return Response(serializer.data)
+            
+        except Product.DoesNotExist:
+            return Response({
+                'error': 'Product not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch product',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ProductCategoriesView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """Get all available product categories"""
+        try:
+            categories = Product.objects.filter(is_active=True).values_list('category', flat=True).distinct()
+            return Response({
+                'categories': list(categories)
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch categories',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def hello(request):
     return JsonResponse({"message": "Hello from Django backend!"})
