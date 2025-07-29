@@ -56,7 +56,6 @@ INSTALLED_APPS = [
 
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -64,27 +63,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-]
-CORS_ALLOWED_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
-]
 
 ROOT_URLCONF = "core.urls"
 
@@ -111,9 +93,9 @@ from cloudinary.utils import cloudinary_url
 
 # Configuration       
 cloudinary.config( 
-    cloud_name = "dj99emwc0", 
-    api_key = "223957316141819", 
-    api_secret = "w32S8VtEzPlV-veBlcf4GDM7tg8", # Click 'View API Keys' above to copy your API secret
+    cloud_name = "dlpuuekkl", 
+    api_key = "474816865319319", 
+    api_secret = "OqVqRF4FwbBhAEH_xtzSnl2aU28", # Click 'View API Keys' above to copy your API secret
     secure=True
 )
 
