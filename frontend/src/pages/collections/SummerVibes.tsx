@@ -122,7 +122,7 @@ const SummerVibes = () => {
                 {/* Shop Collection Button */}
                 <div className="bg-card rounded-xl p-6 border border-border">
                   <Link 
-                    to="/collections/summer-vibes-collection/products"
+                    to="/collections/summer-vibes/products"
                     className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
                   >
                     <ShoppingBag className="w-5 h-5" />

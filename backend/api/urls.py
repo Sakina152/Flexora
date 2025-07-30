@@ -18,6 +18,6 @@ urlpatterns = [
     
     # Product API endpoints
     path('products/', ProductListView.as_view(), name='product-list'),
-    path('products/<str:product_id>/', ProductDetailView.as_view(), name='product-detail'),
     path('products/categories/', ProductCategoriesView.as_view(), name='product-categories'),
+    path('products/<str:product_id>/', ProductDetailView.as_view(), name='product-detail'),
 ]

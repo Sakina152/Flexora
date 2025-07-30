@@ -1,20 +1,65 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { getProductsByCollection } from '../data/products';
-import { Heart, Star, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { apiService, Product as ApiProduct } from '../services/api';
+import { Heart, Star, ShoppingBag, ArrowLeft, Loader2 } from 'lucide-react';
 
 const CollectionProducts = () => {
   const { collection } = useParams<{ collection: string }>();
-  const [likedProducts, setLikedProducts] = useState<Set<number>>(new Set());
+  const [likedProducts, setLikedProducts] = useState<Set<string>>(new Set());
+  const [products, setProducts] = useState<ApiProduct[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   const collectionName = collection?.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()) || '';
-  const products = getProductsByCollection(collectionName);
 
-  const handleLike = (productId: number) => {
+  // Map collection names to categories for API filtering
+  const getCategoryFromCollection = (collectionName: string) => {
+    const collectionMap: { [key: string]: string } = {
+      'Summer Vibes Collection': 'Casual',
+      'Elegant Evening Wear': 'Formal',
+      'Bohemian Dream': 'Bohemian',
+      'Street Style Essentials': 'Streetwear',
+      'Minimalist Chic': 'Minimalist',
+      'Vintage Revival': 'Vintage',
+      'Minimalist Elegance': 'Minimalist',
+      'Conscious Choices': 'Casual',
+      'Handcrafted Beauty': 'Bohemian'
+    };
+    return collectionMap[collectionName] || 'Casual';
+  };
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const category = getCategoryFromCollection(collectionName);
+        const response = await apiService.getProductsByCategory(category);
+        
+        if (response.error) {
+          setError(response.error);
+        } else if (response.data) {
+          setProducts(response.data);
+        }
+      } catch (err) {
+        setError('Failed to fetch products');
+        console.error('Error fetching products:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (collectionName) {
+      fetchProducts();
+    }
+  }, [collectionName]);
+
+  const handleLike = (productId: string) => {
     setLikedProducts(prev => {
       const newLiked = new Set(prev);
       if (newLiked.has(productId)) {
@@ -34,10 +79,31 @@ const CollectionProducts = () => {
         return 'from-accent to-secondary';
       case 'Street Style Essentials':
         return 'from-accent/30 to-primary/20';
+      case 'Bohemian Dream':
+        return 'from-secondary to-primary/20';
+      case 'Minimalist Chic':
+        return 'from-primary/20 to-accent/20';
+      case 'Vintage Revival':
+        return 'from-secondary/10 to-primary/30';
       default:
         return 'from-primary/20 to-accent/30';
     }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-6 h-6 animate-spin" />
+            <span>Loading products...</span>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -67,7 +133,21 @@ const CollectionProducts = () => {
         {/* Products Grid */}
         <section className="py-16 px-6">
           <div className="max-w-6xl mx-auto">
-            {products.length === 0 ? (
+            {error ? (
+              <div className="text-center py-12">
+                <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                <h2 className="text-2xl font-bold text-foreground mb-2">Error Loading Products</h2>
+                <p className="text-muted-foreground mb-6">
+                  {error}
+                </p>
+                <Link 
+                  to="/products"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                >
+                  Browse All Products
+                </Link>
+              </div>
+            ) : products.length === 0 ? (
               <div className="text-center py-12">
                 <ShoppingBag className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                 <h2 className="text-2xl font-bold text-foreground mb-2">No Products Found</h2>
@@ -97,16 +177,29 @@ const CollectionProducts = () => {
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <Link to={`/products/${product.id}`}>
-                        <div className={`relative h-64 bg-gradient-to-br ${product.images[0]} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                          <ShoppingBag className="w-12 h-12 text-primary/60" />
-                          {product.featured && (
+                        <div className="relative h-64 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+                          {product.image_url ? (
+                            <img 
+                              src={product.image_url} 
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <ShoppingBag className="w-12 h-12 text-primary/60" />
+                          )}
+                          {product.stock_quantity > 20 && (
                             <div className="absolute top-3 left-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
                               Featured
                             </div>
                           )}
-                          {product.originalPrice && (
+                          {product.stock_quantity < 10 && product.stock_quantity > 0 && (
+                            <div className="absolute top-3 right-3 bg-orange-500 text-white px-2 py-1 rounded-full text-xs font-medium">
+                              Low Stock
+                            </div>
+                          )}
+                          {product.stock_quantity === 0 && (
                             <div className="absolute top-3 right-3 bg-red-500 text-white px-2 py-1 rounded-full text-xs font-medium">
-                              Sale
+                              Out of Stock
                             </div>
                           )}
                         </div>
@@ -117,9 +210,9 @@ const CollectionProducts = () => {
                           <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
                             {product.category}
                           </span>
-                          {product.collection && (
+                          {product.brand && (
                             <span className="text-xs text-muted-foreground">
-                              {product.collection}
+                              {product.brand}
                             </span>
                           )}
                         </div>
@@ -131,29 +224,24 @@ const CollectionProducts = () => {
                         </Link>
                         
                         <p className="text-sm text-muted-foreground mb-3">
-                          by {product.designer}
+                          by {product.brand || 'Flexora'}
                         </p>
                         
                         <div className="flex items-center gap-2 mb-3">
                           <div className="flex items-center gap-1">
                             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                            <span className="text-sm font-medium">{product.rating}</span>
+                            <span className="text-sm font-medium">4.5</span>
                           </div>
                           <span className="text-sm text-muted-foreground">
-                            ({product.reviews} reviews)
+                            (New)
                           </span>
                         </div>
                         
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <span className="text-lg font-bold text-foreground">
-                              ${product.price}
+                              ${parseFloat(product.price).toFixed(2)}
                             </span>
-                            {product.originalPrice && (
-                              <span className="text-sm text-muted-foreground line-through">
-                                ${product.originalPrice}
-                              </span>
-                            )}
                           </div>
                           <button
                             onClick={() => handleLike(product.id)}
@@ -163,6 +251,10 @@ const CollectionProducts = () => {
                           >
                             <Heart className={`w-5 h-5 ${likedProducts.has(product.id) ? 'fill-current' : ''}`} />
                           </button>
+                        </div>
+                        
+                        <div className="mt-3 text-sm text-muted-foreground">
+                          Stock: {product.stock_quantity} available
                         </div>
                       </div>
                     </article>
