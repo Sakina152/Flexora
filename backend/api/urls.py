@@ -2,7 +2,8 @@ from django.urls import path
 from .views import (
     hello, RegisterView, QuizSubmissionView, ProfileView, ChangePasswordView, 
     DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView,
-    ProductListView, ProductDetailView, ProductCategoriesView
+    ProductListView, ProductDetailView, ProductCategoriesView,
+    BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView
 )
 
 urlpatterns = [
@@ -20,4 +21,10 @@ urlpatterns = [
     path('products/', ProductListView.as_view(), name='product-list'),
     path('products/categories/', ProductCategoriesView.as_view(), name='product-categories'),
     path('products/<str:product_id>/', ProductDetailView.as_view(), name='product-detail'),
+    
+    # Blog API endpoints
+    path('blogs/', BlogListView.as_view(), name='blog-list'),
+    path('blogs/categories/', BlogCategoriesView.as_view(), name='blog-categories'),
+    path('blogs/<str:blog_slug>/', BlogDetailView.as_view(), name='blog-detail'),
+    path('blogs/<str:blog_id>/engagement/', BlogEngagementView.as_view(), name='blog-engagement'),
 ]

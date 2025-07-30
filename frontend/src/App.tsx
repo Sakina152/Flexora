@@ -13,6 +13,7 @@ import ProductDetail from "./pages/ProductDetail";
 import CategoryProducts from "./pages/CategoryProducts";
 import CollectionProducts from "./pages/CollectionProducts";
 import Lookbook from "./pages/Lookbook";
+import BlogDetail from "./pages/BlogDetail";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -132,6 +133,9 @@ const App = () => {
               <Route path="/products/:id" element={<ProductDetail />} />
               <Route path="/categories/:category/products" element={<CategoryProducts />} />
               <Route path="/collections/:collection/products" element={<CollectionProducts />} />
+              
+              {/* Blog routes */}
+              <Route path="/trending/:slug" element={<BlogDetail />} />
               
               {/* Lookbook route */}
               <Route path="/lookbook/:persona" element={<Lookbook />} />

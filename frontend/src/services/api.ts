@@ -16,6 +16,31 @@ export interface Product {
   updated_at: string;
 }
 
+export interface Blog {
+  id: string;
+  title: string;
+  slug: string;
+  author: string;
+  content: string;
+  excerpt: string;
+  category: string;
+  cover_image?: string;
+  cover_image_url?: string;
+  likes_count: number;
+  comments_count: number;
+  views_count: number;
+  is_trending: boolean;
+  is_published: boolean;
+  is_featured: boolean;
+  meta_title: string;
+  meta_description: string;
+  tags: string;
+  created_at: string;
+  updated_at: string;
+  published_at: string;
+  time_ago: string;
+}
+
 export interface ApiResponse<T> {
   data?: T;
   error?: string;
@@ -86,6 +111,47 @@ class ApiService {
   // Get products by category
   async getProductsByCategory(category: string): Promise<ApiResponse<Product[]>> {
     return this.getProducts(category);
+  }
+
+  // Blog API methods
+  async getBlogs(category?: string, trending?: boolean, featured?: boolean, limit?: number): Promise<ApiResponse<Blog[]>> {
+    const params = new URLSearchParams();
+    if (category) params.append('category', category);
+    if (trending) params.append('trending', 'true');
+    if (featured) params.append('featured', 'true');
+    if (limit) params.append('limit', limit.toString());
+    
+    return this.makeRequest<Blog[]>(`/blogs/?${params.toString()}`);
+  }
+
+  async getBlog(slug: string): Promise<ApiResponse<Blog>> {
+    return this.makeRequest<Blog>(`/blogs/${slug}/`);
+  }
+
+  async getBlogCategories(): Promise<ApiResponse<{ categories: string[] }>> {
+    return this.makeRequest<{ categories: string[] }>('/blogs/categories/');
+  }
+
+  async getTrendingBlogs(): Promise<ApiResponse<Blog[]>> {
+    return this.getBlogs(undefined, true);
+  }
+
+  async getBlogsByCategory(category: string): Promise<ApiResponse<Blog[]>> {
+    return this.getBlogs(category);
+  }
+
+  async likeBlog(blogId: string): Promise<ApiResponse<{ message: string; likes_count: number }>> {
+    return this.makeRequest<{ message: string; likes_count: number }>(`/blogs/${blogId}/engagement/`, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'like' }),
+    });
+  }
+
+  async commentBlog(blogId: string): Promise<ApiResponse<{ message: string; comments_count: number }>> {
+    return this.makeRequest<{ message: string; comments_count: number }>(`/blogs/${blogId}/engagement/`, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'comment' }),
+    });
   }
 
   // Test API connection

@@ -11,18 +11,33 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from .models import UserProfile, Product
+from .models import UserProfile, Product, Blog
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.conf import settings
 import os
 from rest_framework import serializers
+from django.db.models import F
 
 # Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'price', 'description', 'image_url', 'image', 'category', 'brand', 'stock_quantity', 'sku', 'is_active', 'created_at', 'updated_at']
+
+# Blog Serializer
+class BlogSerializer(serializers.ModelSerializer):
+    time_ago = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = Blog
+        fields = [
+            'id', 'title', 'slug', 'author', 'content', 'excerpt', 'category',
+            'cover_image', 'cover_image_url', 'likes_count', 'comments_count', 
+            'views_count', 'is_trending', 'is_published', 'is_featured',
+            'meta_title', 'meta_description', 'tags', 'created_at', 
+            'updated_at', 'published_at', 'time_ago'
+        ]
 
 # Product API Views
 class ProductListView(APIView):
@@ -87,6 +102,132 @@ class ProductCategoriesView(APIView):
         except Exception as e:
             return Response({
                 'error': 'Failed to fetch categories',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# Blog API Views
+class BlogListView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """Get all published blogs with optional filtering"""
+        try:
+            category = request.GET.get('category')
+            trending = request.GET.get('trending')
+            featured = request.GET.get('featured')
+            limit = request.GET.get('limit', 20)
+            
+            blogs = Blog.objects.filter(is_published=True)
+            
+            if category:
+                blogs = blogs.filter(category=category)
+            
+            if trending:
+                blogs = blogs.filter(is_trending=True)
+            
+            if featured:
+                blogs = blogs.filter(is_featured=True)
+            
+            # Limit results
+            try:
+                limit = int(limit)
+                blogs = blogs[:limit]
+            except ValueError:
+                blogs = blogs[:20]
+            
+            serializer = BlogSerializer(blogs, many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch blogs',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BlogDetailView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request, blog_slug):
+        """Get a specific blog by slug and increment view count"""
+        try:
+            blog = Blog.objects.get(slug=blog_slug, is_published=True)
+            
+            # Increment view count
+            blog.views_count = F('views_count') + 1
+            blog.save()
+            blog.refresh_from_db()
+            
+            serializer = BlogSerializer(blog)
+            return Response(serializer.data)
+            
+        except Blog.DoesNotExist:
+            return Response({
+                'error': 'Blog not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch blog',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BlogCategoriesView(APIView):
+    permission_classes = [AllowAny]
+    
+    def get(self, request):
+        """Get all available blog categories"""
+        try:
+            categories = Blog.objects.filter(is_published=True).values_list('category', flat=True).distinct()
+            return Response({
+                'categories': list(categories)
+            })
+            
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch blog categories',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class BlogEngagementView(APIView):
+    permission_classes = [AllowAny]
+    
+    def post(self, request, blog_id):
+        """Handle blog engagement (likes, comments)"""
+        try:
+            action = request.data.get('action')  # 'like' or 'comment'
+            
+            try:
+                blog = Blog.objects.get(id=blog_id, is_published=True)
+            except Blog.DoesNotExist:
+                return Response({
+                    'error': 'Blog not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            if action == 'like':
+                blog.likes_count = F('likes_count') + 1
+                blog.save()
+                blog.refresh_from_db()
+                return Response({
+                    'message': 'Blog liked successfully',
+                    'likes_count': blog.likes_count
+                })
+            
+            elif action == 'comment':
+                blog.comments_count = F('comments_count') + 1
+                blog.save()
+                blog.refresh_from_db()
+                return Response({
+                    'message': 'Comment added successfully',
+                    'comments_count': blog.comments_count
+                })
+            
+            else:
+                return Response({
+                    'error': 'Invalid action. Use "like" or "comment"'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({
+                'error': 'Failed to update engagement',
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

@@ -28,4 +28,6 @@ export const STORAGE_KEYS = {
   SAVED_ADDRESSES: 'flexora-saved-addresses',
   MEMBER_SINCE: 'flexora-member-since',
   LAST_LOGIN: 'flexora-last-login',
+  LIKED_POSTS: 'flexora-liked-posts',
+  FAVORITE_POSTS: 'flexora-favorite-posts',
 } as const; 
