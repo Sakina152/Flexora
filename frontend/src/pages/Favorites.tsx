@@ -69,8 +69,13 @@ const Favorites = () => {
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
                       <a href={`/products/${item.id}`} className="block">
-                        <div className={`h-64 bg-gradient-to-br ${item.images?.[0] || 'from-primary/20 to-accent/30'} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
-                          <ShoppingBag className="w-8 h-8 text-primary/60" />
+                        <div className="h-64 bg-gradient-to-br from-primary/20 to-accent/30 flex items-center justify-center hover:scale-105 transition-transform duration-300 overflow-hidden">
+                          <img
+                            src={item.image_url || '/placeholder.svg'}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                            onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
+                          />
                         </div>
                         <div className="p-4">
                           <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2">

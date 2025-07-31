@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { Heart, Eye, MessageCircle, BookmarkPlus, TrendingUp, Filter, Loader2 } from 'lucide-react';
+import { Heart, Eye, MessageCircle, TrendingUp, Filter, Loader2 } from 'lucide-react';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
 import { apiService, Blog } from '../services/api';
@@ -255,7 +255,7 @@ const TrendingLooks = () => {
                             }}
                             className="transition-colors hover:scale-110 transform hover:text-primary"
                           >
-                            <BookmarkPlus className="w-4 h-4" />
+                            <Heart className="w-4 h-4" />
                           </button>
                         </div>
                       </div>

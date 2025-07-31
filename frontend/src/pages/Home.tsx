@@ -5,7 +5,7 @@ import Hero from '../components/Hero';
 import Footer from '../components/Footer';
 import FashionStyleQuiz from '../components/FashionStyleQuiz';
 import TrendSwipePopup from '../components/TrendSwipePopup';
-import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, BookmarkPlus, X } from 'lucide-react';
+import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, X } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
@@ -288,7 +288,7 @@ const Home = ({ openQuiz = false }: HomeProps) => {
                           onClick={e => { e.preventDefault(); handleFavorite(post); }}
                           className="transition-colors hover:scale-110 transform hover:text-primary"
                         >
-                          <BookmarkPlus className="w-4 h-4" />
+                          <Heart className="w-4 h-4" />
                         </button>
                       </div>
                     </div>

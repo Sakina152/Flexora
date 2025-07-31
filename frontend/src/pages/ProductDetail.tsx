@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
-import { Heart, Star, ShoppingBag, Truck, Shield, RotateCcw, ArrowLeft, BookmarkPlus } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Truck, Shield, RotateCcw, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import { useAuth } from '../App';
 import { Skeleton } from '../components/ui/skeleton';
@@ -311,21 +311,15 @@ const ProductDetail = () => {
                       Add to Cart
                     </button>
                     <button
-                      onClick={() => setIsLiked(!isLiked)}
-                      className={`px-4 py-3 border rounded-lg transition-colors ${
-                        isLiked ? 'border-primary text-primary' : 'border-border hover:border-primary'
-                      }`}
-                    >
-                      <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
-                    </button>
-                    <button
                       onClick={handleFavorite}
                       className={`px-4 py-3 border rounded-lg transition-colors ml-2 ${
                         isFavorite ? 'border-primary text-primary' : 'border-border hover:border-primary'
                       }`}
                       aria-label="Favorite"
                     >
-                      <BookmarkPlus className={`w-5 h-5 ${isFavorite ? 'fill-current' : ''}`} />
+                      <Heart
+                        className={`w-5 h-5 cursor-pointer ${isFavorite ? 'fill-current text-primary' : ''}`}
+                      />
                     </button>
                   </div>
 

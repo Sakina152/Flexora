@@ -1,7 +1,7 @@
 import Navigation from '../../components/Navigation';
 import Footer from '../../components/Footer';
 import PageHero from '../../components/PageHero';
-import { Heart, Eye, MessageCircle, BookmarkPlus, Clock, User } from 'lucide-react';
+import { Heart, Eye, MessageCircle, Clock, User } from 'lucide-react';
 
 const CasualSummer = () => {
   return (
@@ -52,7 +52,6 @@ const CasualSummer = () => {
               </div>
             </div>
             <button className="flex items-center gap-2 hover:text-primary transition-colors mt-4">
-              <BookmarkPlus className="w-5 h-5" />
               <span>Save</span>
             </button>
           </div>

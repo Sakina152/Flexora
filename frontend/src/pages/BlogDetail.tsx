@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { Heart, Eye, MessageCircle, BookmarkPlus, Clock, User } from 'lucide-react';
+import { Heart, Eye, MessageCircle, Clock, User } from 'lucide-react';
 import { useAuth } from '../App';
 import { apiService, Blog } from '../services/api';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
@@ -196,7 +196,7 @@ const BlogDetail = () => {
                   }`}
                   onClick={handleFavorite}
                 >
-                  <BookmarkPlus className={`w-5 h-5 ${favorited ? 'fill-current' : ''}`} />
+                  <Heart className={`w-5 h-5 ${favorited ? 'fill-current' : ''}`} />
                   <span>Save</span>
                 </button>
               </div>

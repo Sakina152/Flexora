@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { Heart, Star, ShoppingBag, Filter, SortAsc, BookmarkPlus } from 'lucide-react';
+import { Heart, Star, ShoppingBag, Filter, SortAsc } from 'lucide-react';
 import { toast } from "sonner";
 import { Toaster } from "sonner";
 import { useAuth } from '../App';
@@ -160,7 +160,7 @@ const Products = () => {
                 >
                   All
                 </button>
-                {categories.map((category) => (
+                {Array.from(new Set(categories)).map((category) => (
                   <button
                     key={category}
                     onClick={() => setSelectedCategory(category)}
@@ -270,23 +270,10 @@ const Products = () => {
                           </span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <button
-                            onClick={() => handleLike(product.id)}
-                            className={`transition-colors hover:scale-110 transform ${
-                              likedProducts.has(product.id) ? 'text-primary' : 'text-muted-foreground hover:text-primary'
-                            }`}
-                          >
-                            <Heart className={`w-5 h-5 ${likedProducts.has(product.id) ? 'fill-current' : ''}`} />
-                          </button>
-                          <button
+                          <Heart
+                            className={`w-5 h-5 cursor-pointer ${favoriteProducts.has(product.id) ? 'fill-current text-primary' : ''}`}
                             onClick={() => handleFavorite(product)}
-                            className={`ml-2 transition-colors hover:scale-110 transform ${
-                              favoriteProducts.has(product.id) ? 'text-primary' : 'text-muted-foreground hover:text-primary'
-                            }`}
-                            aria-label="Favorite"
-                          >
-                            <BookmarkPlus className={`w-5 h-5 ${favoriteProducts.has(product.id) ? 'fill-current' : ''}`} />
-                          </button>
+                          />
                           <button
                             onClick={e => { e.stopPropagation(); handleAddToCart(product); }}
                             className="ml-2 px-3 py-1 bg-primary text-primary-foreground rounded-lg text-xs font-medium hover:bg-primary/90 transition-colors"

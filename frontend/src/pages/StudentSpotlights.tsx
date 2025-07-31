@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { Heart, Eye, MessageCircle, BookmarkPlus, Star, Award, Users } from 'lucide-react';
+import { Heart, Eye, MessageCircle, Star, Award, Users } from 'lucide-react';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
 
@@ -195,7 +195,7 @@ const StudentSpotlights = () => {
                         onClick={() => handleFavorite(student)}
                         className="transition-colors hover:scale-110 transform hover:text-primary"
                       >
-                        <BookmarkPlus className="w-4 h-4" />
+                        <Heart className="w-4 h-4" />
                       </button>
                     </div>
                   </div>

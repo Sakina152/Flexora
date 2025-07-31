@@ -132,8 +132,13 @@ const Cart = () => {
                 {/* Cart Items */}
                 {cartItems.map(item => (
                   <div key={item.id + (item.size || '') + (item.color || '')} className="flex items-center gap-6 bg-card rounded-xl p-6 border border-border">
-                    <div className={`w-24 h-24 rounded-lg flex items-center justify-center bg-gradient-to-br ${item.images?.[0] || 'from-primary/20 to-accent/30'}`}>
-                      <ShoppingBag className="w-10 h-10 text-primary/60" />
+                    <div className="w-24 h-24 rounded-lg flex items-center justify-center bg-gradient-to-br from-primary/20 to-accent/30 overflow-hidden">
+                      <img
+                        src={item.image_url || '/placeholder.svg'}
+                        alt={item.name}
+                        className="w-full h-full object-cover"
+                        onError={e => { e.currentTarget.src = '/placeholder.svg'; }}
+                      />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">

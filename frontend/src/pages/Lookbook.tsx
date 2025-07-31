@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { ArrowLeft, Share2, BookmarkPlus, Sparkles, ShoppingBag, Star} from 'lucide-react';
+import { ArrowLeft, Share2, Sparkles, ShoppingBag, Star} from 'lucide-react';
 import { toast } from "sonner";
 import { products, Product } from '../data/products';
 import { useAuth } from '../App';
@@ -328,7 +328,7 @@ const ProductCard = ({ item, likedItems, favoriteItems, onLike, onFavorite, onAd
             : 'text-muted-foreground hover:text-primary hover:bg-primary/10'
         }`}
       >
-        <BookmarkPlus className={`w-4 h-4 ${favoriteItems.has(item.id) ? 'fill-current' : ''}`} />
+        <Heart className={`w-4 h-4 ${favoriteItems.has(item.id) ? 'fill-current' : ''}`} />
       </button>
       <button
         onClick={() => onAddToCart(item)}
