@@ -8,30 +8,34 @@ interface HeroSlide {
   title: string;
   subtitle: string;
   description: string;
-  backgroundClass: string;
+  image: string;
+  link: string;
 }
 
 const heroSlides: HeroSlide[] = [
   {
     id: 1,
-    title: "Outfit of the Week",
-    subtitle: "Minimalist Elegance",
-    description: "Timeless sophistication meets contemporary design in this carefully curated ensemble",
-    backgroundClass: "from-accent via-card to-secondary"
+    title: "Artisan Collection",
+    subtitle: "Handcrafted Beauty",
+    description: "Traditional craftsmanship reimagined with modern silhouettes. Every piece is a work of art.",
+    image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753980711/pexels-photo-8980243_zjsb5e.jpg",
+    link: "/collections/handcrafted-beauty"
   },
   {
     id: 2,
-    title: "Sustainable Fashion",
-    subtitle: "Conscious Choices",
-    description: "Eco-friendly materials crafted into beautiful, lasting pieces for the mindful wardrobe",
-    backgroundClass: "from-secondary via-accent to-card"
+    title: "Outfit of the Week",
+    subtitle: "Trending Style",
+    description: "This week's most inspiring and trending fashion combination.",
+    image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753980895/360_F_333810258_5gP2SBYroH0jtgAtI2ANibRRDe2YY7dU_cyzdnp.jpg",
+    link: "/trending-looks"
   },
   {
     id: 3,
-    title: "Artisan Collection",
-    subtitle: "Handcrafted Beauty",
-    description: "Traditional craftsmanship reimagined with modern silhouettes and refined details",
-    backgroundClass: "from-card via-secondary to-accent"
+    title: "Sustainable Fashion",
+    subtitle: "Eco-Friendly Style",
+    description: "Fashion that cares for the planet and future generations.",
+    image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753980973/pexels-photo-983569_qfzsxf.jpg",
+    link: "/trending/sustainable-fashion"
   }
 ];
 
@@ -72,7 +76,7 @@ const Hero = () => {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <div className={`absolute inset-0 bg-gradient-to-br ${slide.backgroundClass} opacity-90`} />
+          <div className="absolute inset-0 bg-gradient-to-br from-background/80 to-card/80" />
           <div className="relative flex h-full items-center justify-center px-4">
             <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
               {/* Content */}
@@ -98,23 +102,27 @@ const Hero = () => {
                 <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                   <button
                     className="px-8 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-all duration-300 hover:scale-105"
-                    onClick={() => navigate('/collections')}
+                    onClick={() => navigate(slide.link)}
                   >
                     Explore Collection
                   </button>
                   <button
                     className="px-8 py-3 border border-border text-foreground rounded-lg font-medium hover:bg-accent transition-colors"
-                    onClick={() => navigate(`/collections/${slugify(heroSlides[currentSlide].subtitle || heroSlides[currentSlide].title)}`)}
+                    onClick={() => navigate(slide.link)}
                   >
                     View Details
                   </button>
                 </div>
               </div>
 
-              {/* Featured Image Placeholder */}
+              {/* Featured Image */}
               <div className="flex justify-center">
                 <div className="relative">
-                  <div className="w-80 h-96 bg-gradient-to-br from-primary/20 via-accent to-secondary/30 rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500" />
+                  <img 
+                    src={slide.image}
+                    alt={slide.title}
+                    className="w-80 h-96 object-cover rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500"
+                  />
                   <div className="absolute -bottom-4 -right-4 w-64 h-80 bg-gradient-to-br from-accent/40 to-primary/20 rounded-2xl shadow-lg -z-10" />
                 </div>
               </div>

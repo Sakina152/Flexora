@@ -33,7 +33,7 @@ class BlogSerializer(serializers.ModelSerializer):
         model = Blog
         fields = [
             'id', 'title', 'slug', 'author', 'content', 'excerpt', 'category',
-            'cover_image', 'cover_image_url', 'likes_count', 'comments_count', 
+            'cover_image', 'cover_image_url', 'images', 'likes_count', 'comments_count', 
             'views_count', 'is_trending', 'is_published', 'is_featured',
             'meta_title', 'meta_description', 'tags', 'created_at', 
             'updated_at', 'published_at', 'time_ago'

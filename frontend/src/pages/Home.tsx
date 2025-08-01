@@ -76,29 +76,29 @@ const Home = ({ openQuiz = false }: HomeProps) => {
   const trendingPosts = [
     {
       id: 1,
-      title: "Minimalist Summer Wardrobe Essentials",
+      title: "Minimalist Wardrobe: Capsule Collection",
       author: "Emma Chen",
-      likes: 234,
-      comments: 18,
-      image: "from-accent to-secondary",
+      likes: 156,
+      comments: 12,
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981093/young-beautiful-smiling-hipster-woman-trendy-summer-dress-sexy-carefree-woman-posing-street-near-wall-hat-sunset-positive-model-outdoors-sunglasses-cheerful-happy_158538-26081_g8qs0v.jpg",
       link: "/trending/minimalist-wardrobe"
     },
     {
       id: 2,
-      title: "Sustainable Fashion: Making Conscious Choices",
+      title: "Eco-Friendly Brands: Slow Fashion",
       author: "Alex Rivera",
-      likes: 187,
-      comments: 23,
-      image: "from-primary/30 to-accent",
-      link: "/trending/sustainable-fashion"
+      likes: 203,
+      comments: 28,
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981186/Slow-fashion-intro.jpg_kxrduq.webp",
+      link: "/collections/conscious-choices"
     },
     {
       id: 3,
-      title: "Mixing Vintage with Modern: A Style Guide",
+      title: "Vintage Revival: Retro Inspirations",
       author: "Sophie Laurent",
-      likes: 298,
-      comments: 31,
-      image: "from-secondary to-primary/20",
+      likes: 267,
+      comments: 35,
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981247/5c1fbc42b5818f76953a6f6d90a29eaf_edo4sl.jpg",
       link: "/trending/vintage-revivalT"
     }
   ];
@@ -252,14 +252,24 @@ const Home = ({ openQuiz = false }: HomeProps) => {
               </a>
             </div>
             
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {trendingPosts.map((post, index) => (
                 <Link to={post.link} key={post.id} style={{ animationDelay: `${index * 150}ms` }} className="block animate-fade-in">
                   <article
                     className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
                   >
-                    <div className={`h-48 bg-gradient-to-br ${post.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                      <Eye className="w-8 h-8 text-primary/60" />
+                    <div className="relative h-48 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-full object-cover"
+                        onLoad={() => console.log(`Image loaded successfully: ${post.title}`)}
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${post.image} for ${post.title}`);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                     </div>
                     <div className="p-4">
                       <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">

@@ -69,6 +69,7 @@ class Blog(models.Model):
     # Media
     cover_image = models.ImageField(upload_to='blog_covers/', blank=True, null=True)
     cover_image_url = models.URLField(blank=True, null=True, help_text="Alternative to uploaded image")
+    images = models.JSONField(blank=True, null=True, help_text="List of image URLs for the blog post")
     
     # Engagement metrics
     likes_count = models.PositiveIntegerField(default=0)

@@ -51,7 +51,7 @@ class BlogAdmin(admin.ModelAdmin):
             'classes': ('wide',)
         }),
         ('Media', {
-            'fields': ('cover_image', 'cover_image_url'),
+            'fields': ('cover_image', 'cover_image_url', 'images'),
             'classes': ('collapse',)
         }),
         ('Status & Visibility', {

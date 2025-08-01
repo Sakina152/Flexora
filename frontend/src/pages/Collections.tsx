@@ -24,7 +24,7 @@ const Collections = () => {
       views: 1234,
       likes: 234,
       description: "A vibrant collection perfect for sunny days and warm nights.",
-      image: "from-primary/30 to-accent",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987054/82c14db07a56b00953b6d2d0b35cff7a_wjhuas.jpg",
       slug: "summer-vibes"
     },
     {
@@ -37,7 +37,7 @@ const Collections = () => {
       views: 1876,
       likes: 187,
       description: "Sophisticated dresses and suits for your special occasions.",
-      image: "from-accent to-secondary",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987176/6963ab890bbc454007356ecd0250d101_ugpsxp.jpg",
       slug: "elegant-evening-wear"
     },
     {
@@ -50,7 +50,7 @@ const Collections = () => {
       views: 2987,
       likes: 298,
       description: "Flowing fabrics and earthy tones for the free-spirited soul.",
-      image: "from-secondary to-primary/20",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987234/42b63da69ea98a553aa307e0f691935a_fvoi4k.jpg",
       slug: "bohemian-dream"
     },
     {
@@ -63,7 +63,7 @@ const Collections = () => {
       views: 1567,
       likes: 156,
       description: "Urban-inspired outfits for the fashion-forward individual.",
-      image: "from-accent/20 to-secondary/30",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987332/4e6a23ab6a69693cb7898445617b8170_c54mwt.jpg",
       slug: "street-style-essentials"
     },
     {
@@ -76,7 +76,7 @@ const Collections = () => {
       views: 2145,
       likes: 214,
       description: "Clean lines and neutral colors for a timeless, understated look.",
-      image: "from-primary/20 to-accent/20",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987411/18c4254e3196ad1fce93d92a6bd9c7cd_phxcpq.jpg",
       slug: "minimalist-chic"
     },
     {
@@ -89,7 +89,7 @@ const Collections = () => {
       views: 3256,
       likes: 325,
       description: "Classic styles reimagined for the modern era.",
-      image: "from-secondary/10 to-primary/30",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753987494/2f53d20d76df87c83ab6c5ce73020e3d_s9t6ff.jpg",
       slug: "vintage-revival"
     }
   ];
@@ -165,8 +165,17 @@ const Collections = () => {
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
                   <Link to={`/collections/${collection.slug}`}>
-                    <div className={`relative h-64 bg-gradient-to-br ${collection.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                      <Layers className="w-12 h-12 text-primary/60" />
+                    <div className="relative h-64 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src={collection.image}
+                        alt={collection.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error(`Failed to load image: ${collection.image}`);
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                       <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
                         {collection.itemCount} items
                       </div>

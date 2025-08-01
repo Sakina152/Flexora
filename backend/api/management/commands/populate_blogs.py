@@ -11,151 +11,147 @@ class Command(BaseCommand):
         
         sample_blogs = [
             {
-                'title': 'Parisian Chic: Effortless Style Guide',
-                'author': 'Amelie Dubois',
+                'title': 'Minimalist Wardrobe: Capsule Collection',
+                'author': 'Emma Chen',
                 'content': '''
-                Parisian chic is not about following trends—it's about creating a timeless wardrobe that exudes confidence and sophistication. 
-                The key is to invest in quality basics and learn the art of effortless styling.
+                Discover the art of minimalism in fashion. A capsule wardrobe consists of versatile pieces that can be mixed and matched to create countless outfits.
                 
                 Key Elements:
-                • Well-fitted blazers in neutral tones
-                • Classic trench coats
-                • High-quality silk scarves
-                • Perfectly tailored trousers
-                • Simple, elegant accessories
+                • Neutral color palette
+                • High-quality basics
+                • Versatile silhouettes
+                • Timeless designs
                 
-                The essence of Parisian style lies in the perfect balance between classic and contemporary. 
-                French women have mastered the art of looking put-together without appearing overdone. 
-                They understand that true elegance comes from confidence and comfort in one's own skin.
+                Building a minimalist wardrobe starts with understanding your personal style and investing in pieces that truly serve you.
                 ''',
                 'category': 'Minimalist',
                 'is_trending': True,
-                'likes_count': 321,
-                'comments_count': 45,
+                'likes_count': 156,
+                'comments_count': 12,
                 'views_count': 1200,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023681/ed6992640292b1390dacd70bd14eb883_eomvq3.jpg'
+                ],
             },
             {
-                'title': 'Sustainable Fashion: Eco-Friendly Brands',
-                'author': 'Lena Green',
+                'title': 'Vintage Revival: Retro Inspirations',
+                'author': 'Sophie Laurent',
                 'content': '''
-                As awareness about environmental impact grows, sustainable fashion has become more than just a trend—it's a movement. 
-                Consumers are increasingly demanding transparency and ethical practices from their favorite brands.
+                Vintage fashion is making a comeback with modern twists. Learn how to incorporate retro elements into your contemporary wardrobe.
                 
-                Top Sustainable Practices:
-                • Use of organic and recycled materials
-                • Fair labor practices and living wages
-                • Reduced water and energy consumption
-                • Circular fashion initiatives
-                • Transparent supply chains
+                Vintage Elements:
+                • High-waisted silhouettes
+                • Retro prints and patterns
+                • Classic accessories
+                • Timeless color combinations
                 
-                The future of fashion lies in sustainability. Brands that embrace eco-friendly practices 
-                are not only helping the planet but also building stronger relationships with conscious consumers.
+                The key to vintage style is balancing retro elements with modern sensibilities.
                 ''',
                 'category': 'Vintage',
-                'is_trending': False,
+                'is_trending': True,
                 'likes_count': 267,
-                'comments_count': 32,
-                'views_count': 890,
+                'comments_count': 35,
+                'views_count': 1800,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023754/1458452e3a59cfcd7de95a391dbf8f3c_wu9tob.jpg'
+                ],
             },
             {
-                'title': 'Street Style: Urban Fashion Trends',
-                'author': 'Kenji Tanaka',
+                'title': 'Streetwear Essentials: Urban Style Guide',
+                'author': 'Alex Rivera',
                 'content': '''
-                Street style has evolved from underground subcultures to mainstream fashion influence. 
-                Urban fashion is all about self-expression, comfort, and cultural fusion.
+                Streetwear has evolved from subculture to mainstream fashion. Learn the fundamentals of urban style and street fashion.
                 
-                Current Street Style Trends:
-                • Oversized silhouettes and layering
-                • Bold graphics and statement pieces
-                • Mix of high-end and streetwear brands
-                • Gender-fluid fashion choices
-                • Sustainable streetwear options
+                Streetwear Basics:
+                • Oversized silhouettes
+                • Graphic elements
+                • Comfortable materials
+                • Athletic influences
                 
-                Street style continues to push boundaries and challenge traditional fashion norms, 
-                making it one of the most dynamic and influential fashion movements today.
+                Streetwear is about expressing individuality through bold choices and comfortable style.
                 ''',
                 'category': 'Streetwear',
                 'is_trending': True,
-                'likes_count': 456,
-                'comments_count': 67,
+                'likes_count': 189,
+                'comments_count': 23,
                 'views_count': 1500,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023828/be2838c5be147c154656b2a6759c5cbb_uasjgn.jpg'
+                ],
             },
             {
-                'title': 'Bohemian Vibes: Free-Spirited Fashion',
-                'author': 'Maya Silva',
+                'title': 'Bohemian Dreams: Free-Spirited Fashion',
+                'author': 'Luna Moon',
                 'content': '''
-                Bohemian fashion celebrates freedom, creativity, and a connection to nature. 
-                It's about embracing individuality and creating a style that reflects your inner spirit.
+                Bohemian style celebrates creativity, freedom, and artistic expression. Discover how to embrace the boho aesthetic.
                 
-                Boho Style Elements:
-                • Flowing maxi dresses and skirts
-                • Natural fabrics like cotton, linen, and silk
-                • Layered jewelry and accessories
-                • Earthy color palettes
-                • Handcrafted and vintage pieces
+                Boho Elements:
+                • Flowing fabrics
+                • Natural materials
+                • Artistic prints
+                • Layered accessories
                 
-                Bohemian style is more than just fashion—it's a lifestyle that embraces creativity, 
-                freedom, and a deep appreciation for art and culture.
+                Bohemian fashion is about expressing your creative spirit through eclectic, artistic choices.
                 ''',
                 'category': 'Bohemian',
-                'is_trending': False,
-                'likes_count': 298,
-                'comments_count': 23,
-                'views_count': 750,
-            },
-            {
-                'title': 'Vintage Revival: Retro Fashion Inspirations',
-                'author': 'Clara Rossi',
-                'content': '''
-                Vintage fashion has made a powerful comeback, bringing with it the elegance and charm of bygone eras. 
-                From 1920s flapper dresses to 1980s power suits, retro styles continue to inspire modern fashion.
-                
-                Popular Vintage Eras:
-                • 1920s: Art Deco elegance and flapper style
-                • 1950s: Feminine silhouettes and classic glamour
-                • 1970s: Bohemian freedom and disco glam
-                • 1980s: Bold colors and power dressing
-                • 1990s: Minimalist grunge and street style
-                
-                Vintage fashion allows us to connect with history while creating unique, 
-                sustainable style choices that stand out in today's fast-fashion world.
-                ''',
-                'category': 'Vintage',
                 'is_trending': True,
-                'likes_count': 387,
-                'comments_count': 54,
-                'views_count': 1100,
+                'likes_count': 234,
+                'comments_count': 28,
+                'views_count': 1600,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023898/d89c9c96b2e3cd6fed259664e60527e3_jpsdyt.jpg'
+                ],
             },
             {
-                'title': 'Minimalist Wardrobe: Capsule Collection',
-                'author': 'Ethan White',
+                'title': 'Formal Elegance: Professional Style',
+                'author': 'Michael Chang',
                 'content': '''
-                Minimalism in fashion is about quality over quantity, creating a curated wardrobe 
-                that serves your lifestyle and reflects your personal style.
+                Professional dressing is an art that combines sophistication with comfort. Learn the principles of formal fashion.
                 
-                Capsule Wardrobe Essentials:
-                • 10-15 versatile tops
-                • 5-7 bottoms (pants, skirts, shorts)
-                • 3-5 dresses for various occasions
-                • 2-3 outerwear pieces
-                • 5-7 pairs of shoes
-                • Quality accessories
+                Formal Essentials:
+                • Tailored fits
+                • Quality fabrics
+                • Classic colors
+                • Polished accessories
                 
-                A minimalist wardrobe reduces decision fatigue, saves money, and helps create 
-                a more sustainable approach to fashion consumption.
+                Formal style is about projecting confidence and professionalism through well-chosen pieces.
                 ''',
-                'category': 'Minimalist',
-                'is_trending': False,
-                'likes_count': 245,
-                'comments_count': 12,
-                'views_count': 680,
+                'category': 'Formal',
+                'is_trending': True,
+                'likes_count': 145,
+                'comments_count': 18,
+                'views_count': 1100,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024009/8d2042c922054d05fd4dfc7bd197118b_loopi0.jpg'
+                ],
+            },
+            {
+                'title': 'Casual Comfort: Everyday Style',
+                'author': 'Sarah Martinez',
+                'content': '''
+                Casual fashion is about comfort without sacrificing style. Learn how to look put-together in everyday situations.
+                
+                Casual Style Tips:
+                • Comfortable fits
+                • Versatile pieces
+                • Easy maintenance
+                • Personal expression
+                
+                Casual style celebrates the beauty of simplicity and comfort in daily life.
+                ''',
+                'category': 'Casual',
+                'is_trending': True,
+                'likes_count': 178,
+                'comments_count': 22,
+                'views_count': 1300,
+                'images': [
+                    'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024065/462431de5eab01e6f00ea6a0c1a31cfc_avzade.jpg'
+                ],
             },
         ]
-        
-        created_count = 0
+
         for blog_data in sample_blogs:
-            # Check if blog already exists
-            if not Blog.objects.filter(title=blog_data['title']).exists():
+            try:
                 blog = Blog.objects.create(
                     title=blog_data['title'],
                     author=blog_data['author'],
@@ -165,13 +161,10 @@ class Command(BaseCommand):
                     likes_count=blog_data['likes_count'],
                     comments_count=blog_data['comments_count'],
                     views_count=blog_data['views_count'],
-                    is_published=True,
+                    images=blog_data.get('images', [])
                 )
-                created_count += 1
-                self.stdout.write(f'Created blog: {blog.title}')
-            else:
+                self.stdout.write(f'Blog created: {blog.title}')
+            except Exception as e:
                 self.stdout.write(f'Blog already exists: {blog_data["title"]}')
-        
-        self.stdout.write(
-            self.style.SUCCESS(f'Successfully created {created_count} blog posts!')
-        ) 
+
+        self.stdout.write(self.style.SUCCESS('Sample blogs created successfully!')) 

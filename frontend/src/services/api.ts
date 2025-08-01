@@ -26,6 +26,7 @@ export interface Blog {
   category: string;
   cover_image?: string;
   cover_image_url?: string;
+  images?: string[];
   likes_count: number;
   comments_count: number;
   views_count: number;

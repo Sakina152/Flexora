@@ -19,7 +19,7 @@ const StyleCategories = () => {
       description: 'Clean lines, neutral colors, and functional designs for a modern and simple style.',
       icon: Sparkles,
       count: 24,
-      gradient: 'from-primary/30 to-accent/20',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023681/ed6992640292b1390dacd70bd14eb883_eomvq3.jpg',
       link: '/categories/minimalist'
     },
     {
@@ -27,7 +27,7 @@ const StyleCategories = () => {
       description: 'Classic cuts, retro prints, and timeless accessories inspired by past decades.',
       icon: Camera,
       count: 31,
-      gradient: 'from-secondary/30 to-primary/20',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023754/1458452e3a59cfcd7de95a391dbf8f3c_wu9tob.jpg',
       link: '/categories/vintage'
     },
     {
@@ -35,7 +35,7 @@ const StyleCategories = () => {
       description: 'Bold graphics, oversized fits, and urban-inspired elements for a trendy and edgy style.',
       icon: Shirt,
       count: 27,
-      gradient: 'from-accent/30 to-primary/20',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023828/be2838c5be147c154656b2a6759c5cbb_uasjgn.jpg',
       link: '/categories/streetwear'
     },
     {
@@ -43,7 +43,7 @@ const StyleCategories = () => {
       description: 'Earthy tones, vintage patterns, and relaxed silhouettes for a free-spirited and eclectic style.',
       icon: Leaf,
       count: 18,
-      gradient: 'from-accent/20 to-secondary/30',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754023898/d89c9c96b2e3cd6fed259664e60527e3_jpsdyt.jpg',
       link: '/categories/bohemian'
     },
     {
@@ -51,7 +51,7 @@ const StyleCategories = () => {
       description: 'Sophisticated fabrics, tailored designs, and elegant details for a polished and refined style.',
       icon: CheckCircle,
       count: 19,
-      gradient: 'from-primary/20 to-secondary/30',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024009/8d2042c922054d05fd4dfc7bd197118b_loopi0.jpg',
       link: '/categories/formal'
     },
     {
@@ -59,7 +59,7 @@ const StyleCategories = () => {
       description: 'Comfortable fabrics, effortless silhouettes, and stylish accents for a relaxed yet put-together style.',
       icon: Cloud,
       count: 35,
-      gradient: 'from-secondary/20 to-accent/30',
+      image: 'https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024065/462431de5eab01e6f00ea6a0c1a31cfc_avzade.jpg',
       link: '/categories/casual'
     },
   ];
@@ -71,7 +71,7 @@ const StyleCategories = () => {
       author: "Emma Chen",
       likes: 234,
       comments: 18,
-      image: "from-accent to-secondary"
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024148/8d662f1c5143ca1c3f0ac344fe1cc4a2_njjfqx.jpg"
     },
     {
       id: 2,
@@ -79,7 +79,7 @@ const StyleCategories = () => {
       author: "Alex Rivera",
       likes: 187,
       comments: 23,
-      image: "from-primary/30 to-accent"
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024207/e232f46b97412f967b1229acf553e24a_gwap12.jpg"
     },
     {
       id: 3,
@@ -87,7 +87,7 @@ const StyleCategories = () => {
       author: "Sophie Laurent",
       likes: 298,
       comments: 31,
-      image: "from-secondary to-primary/20"
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754024280/95e5888f354aa3b9a31e6c07ea4d0ed3_s1jqny.jpg"
     }
   ];
 
@@ -157,8 +157,15 @@ const StyleCategories = () => {
                   <div className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
-                    <div className={`h-48 bg-gradient-to-br ${category.gradient} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                      <category.icon className="w-12 h-12 text-primary/80" />
+                    <div className="h-48 overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                      <img
+                        src={category.image}
+                        alt={`${category.name} style`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
                     </div>
                     <div className="p-6">
                       <h3 className="font-display text-xl font-semibold text-foreground mb-2">
@@ -197,8 +204,15 @@ const StyleCategories = () => {
                   className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in"
                   style={{ animationDelay: `${index * 150}ms` }}
                 >
-                  <div className={`h-48 bg-gradient-to-br ${card.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
-                    <Eye className="w-8 h-8 text-primary/60" />
+                  <div className="h-48 overflow-hidden hover:scale-105 transition-transform duration-300">
+                    <img
+                      src={card.image}
+                      alt={card.title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder.svg';
+                      }}
+                    />
                   </div>
                   <div className="p-4">
                     <h3 className="font-display font-semibold text-foreground mb-2">
