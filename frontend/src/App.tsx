@@ -24,6 +24,7 @@ import Profile from "./pages/Profile";
 import EditProfile from "./pages/EditProfile";
 import DeleteAccount from "./pages/DeleteAccount";
 import PastOrders from "./pages/PastOrders";
+import WriteBlog from "./pages/WriteBlog";
 
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
@@ -123,6 +124,7 @@ const App = () => {
               <Route path="/edit-profile" element={<EditProfile />} />
               <Route path="/delete-account" element={<DeleteAccount />} />
               <Route path="/past-orders" element={<PastOrders />} />
+              <Route path="/write-blog" element={<WriteBlog />} />
               
               {/* Auth pages */}
               <Route path="/login" element={<Login />} />

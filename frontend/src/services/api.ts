@@ -154,6 +154,67 @@ class ApiService {
     });
   }
 
+  // Create a new blog post
+  async createBlog(blogData: FormData): Promise<ApiResponse<{ message: string; blog: Blog }>> {
+    try {
+      const token = localStorage.getItem('accessToken');
+      console.log('Blog creation - Token found:', !!token);
+      console.log('Blog creation - Token preview:', token ? token.substring(0, 20) + '...' : 'null');
+      
+      if (!token) {
+        return {
+          error: 'No authentication token found. Please log in again.',
+        };
+      }
+      
+      console.log('Blog creation - Making request to:', `${API_BASE_URL}/blogs/create/`);
+      
+      const response = await fetch(`${API_BASE_URL}/blogs/create/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          // Don't set Content-Type for FormData, let the browser set it with boundary
+        },
+        body: blogData,
+      });
+      
+      console.log('Blog creation - Response status:', response.status);
+      console.log('Blog creation - Response headers:', Object.fromEntries(response.headers.entries()));
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        return {
+          error: errorData.error || `HTTP error! status: ${response.status}`,
+          details: errorData.details,
+        };
+      }
+
+      const data = await response.json();
+      return { data };
+    } catch (error) {
+      return {
+        error: 'Network error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  }
+
+  // Test authenticated API connection
+  async testAuthenticatedConnection(): Promise<ApiResponse<{ message: string }>> {
+    const token = localStorage.getItem('accessToken');
+    console.log('Auth test - Token found:', !!token);
+    
+    if (!token) {
+      return { error: 'No token found' };
+    }
+    
+    return this.makeRequest<{ message: string }>('/blogs/categories/', {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  }
+
   // Test API connection
   async testConnection(): Promise<ApiResponse<{ message: string }>> {
     return this.makeRequest<{ message: string }>('/hello/');
