@@ -64,7 +64,7 @@ const Navigation = () => {
           }
           
           const baseURL = import.meta.env.VITE_BACKEND_URL;
-          const res = await fetch('${baseURL}/api/profile/', {
+          const res = await fetch('http://127.0.0.1:8000/api/profile/', {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
@@ -116,7 +116,7 @@ const Navigation = () => {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
             const baseURL = import.meta.env.VITE_BACKEND_URL;
-            const res = await fetch('${baseURL}/api/profile/', {
+            const res = await fetch('http://127.0.0.1:8000/api/profile/', {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
