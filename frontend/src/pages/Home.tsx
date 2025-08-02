@@ -76,30 +76,30 @@ const Home = ({ openQuiz = false }: HomeProps) => {
   const trendingPosts = [
     {
       id: 1,
-      title: "Minimalist Summer Wardrobe Essentials",
+      title: "Minimalist Wardrobe: Capsule Collection",
       author: "Emma Chen",
       likes: 234,
       comments: 18,
-      image: "from-accent to-secondary",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981093/young-beautiful-smiling-hipster-woman-trendy-summer-dress-sexy-carefree-woman-posing-street-near-wall-hat-sunset-positive-model-outdoors-sunglasses-cheerful-happy_158538-26081_g8qs0v.jpg",
       link: "/trending/minimalist-wardrobe"
     },
     {
       id: 2,
-      title: "Sustainable Fashion: Making Conscious Choices",
+      title: "Sustainable Fashion: Eco-Friendly Brands",
       author: "Alex Rivera",
       likes: 187,
       comments: 23,
-      image: "from-primary/30 to-accent",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981186/Slow-fashion-intro.jpg_kxrduq.webp",
       link: "/trending/sustainable-fashion"
     },
     {
       id: 3,
-      title: "Mixing Vintage with Modern: A Style Guide",
+      title: "Vintage Revival: Retro Fashion Inspirations",
       author: "Sophie Laurent",
       likes: 298,
       comments: 31,
-      image: "from-secondary to-primary/20",
-      link: "/trending/vintage-revivalT"
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1753981247/5c1fbc42b5818f76953a6f6d90a29eaf_edo4sl.jpg",
+      link: "/trending/vintage-revival"
     }
   ];
 
@@ -258,8 +258,12 @@ const Home = ({ openQuiz = false }: HomeProps) => {
                   <article
                     className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 group"
                   >
-                    <div className={`h-48 bg-gradient-to-br ${post.image} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                      <Eye className="w-8 h-8 text-primary/60" />
+                    <div className="h-48 overflow-hidden">
+                      <img 
+                        src={post.image} 
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
                     <div className="p-4">
                       <h3 className="font-display font-semibold text-foreground mb-2 line-clamp-2 group-hover:text-primary transition-colors">
