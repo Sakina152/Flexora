@@ -80,8 +80,8 @@ const Signup = () => {
     
     try {
       console.log('Sending registration request with data:', { username, email, phone, address });
-      
-      const response = await fetch('http://localhost:8000/api/register/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch('${baseURL}/api/register/', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',

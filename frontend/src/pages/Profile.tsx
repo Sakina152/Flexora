@@ -160,7 +160,8 @@ const Profile = () => {
       setError('');
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch('http://localhost:8000/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL;
+        const res = await fetch('${baseURL}/api/profile/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

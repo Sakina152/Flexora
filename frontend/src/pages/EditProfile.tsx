@@ -74,7 +74,8 @@ const EditProfile = () => {
       setError('');
       try {
         const token = localStorage.getItem('accessToken');
-        const res = await fetch('http://localhost:8000/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL;
+        const res = await fetch('${baseURL}/api/profile/', {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to fetch profile');
@@ -158,8 +159,8 @@ const EditProfile = () => {
       if (form.accountType) {
         formData.append('account_type', form.accountType);
       }
-      
-      const res = await fetch('http://localhost:8000/api/profile/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch('${baseURL}/api/profile/', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -200,7 +201,8 @@ const EditProfile = () => {
     setPasswordSuccess('');
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://localhost:8000/api/change-password/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch('${baseURL}/api/change-password/', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

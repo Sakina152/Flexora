@@ -26,7 +26,8 @@ const DeleteAccount = () => {
     
     try {
       const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://localhost:8000/api/delete-account/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch('${baseURL}/api/delete-account/', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
