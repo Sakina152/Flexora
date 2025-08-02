@@ -48,7 +48,7 @@ const Favorites = () => {
                     No favorites yet
                   </h3>
                   <p className="text-muted-foreground text-lg max-w-md mx-auto">
-                    Start exploring our amazing collection and heart the styles you love to see them here!
+                    Start exploring our amazing collection and Heart the styles you love to see them here!
                   </p>
                 </div>
                 <button 
