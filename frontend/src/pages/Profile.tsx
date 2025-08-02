@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent, CardFooter } from '../compone
 import { useAuth } from '../App';
 import { useNavigate, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { User, Mail, Phone, MapPin, Trash2, Users, UserCheck, UserPlus, UserX, UserMinus, Calendar, Clock, Shield, Edit, Settings, ShoppingCart, Heart } from 'lucide-react';
+import { User, Mail, Phone, MapPin, Trash2, Users, UserCheck, UserPlus, UserX, UserMinus, Calendar, Clock, Shield, Edit, Settings, ShoppingCart, Heart, PenTool } from 'lucide-react';
 import { Skeleton } from '../components/ui/skeleton';
 import AddressManager from '../components/AddressManager';
 import { getStorageData, getStorageKey, STORAGE_KEYS } from '../lib/storage';
@@ -25,6 +25,8 @@ const Profile = () => {
   const [showOrders, setShowOrders] = useState(false);
   const [savedAddresses, setSavedAddresses] = useState<any[]>([]);
   const [defaultAddress, setDefaultAddress] = useState('');
+  const [isCommunityMember, setIsCommunityMember] = useState(false);
+  const [membershipLoading, setMembershipLoading] = useState(true);
 
   // Default avatar options (same as EditProfile)
   const defaultAvatars = [
@@ -107,6 +109,55 @@ const Profile = () => {
     return formatDate(dateString);
   };
 
+  // Check if user is a community member
+  const checkCommunityMembership = async () => {
+    console.log('🔍 Checking community membership for user:', user);
+    console.log('🔍 Profile data:', profile);
+    
+    // Use profile email if available, fallback to user email
+    const userEmail = profile?.email || user?.email;
+    
+    if (!userEmail) {
+      console.log('❌ No user email found in profile or user object, skipping membership check');
+      setMembershipLoading(false);
+      return;
+    }
+
+    console.log('📧 User email from profile:', userEmail);
+
+    try {
+      const token = localStorage.getItem('accessToken');
+      console.log('🔑 Token exists:', !!token);
+      
+      const res = await fetch('http://127.0.0.1:8000/api/community-member-check/', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      console.log('📡 API Response status:', res.status);
+      
+      if (res.ok) {
+        const data = await res.json();
+        console.log('✅ API Response data:', data);
+        const isMember = data.is_community_member || false;
+        console.log('👤 Is community member:', isMember);
+        setIsCommunityMember(isMember);
+      } else {
+        console.log('❌ API call failed with status:', res.status);
+        const errorText = await res.text();
+        console.log('❌ Error response:', errorText);
+        setIsCommunityMember(false);
+      }
+    } catch (error) {
+      console.error('💥 Error checking community membership:', error);
+      setIsCommunityMember(false);
+    } finally {
+      setMembershipLoading(false);
+    }
+  };
+
   // Calculate account stats from localStorage
   useEffect(() => {
     if (!user?.username) {
@@ -179,6 +230,19 @@ const Profile = () => {
     };
     fetchProfile();
   }, [user, navigate]);
+
+  // Separate useEffect for community membership check
+  useEffect(() => {
+    if (profile?.email && !loading) {
+      console.log('🚀 Profile email available, checking community membership');
+      checkCommunityMembership();
+    }
+  }, [profile?.email, loading]);
+
+  // Debug useEffect to track state changes
+  useEffect(() => {
+    console.log('📊 State Update - isCommunityMember:', isCommunityMember, 'membershipLoading:', membershipLoading);
+  }, [isCommunityMember, membershipLoading]);
 
   if (!user) return null;
 
@@ -423,7 +487,7 @@ const Profile = () => {
                     <Settings className="w-5 h-5 text-purple-600" />
                     Quick Actions
                   </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className={`grid grid-cols-1 ${isCommunityMember ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-3`}>
                     <Link to="/edit-profile" className="flex items-center gap-2 p-3 bg-white rounded-lg border border-purple-200 hover:bg-purple-50 transition-colors">
                       <Edit className="w-4 h-4 text-purple-600" />
                       <span className="text-sm font-medium">Edit Profile</span>
@@ -436,6 +500,12 @@ const Profile = () => {
                       <Heart className="w-4 h-4 text-purple-600" />
                       <span className="text-sm font-medium">My Favorites</span>
                     </Link>
+                    {isCommunityMember && (
+                      <Link to="/write-blog" className="flex items-center gap-2 p-3 bg-white rounded-lg border border-purple-200 hover:bg-purple-50 transition-colors">
+                        <PenTool className="w-4 h-4 text-purple-600" />
+                        <span className="text-sm font-medium">Write a Blog</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
               </div>

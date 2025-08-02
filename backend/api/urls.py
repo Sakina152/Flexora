@@ -4,7 +4,7 @@ from .views import (
     DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView,
     ProductListView, ProductDetailView, ProductCategoriesView,
     BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView,
-    JoinCommunityView
+    JoinCommunityView, CommunityMemberCheckView
 )
 
 urlpatterns = [
@@ -18,6 +18,7 @@ urlpatterns = [
     path('quiz/submit/', QuizSubmissionView.as_view(), name='quiz-submit'),
     path('usernames/', UsernameSuggestionsView.as_view(), name='username-suggestions'),
     path('join-community/', JoinCommunityView.as_view(), name='join-community'),
+    path('community-member-check/', CommunityMemberCheckView.as_view(), name='community-member-check'),
     
     # Product API endpoints
     path('products/', ProductListView.as_view(), name='product-list'),

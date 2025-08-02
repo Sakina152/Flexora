@@ -510,6 +510,61 @@ class UsernameSuggestionsView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
+class CommunityMemberCheckView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """
+        Check if the authenticated user is a community member
+        """
+        try:
+            user = request.user
+            print(f"🔍 Checking membership for user: {user.username} (email: {user.email})")
+            
+            # First, check if user has any community member record
+            community_member = None
+            try:
+                community_member = CommunityMember.objects.get(user=user)
+                print(f"✅ Found community member record: {community_member}")
+                print(f"📧 Community member email: {community_member.email}")
+                print(f"✅ Agreed to terms: {community_member.agreed_to_terms}")
+            except CommunityMember.DoesNotExist:
+                print(f"❌ No community member record found for user: {user.username}")
+            
+            # Check multiple conditions to be more flexible
+            is_member = False
+            
+            if community_member:
+                # Check if they agreed to terms (most important)
+                if community_member.agreed_to_terms:
+                    is_member = True
+                    print(f"✅ User is a community member (agreed to terms)")
+                else:
+                    print(f"❌ User has record but hasn't agreed to terms")
+            
+            # Additional debug info
+            all_members = CommunityMember.objects.all().count()
+            print(f"📊 Total community members in database: {all_members}")
+            
+            return Response({
+                'is_community_member': is_member,
+                'user_email': user.email,
+                'debug_info': {
+                    'has_community_record': community_member is not None,
+                    'agreed_to_terms': community_member.agreed_to_terms if community_member else False,
+                    'community_email': community_member.email if community_member else None,
+                    'total_members': all_members
+                }
+            }, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            print(f"💥 Error in community member check: {str(e)}")
+            return Response({
+                'error': 'Failed to check community membership',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
 class JoinCommunityView(APIView):
     permission_classes = [IsAuthenticated]
     
