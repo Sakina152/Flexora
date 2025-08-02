@@ -25,7 +25,8 @@ dist-ssr
 
 *.sqlite3
 *.pyc
-__pycache__/
+backend/core/__pycache__/
+backend/api/__pycache__/
 
 node_modules/
 
