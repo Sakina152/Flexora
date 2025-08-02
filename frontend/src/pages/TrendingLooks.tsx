@@ -19,10 +19,10 @@ const TrendingLooks = () => {
 
   const filters = ['All', 'Minimalist', 'Vintage', 'Streetwear', 'Bohemian', 'Formal', 'Casual'];
 
-  // Filter blogs based on active filter
+  // Filter blogs based on active filter and exclude Test Blog Post
   const filteredBlogs = activeFilter === 'All'
-    ? blogs
-    : blogs.filter(blog => blog.category === activeFilter);
+    ? blogs.filter(blog => blog.title !== 'Test Blog Post')
+    : blogs.filter(blog => blog.category === activeFilter && blog.title !== 'Test Blog Post');
 
   const handleLike = async (blogId: string) => {
     try {
@@ -205,8 +205,16 @@ const TrendingLooks = () => {
                       className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
                       style={{ animationDelay: `${index * 100}ms` }}
                     >
-                      <div className={`relative h-64 bg-gradient-to-br ${getGradientClass(blog, index)} flex items-center justify-center group-hover:scale-105 transition-transform duration-300`}>
-                        <Eye className="w-8 h-8 text-primary/60" />
+                      <div className={`relative h-64 bg-gradient-to-br ${getGradientClass(blog, index)} flex items-center justify-center group-hover:scale-105 transition-transform duration-300 overflow-hidden`}>
+                        {blog.cover_image_url || blog.cover_image ? (
+                          <img 
+                            src={blog.cover_image_url || blog.cover_image} 
+                            alt={blog.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Eye className="w-8 h-8 text-primary/60" />
+                        )}
                         {blog.is_trending && (
                           <div className="absolute top-3 right-3 bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1">
                             <TrendingUp className="w-3 h-3" />
