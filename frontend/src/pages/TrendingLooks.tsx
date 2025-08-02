@@ -15,7 +15,7 @@ const TrendingLooks = () => {
   const [favoritePosts, setFavoritePosts] = useState<Set<string>>(new Set());
   const [activeFilter, setActiveFilter] = useState('All');
   
-  const { blogs, loading, error, refetch } = useBlogs();
+  const { blogs, loading, error, refetch } = useBlogs({ trending: true, limit: 50 });
 
   const filters = ['All', 'Minimalist', 'Vintage', 'Streetwear', 'Bohemian', 'Formal', 'Casual'];
 

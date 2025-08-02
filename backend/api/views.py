@@ -128,12 +128,16 @@ class BlogListView(APIView):
             if featured:
                 blogs = blogs.filter(is_featured=True)
             
-            # Limit results
-            try:
-                limit = int(limit)
-                blogs = blogs[:limit]
-            except ValueError:
-                blogs = blogs[:20]
+            # Limit results - but return all trending blogs if no specific limit is requested
+            if trending and not request.GET.get('limit'):
+                # Return all trending blogs without limit
+                pass
+            else:
+                try:
+                    limit = int(limit)
+                    blogs = blogs[:limit]
+                except ValueError:
+                    blogs = blogs[:20]
             
             serializer = BlogSerializer(blogs, many=True)
             return Response(serializer.data)
