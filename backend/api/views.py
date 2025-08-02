@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from .models import UserProfile, Product, Blog
+from .models import UserProfile, Product, Blog, CommunityMember
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.conf import settings
@@ -506,5 +506,99 @@ class UsernameSuggestionsView(APIView):
         except Exception as e:
             return Response({
                 'error': 'Failed to fetch username suggestions',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class JoinCommunityView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """
+        Handle join community form submission
+        """
+        try:
+            print(f"Join community request received from user: {request.user.username}")
+            print(f"Request data: {request.data}")
+            
+            # Check if user is already a community member
+            if hasattr(request.user, 'community_member'):
+                print(f"User {request.user.username} is already a community member")
+                return Response({
+                    'error': 'You are already a community member.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Validate required fields
+            required_fields = ['name', 'email', 'agreeToTerms']
+            for field in required_fields:
+                if not request.data.get(field):
+                    print(f"Missing required field: {field}")
+                    return Response({
+                        'error': f'{field} is required.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Create community member
+            from .serializers import CommunityMemberSerializer
+            
+            # Prepare data for serializer
+            member_data = {
+                'name': request.data.get('name'),
+                'email': request.data.get('email'),
+                'phone': request.data.get('phone', ''),
+                'location': request.data.get('location', ''),
+                'instagram_handle': request.data.get('instagram', ''),
+                'personal_website': request.data.get('website', ''),
+                'fashion_interest': request.data.get('fashionInterest', ''),
+                'what_brings_you_here': request.data.get('whatBringsYouHere', ''),
+                'bio': request.data.get('bio', ''),
+                'agreed_to_terms': request.data.get('agreeToTerms', False),
+                'subscribe_newsletter': request.data.get('subscribeNewsletter', False),
+            }
+            
+            print(f"Prepared member data: {member_data}")
+            
+            serializer = CommunityMemberSerializer(data=member_data, context={'request': request})
+            
+            if serializer.is_valid():
+                print("Serializer is valid, saving member...")
+                member = serializer.save()
+                print(f"Successfully created community member: {member}")
+                return Response({
+                    'message': 'Successfully joined the Flexora community!',
+                    'member': serializer.data
+                }, status=status.HTTP_201_CREATED)
+            else:
+                print(f"Serializer errors: {serializer.errors}")
+                return Response({
+                    'error': 'Invalid data provided.',
+                    'details': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            print(f"Error in join community: {str(e)}")
+            return Response({
+                'error': 'Failed to join community.',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def get(self, request):
+        """
+        Check if user is already a community member
+        """
+        try:
+            if hasattr(request.user, 'community_member'):
+                from .serializers import CommunityMemberSerializer
+                serializer = CommunityMemberSerializer(request.user.community_member)
+                return Response({
+                    'is_member': True,
+                    'member': serializer.data
+                })
+            else:
+                return Response({
+                    'is_member': False
+                })
+        except Exception as e:
+            return Response({
+                'error': 'Failed to check membership status.',
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

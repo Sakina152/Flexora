@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import UserProfile, Product, Blog
+from .models import UserProfile, Product, Blog, CommunityMember
 
 admin.site.register(UserProfile)
 
@@ -111,3 +111,77 @@ class BlogAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         # The model's save method will handle published_at logic
         super().save_model(request, obj, form, change)
+
+
+@admin.register(CommunityMember)
+class CommunityMemberAdmin(admin.ModelAdmin):
+    list_display = ('name', 'user', 'email', 'fashion_interest', 'agreed_to_terms', 'subscribe_newsletter', 'created_at')
+    list_filter = ('fashion_interest', 'what_brings_you_here', 'agreed_to_terms', 'subscribe_newsletter', 'created_at')
+    search_fields = ('name', 'user__username', 'email', 'bio', 'location')
+    readonly_fields = ('user', 'created_at', 'updated_at')
+    
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user', 'name', 'email', 'phone', 'location')
+        }),
+        ('Social Media & Online Presence', {
+            'fields': ('instagram_handle', 'personal_website'),
+            'classes': ('collapse',)
+        }),
+        ('Fashion & Community', {
+            'fields': ('fashion_interest', 'what_brings_you_here', 'bio')
+        }),
+        ('Legal & Communication', {
+            'fields': ('agreed_to_terms', 'subscribe_newsletter')
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+    
+    ordering = ('-created_at',)
+    
+    actions = ['export_members', 'mark_newsletter_subscribers']
+    
+    def export_members(self, request, queryset):
+        """Export selected members to CSV"""
+        import csv
+        from django.http import HttpResponse
+        
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="community_members.csv"'
+        
+        writer = csv.writer(response)
+        writer.writerow([
+            'Name', 'Username', 'Email', 'Phone', 'Location', 
+            'Fashion Interest', 'What Brings You Here', 'Instagram', 
+            'Website', 'Bio', 'Agreed to Terms', 'Newsletter Subscriber', 
+            'Joined Date'
+        ])
+        
+        for member in queryset:
+            writer.writerow([
+                member.name,
+                member.user.username,
+                member.email,
+                member.phone,
+                member.location,
+                member.fashion_interest,
+                member.what_brings_you_here,
+                member.instagram_handle,
+                member.personal_website,
+                member.bio,
+                'Yes' if member.agreed_to_terms else 'No',
+                'Yes' if member.subscribe_newsletter else 'No',
+                member.created_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        return response
+    export_members.short_description = "Export selected members to CSV"
+    
+    def mark_newsletter_subscribers(self, request, queryset):
+        """Mark selected members as newsletter subscribers"""
+        updated = queryset.update(subscribe_newsletter=True)
+        self.message_user(request, f'{updated} member(s) marked as newsletter subscribers.')
+    mark_newsletter_subscribers.short_description = "Mark as newsletter subscribers"

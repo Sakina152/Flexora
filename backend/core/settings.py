@@ -30,7 +30,6 @@ ALLOWED_HOSTS = os.getenv("flexora-ri89.onrender.com", "localhost,127.0.0.1,0.0.
 
 
 
-
 # Application definition
 
 INSTALLED_APPS = [

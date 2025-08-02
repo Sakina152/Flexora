@@ -145,3 +145,68 @@ class Blog(models.Model):
             return f"{minutes} minute{'s' if minutes != 1 else ''} ago"
         else:
             return "Just now"
+
+
+class CommunityMember(models.Model):
+    FASHION_INTEREST_CHOICES = [
+        ('Streetwear', 'Streetwear'),
+        ('Vintage', 'Vintage'),
+        ('Minimalist', 'Minimalist'),
+        ('Bohemian', 'Bohemian'),
+        ('Formal/Elegant', 'Formal/Elegant'),
+        ('Casual', 'Casual'),
+        ('Sustainable Fashion', 'Sustainable Fashion'),
+        ('High Fashion', 'High Fashion'),
+        ('Street Style', 'Street Style'),
+        ('Other', 'Other'),
+    ]
+    
+    WHAT_BRINGS_YOU_CHOICES = [
+        ('Discover new styles', 'Discover new styles'),
+        ('Connect with fashion community', 'Connect with fashion community'),
+        ('Showcase my designs', 'Showcase my designs'),
+        ('Learn about fashion trends', 'Learn about fashion trends'),
+        ('Find inspiration', 'Find inspiration'),
+        ('Network with students', 'Network with students'),
+        ('Support student designers', 'Support student designers'),
+        ('Other', 'Other'),
+    ]
+    
+    # User relationship
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='community_member')
+    
+    # Personal Information
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    phone = models.CharField(max_length=20, blank=True)
+    location = models.CharField(max_length=255, blank=True)
+    
+    # Social Media & Online Presence
+    instagram_handle = models.CharField(max_length=100, blank=True)
+    personal_website = models.URLField(blank=True)
+    
+    # Fashion & Community
+    fashion_interest = models.CharField(max_length=50, choices=FASHION_INTEREST_CHOICES, blank=True)
+    what_brings_you_here = models.CharField(max_length=100, choices=WHAT_BRINGS_YOU_CHOICES, blank=True)
+    bio = models.TextField(blank=True)
+    
+    # Legal & Communication
+    agreed_to_terms = models.BooleanField(default=False)
+    subscribe_newsletter = models.BooleanField(default=False)
+    
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        verbose_name = 'Community Member'
+        verbose_name_plural = 'Community Members'
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} ({self.user.username})"
+    
+    @property
+    def is_active_member(self):
+        """Check if member is active (has agreed to terms)"""
+        return self.agreed_to_terms

@@ -1,7 +1,10 @@
 
 import { Link } from 'react-router-dom';
+import { useAuth } from '../App';
 
 const Footer = () => {
+  const { user } = useAuth();
+
   return (
     <footer className="bg-card border-t border-border py-16">
       <div className="max-w-6xl mx-auto px-4">
@@ -60,9 +63,15 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/join-community" className="text-muted-foreground hover:text-primary transition-colors">
-                  Join Community
-                </Link>
+                {user ? (
+                  <Link to="/join-community" className="text-muted-foreground hover:text-primary transition-colors">
+                    Join Community
+                  </Link>
+                ) : (
+                  <Link to="/login" className="text-muted-foreground hover:text-primary transition-colors">
+                    Login to Join Community
+                  </Link>
+                )}
               </li>
               <li>
                 <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
