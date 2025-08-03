@@ -37,22 +37,46 @@ interface PersonaData {
 }
 
 // Convert Product to LookbookItem
-const convertProductToLookbookItem = (product: Product): LookbookItem => ({
-  id: product.id,
-  title: product.name,
-  description: product.description,
-  category: product.category || 'General',
-  price: product.price,
-  originalPrice: undefined, // Backend doesn't have originalPrice
-  image: product.image_url || product.image || '/placeholder.jpg',
-  designer: product.brand || 'Unknown Designer',
-  rating: 4.5, // Default rating since backend doesn't have this
-  reviews: Math.floor(Math.random() * 100) + 10, // Random reviews count
-  featured: product.stock_quantity > 20, // Use stock as featured indicator
-  trending: product.stock_quantity > 20,
-  sizes: ['XS', 'S', 'M', 'L', 'XL'], // Default sizes
-  colors: ['Black', 'White', 'Gray'] // Default colors
-});
+const convertProductToLookbookItem = (product: Product): LookbookItem => {
+  // Handle image URL properly
+  let imageUrl = '/placeholder.jpg'; // Default fallback
+  
+  if (product.image_url) {
+    imageUrl = product.image_url;
+  } else if (product.image) {
+    // If image is a relative path, make it absolute
+    if (product.image.startsWith('/')) {
+      imageUrl = `http://localhost:8000${product.image}`;
+    } else if (product.image.startsWith('http')) {
+      imageUrl = product.image;
+    } else {
+      imageUrl = `http://localhost:8000/media/${product.image}`;
+    }
+  }
+  
+  console.log('Converting product image:', { 
+    original_image_url: product.image_url, 
+    original_image: product.image, 
+    final_image: imageUrl 
+  });
+  
+  return {
+    id: product.id,
+    title: product.name,
+    description: product.description,
+    category: product.category || 'General',
+    price: product.price,
+    originalPrice: undefined, // Backend doesn't have originalPrice
+    image: imageUrl,
+    designer: product.brand || 'Unknown Designer',
+    rating: 4.5, // Default rating since backend doesn't have this
+    reviews: Math.floor(Math.random() * 100) + 10, // Random reviews count
+    featured: product.stock_quantity > 20, // Use stock as featured indicator
+    trending: product.stock_quantity > 20,
+    sizes: ['XS', 'S', 'M', 'L', 'XL'], // Default sizes
+    colors: ['Black', 'White', 'Gray'] // Default colors
+  };
+};
 
 // Convert LookbookItem to TrendSwipePopup Product format
 const convertToSwipeProduct = (item: LookbookItem): { id: number; name: string; images: string[]; tags: string[]; } => {
@@ -326,16 +350,30 @@ const Lookbook = () => {
               const likedProducts = allProducts.filter(p => {
                 const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
                 const isLiked = likedProductIds.includes(numericId);
-                if (isLiked) console.log('Found liked product:', p.name, numericId);
+                if (isLiked) {
+                  console.log('Found liked product:', p.name, numericId);
+                  console.log('Product image data:', { image_url: p.image_url, image: p.image });
+                }
                 return isLiked;
-              }).map(p => convertProductToLookbookItem(p));
+              }).map(p => {
+                const converted = convertProductToLookbookItem(p);
+                console.log('Converted product image:', converted.image);
+                return converted;
+              });
               
               const skippedProducts = allProducts.filter(p => {
                 const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
                 const isSkipped = skippedProductIds.includes(numericId);
-                if (isSkipped) console.log('Found skipped product:', p.name, numericId);
+                if (isSkipped) {
+                  console.log('Found skipped product:', p.name, numericId);
+                  console.log('Product image data:', { image_url: p.image_url, image: p.image });
+                }
                 return isSkipped;
-              }).map(p => convertProductToLookbookItem(p));
+              }).map(p => {
+                const converted = convertProductToLookbookItem(p);
+                console.log('Converted product image:', converted.image);
+                return converted;
+              });
               
               console.log('Final swipe results:', { liked: likedProducts.length, skipped: skippedProducts.length });
               
@@ -425,8 +463,7 @@ const Lookbook = () => {
     setShowTrendSwipe(true);
   };
 
-  const handleSwipeComplete = (liked: any[], skipped: any[]) => {
-    setSwipeResults({ liked, skipped });
+  const handleSwipeComplete = async (liked: any[], skipped: any[]) => {
     setShowTrendSwipe(false);
     
     // Save swipe results to localStorage
@@ -440,7 +477,88 @@ const Lookbook = () => {
       setStorageData(STORAGE_KEYS.SWIPE_RESULTS, swipeData, user.username);
     }
     
-    toast.success(`Trend swipe complete! You liked ${liked.length} items.`);
+    // Fetch fresh products from backend API based on swipe results
+    try {
+      console.log('Fetching products after swipe completion...');
+      
+      // Fetch all products for the current persona/style
+      const allProducts = await productApi.getProductsForStyle(persona || 'minimalist');
+      console.log('Fetched products from API:', allProducts.length);
+      
+      // Convert liked products to LookbookItem format
+      const likedProductItems = liked.map(swipedProduct => {
+        // Find the corresponding product from API by matching ID
+        const apiProduct = allProducts.find(p => {
+          const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
+          return numericId === swipedProduct.id;
+        });
+        
+        if (apiProduct) {
+          return convertProductToLookbookItem(apiProduct);
+        } else {
+          // Fallback to the swipe product data if API product not found
+          return {
+            id: swipedProduct.id.toString(),
+            title: swipedProduct.name,
+            description: swipedProduct.name,
+            category: 'Fashion',
+            price: 99, // Default price
+            image: swipedProduct.images[0] || '/placeholder.jpg',
+            designer: 'Designer',
+            rating: 4.5,
+            reviews: 10,
+            sizes: ['S', 'M', 'L'],
+            colors: ['Black', 'White']
+          };
+        }
+      });
+      
+      // Convert skipped products to LookbookItem format
+      const skippedProductItems = skipped.map(swipedProduct => {
+        const apiProduct = allProducts.find(p => {
+          const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
+          return numericId === swipedProduct.id;
+        });
+        
+        if (apiProduct) {
+          return convertProductToLookbookItem(apiProduct);
+        } else {
+          return {
+            id: swipedProduct.id.toString(),
+            title: swipedProduct.name,
+            description: swipedProduct.name,
+            category: 'Fashion',
+            price: 99,
+            image: swipedProduct.images[0] || '/placeholder.jpg',
+            designer: 'Designer',
+            rating: 4.5,
+            reviews: 10,
+            sizes: ['S', 'M', 'L'],
+            colors: ['Black', 'White']
+          };
+        }
+      });
+      
+      console.log('Processed swipe results:', {
+        liked: likedProductItems.length,
+        skipped: skippedProductItems.length
+      });
+      
+      // Update swipe results with properly formatted product data
+      setSwipeResults({
+        liked: likedProductItems,
+        skipped: skippedProductItems
+      });
+      
+      toast.success(`Trend swipe complete! You liked ${liked.length} items. Products loaded from database.`);
+      
+    } catch (error) {
+      console.error('Error fetching products after swipe:', error);
+      
+      // Fallback to original swipe data if API call fails
+      setSwipeResults({ liked, skipped });
+      toast.success(`Trend swipe complete! You liked ${liked.length} items.`);
+    }
   };
 
   if (loading) {
