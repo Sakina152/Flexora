@@ -18,7 +18,7 @@ const StudentSpotlights = () => {
       specialty: "Sustainable Fashion",
       year: "Senior",
       bio: "A talented designer passionate about eco-friendly fashion.",
-      image: "from-primary/20 to-accent/30",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754201052/fa6f61253506d011586fbba27a63445b_f3dfsn.jpg",
       followers: 890,
       designs: 32
     },
@@ -28,7 +28,7 @@ const StudentSpotlights = () => {
       specialty: "Streetwear",
       year: "Junior",
       bio: "Creating urban-inspired designs with a unique cultural twist.",
-      image: "from-accent/30 to-secondary/20",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754201310/e62c73ef83df6fb30e7b183003440e24_y1jd56.jpg",
       followers: 670,
       designs: 28
     },
@@ -38,7 +38,7 @@ const StudentSpotlights = () => {
       specialty: "Formal Wear",
       year: "Sophomore",
       bio: "Crafting elegant and timeless pieces for special occasions.",
-      image: "from-secondary/20 to-primary/20",
+      image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754201353/4eff84d0cf652d620a109461b8403226_cmzfcj.jpg",
       followers: 750,
       designs: 25
     }
@@ -108,8 +108,12 @@ const StudentSpotlights = () => {
             </div>
             
             <div className="bg-card rounded-xl border border-border overflow-hidden shadow-lg animate-fade-in">
-              <div className="h-80 bg-gradient-to-br from-primary/20 to-accent/30 flex items-center justify-center">
-                <Users className="w-16 h-16 text-primary/60" />
+              <div className="h-80 bg-gradient-to-br from-primary/20 to-accent/30 flex items-center justify-center overflow-hidden">
+                <img 
+                  src="https://res.cloudinary.com/dlpuuekkl/image/upload/v1754201201/f7f00a748f183f30b2f52ad47b400e58_gw6jmc.jpg" 
+                  alt="Sarah Martinez - Featured Designer" 
+                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                />
               </div>
               <div className="p-8">
                 <div className="flex items-center gap-3 mb-4">
@@ -157,8 +161,12 @@ const StudentSpotlights = () => {
                   className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-scale-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className={`h-48 bg-gradient-to-br ${student.image} flex items-center justify-center hover:scale-105 transition-transform duration-300`}>
-                    <Users className="w-8 h-8 text-primary/60" />
+                  <div className="h-48 overflow-hidden">
+                    <img 
+                      src={student.image} 
+                      alt={`${student.name} - ${student.specialty}`} 
+                      className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
                   <div className="p-4">
                     <div className="flex items-center gap-2 mb-2">
