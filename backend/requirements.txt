@@ -8,4 +8,6 @@ psycopg2-binary>=2.9
  django-cors-headers>=4.3 
  python-decouple
  psycopg2-binary
+# Razorpay payment gateway
+razorpay>=1.3.0
  

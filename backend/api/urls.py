@@ -5,7 +5,8 @@ from .views import (
     ProductListView, ProductDetailView, ProductCategoriesView,
     BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView,
     JoinCommunityView, CommunityMemberCheckView,
-    LookbookListView, LookbookDetailView, LookbookByStyleView, LookbookItemView
+    LookbookListView, LookbookDetailView, LookbookByStyleView, LookbookItemView,
+    CreateRazorpayOrderView, VerifyRazorpayPaymentView
 )
 
 urlpatterns = [
@@ -38,4 +39,7 @@ urlpatterns = [
     path('lookbooks/style/<str:style_persona>/', LookbookByStyleView.as_view(), name='lookbook-by-style'),
     path('lookbooks/<str:lookbook_id>/items/', LookbookItemView.as_view(), name='lookbook-add-item'),
     path('lookbooks/<str:lookbook_id>/items/<str:item_id>/', LookbookItemView.as_view(), name='lookbook-remove-item'),
+    # Razorpay payment endpoints
+    path('create-razorpay-order/', CreateRazorpayOrderView.as_view(), name='create-razorpay-order'),
+    path('verify-razorpay-payment/', VerifyRazorpayPaymentView.as_view(), name='verify-razorpay-payment'),
 ]

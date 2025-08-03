@@ -18,6 +18,10 @@ from django.conf import settings
 import os
 from rest_framework import serializers
 from django.db.models import F
+import razorpay
+import hmac
+import hashlib
+from datetime import datetime
 
 # Product Serializer
 class ProductSerializer(serializers.ModelSerializer):
@@ -659,6 +663,142 @@ class JoinCommunityView(APIView):
             return Response({
                 'error': 'Failed to check membership status.',
                 'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Razorpay Configuration
+RAZORPAY_KEY_ID = 'rzp_test_uWnvz5ddtLEob6'
+RAZORPAY_KEY_SECRET = 'wFigf3Th2WYoMh37rVh6o4LD'
+
+# Initialize Razorpay client
+razorpay_client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
+
+
+class CreateRazorpayOrderView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """
+        Create a Razorpay order for payment processing
+        """
+        try:
+            data = request.data
+            amount = data.get('amount')
+            currency = data.get('currency', 'INR')
+            receipt = data.get('receipt')
+            customer_info = data.get('customer_info', {})
+            cart_items = data.get('cart_items', [])
+            
+            # Validate required fields
+            if not amount or not receipt:
+                return Response({
+                    'error': 'Amount and receipt are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Convert amount to paise (Razorpay expects amount in smallest currency unit)
+            amount_in_paise = int(float(amount) * 100)
+            
+            # Create order data
+            order_data = {
+                'amount': amount_in_paise,
+                'currency': currency,
+                'receipt': receipt,
+                'notes': {
+                    'customer_name': customer_info.get('name', ''),
+                    'customer_email': customer_info.get('email', ''),
+                    'customer_phone': customer_info.get('phone', ''),
+                    'customer_address': customer_info.get('address', ''),
+                    'items_count': len(cart_items),
+                    'user_id': str(request.user.id)
+                }
+            }
+            
+            # Create order with Razorpay
+            razorpay_order = razorpay_client.order.create(order_data)
+            
+            return Response({
+                'success': True,
+                'order_id': razorpay_order['id'],
+                'id': razorpay_order['id'],
+                'amount': razorpay_order['amount'],
+                'currency': razorpay_order['currency'],
+                'receipt': razorpay_order['receipt'],
+                'status': razorpay_order['status']
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Failed to create order: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class VerifyRazorpayPaymentView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """
+        Verify Razorpay payment signature and process the order
+        """
+        try:
+            data = request.data
+            razorpay_payment_id = data.get('razorpay_payment_id')
+            razorpay_order_id = data.get('razorpay_order_id')
+            razorpay_signature = data.get('razorpay_signature')
+            receipt = data.get('receipt')
+            
+            # Validate required fields
+            if not all([razorpay_payment_id, razorpay_order_id, razorpay_signature]):
+                return Response({
+                    'error': 'Payment ID, Order ID, and Signature are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Verify payment signature
+            try:
+                # Create signature verification string
+                verification_string = f"{razorpay_order_id}|{razorpay_payment_id}"
+                
+                # Generate expected signature
+                expected_signature = hmac.new(
+                    RAZORPAY_KEY_SECRET.encode('utf-8'),
+                    verification_string.encode('utf-8'),
+                    hashlib.sha256
+                ).hexdigest()
+                
+                # Verify signature
+                if not hmac.compare_digest(expected_signature, razorpay_signature):
+                    return Response({
+                        'error': 'Invalid payment signature'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # If signature is valid, fetch payment details from Razorpay
+                payment_details = razorpay_client.payment.fetch(razorpay_payment_id)
+                
+                # Check if payment is captured
+                if payment_details['status'] != 'captured':
+                    return Response({
+                        'error': 'Payment not captured'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+                
+                # Here you can save the order to your database
+                # For now, we'll just return success
+                
+                return Response({
+                    'success': True,
+                    'message': 'Payment verified successfully',
+                    'payment_id': razorpay_payment_id,
+                    'order_id': razorpay_order_id,
+                    'amount': payment_details['amount'],
+                    'status': payment_details['status']
+                }, status=status.HTTP_200_OK)
+                
+            except razorpay.errors.SignatureVerificationError:
+                return Response({
+                    'error': 'Payment signature verification failed'
+                }, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({
+                'error': f'Payment verification failed: {str(e)}'
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 

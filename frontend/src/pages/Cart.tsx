@@ -8,6 +8,13 @@ import AddressManager from '../components/AddressManager';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, removeStorageData, getStorageKey, STORAGE_KEYS } from '../lib/storage';
 
+// Declare Razorpay interface
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
+
 const Cart = () => {
   const { user } = useAuth();
   const [cartItems, setCartItems] = useState<any[]>([]);
@@ -21,6 +28,8 @@ const Cart = () => {
     phone: ''
   });
   const [formError, setFormError] = useState('');
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
   useEffect(() => {
     if (!user?.username) {
@@ -34,6 +43,37 @@ const Cart = () => {
     console.log('Cart: Storage key used:', getStorageKey(STORAGE_KEYS.CART, user.username));
     setCartItems(savedCart);
   }, [user?.username]);
+
+  // Load Razorpay script
+  useEffect(() => {
+    const loadRazorpay = () => {
+      return new Promise((resolve) => {
+        const existingScript = document.getElementById('razorpay-checkout-js');
+        if (existingScript) {
+          setRazorpayLoaded(true);
+          resolve(true);
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.id = 'razorpay-checkout-js';
+        script.onload = () => {
+          console.log('Razorpay script loaded successfully');
+          setRazorpayLoaded(true);
+          resolve(true);
+        };
+        script.onerror = () => {
+          console.error('Failed to load Razorpay script');
+          toast.error('Failed to load payment gateway');
+          resolve(false);
+        };
+        document.body.appendChild(script);
+      });
+    };
+
+    loadRazorpay();
+  }, []);
 
   const updateCart = (items: any[]) => {
     if (!user?.username) return;
@@ -62,24 +102,44 @@ const Cart = () => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleCheckout = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError('');
-    if (!form.name || !form.email || !form.address || !form.phone) {
-      setFormError('Please fill in all fields.');
-      return;
-    }
-    if (!/^\d{10}$/.test(form.phone)) {
-      setFormError('Phone number must be exactly 10 digits.');
-      return;
-    }
+  const verifyPayment = async (paymentResponse: any, receipt: string) => {
+    try {
+      const verifyResponse = await fetch('/api/verify-razorpay-payment/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          razorpay_payment_id: paymentResponse.razorpay_payment_id,
+          razorpay_order_id: paymentResponse.razorpay_order_id,
+          razorpay_signature: paymentResponse.razorpay_signature,
+          receipt: receipt
+        })
+      });
 
+      const verifyData = await verifyResponse.json();
+      
+      if (verifyResponse.ok && verifyData.success) {
+        handlePaymentSuccess(paymentResponse.razorpay_payment_id, paymentResponse.razorpay_order_id);
+      } else {
+        throw new Error(verifyData.message || 'Payment verification failed');
+      }
+    } catch (error) {
+      console.error('Payment verification error:', error);
+      toast.error('Payment verification failed. Please contact support.');
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const handlePaymentSuccess = (paymentId: string, orderId: string) => {
     // Save the completed order to localStorage (username-specific)
     if (!user?.username) return;
     
     const orders = getStorageData(STORAGE_KEYS.ORDERS, user.username, []);
     const newOrder = {
-      id: `order-${Date.now()}`,
+      id: orderId,
+      paymentId: paymentId,
       items: cartItems,
       total: total,
       customerInfo: form,
@@ -96,7 +156,119 @@ const Cart = () => {
     removeStorageData(STORAGE_KEYS.CART, user.username);
     window.dispatchEvent(new Event('cart-updated'));
     
-    toast.success('Order placed successfully!');
+    toast.success('Payment successful! Order placed.');
+    setIsProcessingPayment(false);
+  };
+
+  const handleCheckout = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError('');
+    if (!form.name || !form.email || !form.address || !form.phone) {
+      setFormError('Please fill in all fields.');
+      return;
+    }
+    if (!/^\d{10}$/.test(form.phone)) {
+      setFormError('Phone number must be exactly 10 digits.');
+      return;
+    }
+
+    console.log('Starting checkout process...');
+    console.log('Razorpay loaded:', razorpayLoaded);
+    console.log('Window.Razorpay available:', !!window.Razorpay);
+    console.log('Total amount:', total);
+
+    if (!razorpayLoaded || !window.Razorpay) {
+      toast.error('Payment gateway is still loading. Please try again in a moment.');
+      setIsProcessingPayment(false);
+      return;
+    }
+
+    setIsProcessingPayment(true);
+
+    try {
+      // Try to create order on backend first, fallback to direct payment if backend is not available
+      let orderData = null;
+      let useBackend = true;
+      
+      try {
+        const orderResponse = await fetch('/api/create-razorpay-order/', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}` // Assuming you store auth token
+          },
+          body: JSON.stringify({
+            amount: total,
+            currency: 'INR',
+            receipt: `receipt_${Date.now()}`,
+            customer_info: form,
+            cart_items: cartItems
+          })
+        });
+
+        if (orderResponse.ok) {
+          orderData = await orderResponse.json();
+          console.log('Order created via backend:', orderData);
+        } else {
+          throw new Error('Backend order creation failed');
+        }
+      } catch (backendError) {
+        console.log('Backend not available, using direct payment mode:', backendError);
+        useBackend = false;
+        // Create a mock order for direct payment
+        orderData = {
+          id: `order_${Date.now()}`,
+          amount: Math.round(total * 100), // Convert to paise
+          currency: 'INR',
+          receipt: `receipt_${Date.now()}`
+        };
+      }
+
+      // Razorpay options
+      const options = {
+        key: 'rzp_test_uWnvz5ddtLEob6', // Your Razorpay key ID
+        amount: orderData.amount, // Amount in paise
+        currency: orderData.currency,
+        name: 'Flexora',
+        description: 'Purchase from Flexora',
+        order_id: useBackend ? orderData.id : undefined, // Only use order_id if created via backend
+        handler: async function (response: any) {
+          console.log('Payment successful:', response);
+          if (useBackend) {
+            await verifyPayment(response, orderData.receipt);
+          } else {
+            // Direct success handling without backend verification
+            handlePaymentSuccess(response.razorpay_payment_id, response.razorpay_order_id || orderData.id);
+          }
+        },
+        prefill: {
+          name: form.name,
+          email: form.email,
+          contact: form.phone
+        },
+        notes: {
+          address: form.address,
+          items_count: cartItems.length
+        },
+        theme: {
+          color: '#8B5CF6' // Purple theme to match your site
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessingPayment(false);
+            toast.error('Payment cancelled');
+          }
+        }
+      };
+
+      console.log('Opening Razorpay with options:', options);
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error) {
+      console.error('Error creating order:', error);
+      toast.error('Failed to initiate payment. Please try again.');
+      setIsProcessingPayment(false);
+    }
   };
 
   return (
@@ -256,9 +428,10 @@ const Cart = () => {
                     {formError && <div className="text-red-500 text-sm text-center">{formError}</div>}
                     <button
                       type="submit"
-                      className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                      disabled={isProcessingPayment}
+                      className="w-full py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Place Order
+                      {isProcessingPayment ? 'Processing...' : 'Place Order'}
                     </button>
                   </form>
                 )}
