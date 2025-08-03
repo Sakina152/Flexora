@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import (
-    UserProfile, Product, Blog, CommunityMember
+    UserProfile, Product, Blog, CommunityMember, Lookbook, LookbookItem
 )
 
 
@@ -52,6 +52,47 @@ class BlogListSerializer(serializers.ModelSerializer):
         ]
 
 
+class LookbookItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    product_id = serializers.UUIDField(write_only=True)
+    
+    class Meta:
+        model = LookbookItem
+        fields = ['id', 'product', 'product_id', 'added_at', 'order']
+        read_only_fields = ['id', 'added_at']
+
+
+class LookbookSerializer(serializers.ModelSerializer):
+    items = LookbookItemSerializer(many=True, read_only=True)
+    user = UserSerializer(read_only=True)
+    items_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Lookbook
+        fields = ['id', 'title', 'description', 'style_persona', 'is_active', 
+                 'created_at', 'updated_at', 'user', 'items', 'items_count']
+        read_only_fields = ['id', 'created_at', 'updated_at', 'user']
+    
+    def get_items_count(self, obj):
+        return obj.items.count()
+    
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        return super().create(validated_data)
+
+
+class LookbookListSerializer(serializers.ModelSerializer):
+    items_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Lookbook
+        fields = ['id', 'title', 'description', 'style_persona', 'is_active', 
+                 'created_at', 'updated_at', 'items_count']
+    
+    def get_items_count(self, obj):
+        return obj.items.count()
+
+
 class CommunityMemberSerializer(serializers.ModelSerializer):
     user = UserSerializer(read_only=True)
     
@@ -62,4 +103,4 @@ class CommunityMemberSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
-        return super().create(validated_data) 
+        return super().create(validated_data)

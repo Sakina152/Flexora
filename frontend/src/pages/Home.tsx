@@ -9,7 +9,7 @@ import { Sparkles, TrendingUp, Users, Heart, Eye, MessageCircle, X } from 'lucid
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
-import { products as allProducts } from '../data/products';
+import { productApi, Product } from '../services/lookbookApi';
 
 interface HomeProps {
   openQuiz?: boolean;
@@ -145,32 +145,36 @@ const Home = ({ openQuiz = false }: HomeProps) => {
     }
   };
 
-  const handleOpenSwipe = () => {
+  const handleOpenSwipe = async () => {
     const persona = localStorage.getItem('flexora-last-persona');
     setSwipePersona(persona);
-    let filtered;
-    if (persona) {
-      // mimic Lookbook persona filtering
-      const personaMap: Record<string, string> = {
-        'minimalist-style': 'Minimalist',
-        'bohemian-style': 'Bohemian',
-        'vintage-style': 'Vintage',
-        'casual-style': 'Casual',
-        'streetwear-style': 'Streetwear',
-        'formal-style': 'Formal',
-      };
-      const style = personaMap[persona] || '';
-      filtered = allProducts.filter(p => p.category === style);
-    } else {
-      filtered = allProducts;
+    
+    try {
+      let products: Product[];
+      if (persona) {
+        // Fetch products for the specific persona from backend API
+        products = await productApi.getProductsForStyle(persona);
+      } else {
+        // Fetch all products if no persona
+        products = await productApi.getAllProducts();
+      }
+      
+      // Convert backend products to swipe format (same as lookbook)
+      const swipeProducts = products.map(p => ({
+        id: parseInt(p.id.replace(/-/g, '').substring(0, 8), 16), // Convert UUID to number
+        name: p.name,
+        images: p.image_url || p.image ? [p.image_url || p.image] : [],
+        tags: [p.category || 'General', p.brand || 'Unknown', `$${p.price}`],
+      }));
+      
+      setSwipeProducts(swipeProducts);
+      setShowSwipe(true);
+    } catch (error) {
+      console.error('Error fetching products for trend swipe:', error);
+      // Fallback: still show the popup but with empty products
+      setSwipeProducts([]);
+      setShowSwipe(true);
     }
-    setSwipeProducts(filtered.map(p => ({
-      id: p.id,
-      name: p.name,
-      images: p.images,
-      tags: [p.category, ...(p.tags || [])],
-    })));
-    setShowSwipe(true);
   };
 
   return (
@@ -321,18 +325,6 @@ const Home = ({ openQuiz = false }: HomeProps) => {
           </div>
         </section>
         {/* Floating Action Button for Trend Swipe */}
-        <TrendSwipePopup
-          persona={swipePersona || 'minimalist-style'}
-          products={swipeProducts}
-          isOpen={showSwipe}
-          onClose={() => setShowSwipe(false)}
-          onComplete={(liked, skipped) => {
-            localStorage.setItem(`flexora-swipe-results-${swipePersona || 'minimalist-style'}`, JSON.stringify({ liked, skipped }));
-            setShowSwipe(false);
-            if (swipePersona) navigate(`/lookbook/${swipePersona}`);
-            else navigate('/lookbook/minimalist-style');
-          }}
-        />
         <button
           className="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center hover:scale-110 transition-all group"
           style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
@@ -346,6 +338,34 @@ const Home = ({ openQuiz = false }: HomeProps) => {
       </main>
 
       <FashionStyleQuiz isOpen={isQuizOpen} onClose={() => setIsQuizOpen(false)} />
+      
+      {/* Trend Swipe Popup */}
+      <TrendSwipePopup
+        persona={swipePersona || ''}
+        products={swipeProducts}
+        isOpen={showSwipe}
+        onClose={() => setShowSwipe(false)}
+        onComplete={(liked, skipped) => {
+          // Save swipe results to localStorage
+          if (user?.username && swipePersona) {
+            const swipeData = {
+              persona: swipePersona,
+              liked: liked.map(p => p.id),
+              skipped: skipped.map(p => p.id),
+              timestamp: new Date().toISOString()
+            };
+            setStorageData(STORAGE_KEYS.SWIPE_RESULTS, swipeData, user.username);
+          }
+          
+          setShowSwipe(false);
+          
+          // Navigate to lookbook to see results
+          if (swipePersona) {
+            navigate(`/lookbook/${swipePersona}`);
+          }
+        }}
+      />
+      
       <Footer />
     </div>
   );

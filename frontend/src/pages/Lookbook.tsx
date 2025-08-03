@@ -1,18 +1,17 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Footer from '../components/Footer';
 import PageHero from '../components/PageHero';
-import { ArrowLeft, Share2, Sparkles, ShoppingBag, Star} from 'lucide-react';
+import TrendSwipePopup from '../components/TrendSwipePopup';
+import { ArrowLeft, Sparkles, ShoppingBag, Star, Heart } from 'lucide-react';
 import { toast } from "sonner";
-import { products, Product } from '../data/products';
+import { lookbookApi, productApi, Product, Lookbook as LookbookType, LookbookItem as LookbookItemType } from '../services/lookbookApi';
 import { useAuth } from '../App';
 import { getStorageData, setStorageData, STORAGE_KEYS } from '../lib/storage';
-import TrendSwipePopup from '../components/TrendSwipePopup';
-import { ChevronLeft, ChevronRight, Eye, Heart } from 'lucide-react';
 
 interface LookbookItem {
-  id: number;
+  id: string;
   title: string;
   description: string;
   category: string;
@@ -37,243 +36,136 @@ interface PersonaData {
   trendingStyles: string[];
 }
 
-// Function to get products that match each style persona
-const getProductsForPersona = (persona: string): Product[] => {
-  switch (persona) {
-    case 'minimalist-style':
-      return products.filter(product => 
-        product.category === 'Minimalist' || 
-        product.tags.some(tag => ['minimalist', 'essentials', 'professional', 'clean', 'simple'].includes(tag.toLowerCase()))
-      );
-    case 'bohemian-style':
-      return products.filter(product => 
-        product.category === 'Bohemian' || 
-        product.tags.some(tag => ['bohemian', 'boho', 'free-spirited', 'artistic', 'flowy', 'embroidered'].includes(tag.toLowerCase()))
-      );
-    case 'vintage-style':
-      return products.filter(product => 
-        product.category === 'Vintage' || 
-        product.tags.some(tag => ['vintage', 'retro', 'classic', 'timeless', 'sophisticated'].includes(tag.toLowerCase()))
-      );
-    case 'casual-style':
-      return products.filter(product => 
-        product.category === 'Casual' || 
-        product.tags.some(tag => ['casual', 'comfortable', 'versatile', 'everyday', 'relaxed'].includes(tag.toLowerCase()))
-      );
-    case 'streetwear-style':
-      return products.filter(product => 
-        product.category === 'Streetwear' || 
-        product.tags.some(tag => ['streetwear', 'urban', 'street', 'oversized', 'graphic'].includes(tag.toLowerCase()))
-      );
-    case 'formal-style':
-      return products.filter(product => 
-        product.category === 'Formal' || 
-        product.tags.some(tag => ['formal', 'elegant', 'professional', 'sophisticated', 'evening'].includes(tag.toLowerCase()))
-      );
-    default:
-      return products.slice(0, 12); // Default fallback
-  }
-};
-
 // Convert Product to LookbookItem
 const convertProductToLookbookItem = (product: Product): LookbookItem => ({
   id: product.id,
   title: product.name,
   description: product.description,
-  category: product.category,
+  category: product.category || 'General',
   price: product.price,
-  originalPrice: product.originalPrice,
-  image: product.images[0] || 'placeholder',
-  designer: product.designer,
-  rating: product.rating,
-  reviews: product.reviews,
-  featured: product.featured,
-  trending: product.featured, // Use featured as trending indicator
-  sizes: product.sizes,
-  colors: product.colors
+  originalPrice: undefined, // Backend doesn't have originalPrice
+  image: product.image_url || product.image || '/placeholder.jpg',
+  designer: product.brand || 'Unknown Designer',
+  rating: 4.5, // Default rating since backend doesn't have this
+  reviews: Math.floor(Math.random() * 100) + 10, // Random reviews count
+  featured: product.stock_quantity > 20, // Use stock as featured indicator
+  trending: product.stock_quantity > 20,
+  sizes: ['XS', 'S', 'M', 'L', 'XL'], // Default sizes
+  colors: ['Black', 'White', 'Gray'] // Default colors
 });
 
-const personaData: Record<string, PersonaData> = {
-  'minimalist-style': {
-    title: "Minimalist Style Lookbook",
-    description: "Clean lines, quality over quantity, and timeless pieces that speak to your sophisticated aesthetic.",
-    color: "from-gray-400 to-gray-600",
-    recommendations: [
-      "Invest in high-quality basics",
-      "Stick to a neutral color palette",
-      "Focus on clean silhouettes",
-      "Choose versatile pieces that mix and match"
-    ],
-    trendingStyles: ["Capsule Wardrobe", "Neutral Tones", "Clean Lines", "Quality Basics"],
-    items: getProductsForPersona('minimalist-style').map(convertProductToLookbookItem)
-  },
-  'bohemian-style': {
-    title: "Bohemian Style Lookbook",
-    description: "Free-spirited and artistic pieces that celebrate your creative expression and love for eclectic style.",
-    color: "from-amber-400 to-orange-500",
-    recommendations: [
-      "Mix patterns and textures freely",
-      "Layer jewelry and accessories",
-      "Choose flowing, comfortable fabrics",
-      "Embrace earthy and warm tones"
-    ],
-    trendingStyles: ["Free Spirit", "Artistic Expression", "Layered Looks", "Earthy Tones"],
-    items: getProductsForPersona('bohemian-style').map(convertProductToLookbookItem)
-  },
-  'vintage-style': {
-    title: "Vintage Style Lookbook",
-    description: "Timeless elegance and classic sophistication that reflects your appreciation for fashion history.",
-    color: "from-rose-400 to-pink-500",
-    recommendations: [
-      "Look for quality vintage pieces",
-      "Embrace classic silhouettes",
-      "Choose sophisticated accessories",
-      "Mix vintage with modern touches"
-    ],
-    trendingStyles: ["Classic Elegance", "Timeless Fashion", "Sophisticated Look", "Retro Vibes"],
-    items: getProductsForPersona('vintage-style').map(convertProductToLookbookItem)
-  },
-  'casual-style': {
-    title: "Casual Style Lookbook",
-    description: "Comfortable and versatile pieces that maintain style while prioritizing ease and practicality.",
-    color: "from-blue-400 to-indigo-500",
-    recommendations: [
-      "Choose comfortable, breathable fabrics",
-      "Focus on versatile, mix-and-match pieces",
-      "Keep accessories simple and practical",
-      "Prioritize comfort without sacrificing style"
-    ],
-    trendingStyles: ["Weekend Casual", "Comfort First", "Versatile Pieces", "Easy Style"],
-    items: getProductsForPersona('casual-style').map(convertProductToLookbookItem)
-  },
-  'streetwear-style': {
-    title: "Streetwear Style Lookbook",
-    description: "Urban and edgy pieces that reflect your bold, contemporary fashion sense and love for street culture.",
-    color: "from-purple-400 to-pink-500",
-    recommendations: [
-      "Mix high and low fashion",
-      "Embrace bold graphics and logos",
-      "Layer pieces for depth",
-      "Choose comfortable, statement pieces"
-    ],
-    trendingStyles: ["Urban Edge", "Bold Graphics", "Layered Street Style", "Contemporary Cool"],
-    items: getProductsForPersona('streetwear-style').map(convertProductToLookbookItem)
-  },
-  'formal-style': {
-    title: "Formal Style Lookbook",
-    description: "Sophisticated and elegant pieces that showcase your refined taste and professional demeanor.",
-    color: "from-emerald-400 to-teal-500",
-    recommendations: [
-      "Invest in quality formal pieces",
-      "Choose sophisticated accessories",
-      "Focus on tailored fits",
-      "Maintain a polished appearance"
-    ],
-    trendingStyles: ["Sophisticated Elegance", "Professional Polish", "Refined Taste", "Timeless Luxury"],
-    items: getProductsForPersona('formal-style').map(convertProductToLookbookItem)
-  }
-};
-
-// Add a local type for swipe products
-interface SwipeProduct {
-  id: number;
-  name: string;
-  images: string[];
-  tags: string[];
-}
-
-function getSwipeResults(persona: string): { liked: SwipeProduct[]; skipped: SwipeProduct[] } {
-  try {
-    const raw = localStorage.getItem(`flexora-swipe-results-${persona}`);
-    if (raw) return JSON.parse(raw);
-  } catch {}
-  return { liked: [], skipped: [] };
-}
-
-function setSwipeResults(persona: string, liked: SwipeProduct[], skipped: SwipeProduct[]) {
-  try {
-    localStorage.setItem(`flexora-swipe-results-${persona}`, JSON.stringify({ liked, skipped }));
-  } catch {}
-}
-
-// Carousel for liked products
-const LikedCarousel = ({ items }: { items: SwipeProduct[] }) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollBy = 320;
-  const handleScroll = (dir: 'left' | 'right') => {
-    if (!scrollRef.current) return;
-    const newScroll = dir === 'left' ? scrollRef.current.scrollLeft - scrollBy : scrollRef.current.scrollLeft + scrollBy;
-    scrollRef.current.scrollTo({ left: newScroll, behavior: 'smooth' });
+// Convert LookbookItem to TrendSwipePopup Product format
+const convertToSwipeProduct = (item: LookbookItem): { id: number; name: string; images: string[]; tags: string[]; } => {
+  // Ensure we have a valid image URL from the backend product data
+  const imageUrl = item.image && item.image !== '/placeholder.jpg' ? item.image : null;
+  
+  return {
+    id: parseInt(item.id.replace(/-/g, '').substring(0, 8), 16), // Convert UUID to number for swipe component
+    name: item.title,
+    images: imageUrl ? [imageUrl] : [], // Only include valid image URLs
+    tags: [item.category, item.designer, `$${item.price}`]
   };
-  return (
-    <div className="relative">
-      <button
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 rounded-full p-2 shadow hover:bg-accent transition disabled:opacity-30"
-        onClick={() => handleScroll('left')}
-        disabled={!scrollRef.current || scrollRef.current.scrollLeft === 0}
-        aria-label="Scroll left"
-        style={{ display: items.length > 2 ? 'block' : 'none' }}
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      <div
-        ref={scrollRef}
-        className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-2 scrollbar-thin scrollbar-thumb-accent/40 scrollbar-track-transparent"
-        style={{ scrollBehavior: 'smooth' }}
-      >
-        {items.map((item, index) => (
-          <Link
-            to={`/products/${item.id}`}
-            key={item.id}
-            className="min-w-[280px] max-w-[320px] snap-center bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group flex-shrink-0 relative"
-            style={{ animationDelay: `${index * 80}ms` }}
-          >
-            <div className={`h-48 bg-gradient-to-br ${item.images[0]} flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative`}></div>
-            {/* Red heart icon for liked */}
-            <div className="absolute top-3 right-3 bg-white/90 rounded-full p-1 shadow">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="#ef4444" viewBox="0 0 24 24" strokeWidth="1.5" stroke="#ef4444" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 8.25c0-2.485-2.239-4.5-5-4.5-1.657 0-3.156.832-4 2.086C10.156 4.582 8.657 3.75 7 3.75c-2.761 0-5 2.015-5 4.5 0 7.25 10 12.5 10 12.5s10-5.25 10-12.5z" />
-              </svg>
-            </div>
-            <div className="p-4">
-              <h3 className="font-display text-lg font-semibold text-foreground mb-2 hover:text-primary transition-colors">{item.name}</h3>
-              <div className="flex flex-wrap gap-2 mb-2">
-                {item.tags.map(tag => (
-                  <span key={tag} className="px-3 py-1 bg-accent/20 text-primary rounded-full text-xs font-medium border border-border">{tag}</span>
-                ))}
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-      <button
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 bg-background/80 rounded-full p-2 shadow hover:bg-accent transition disabled:opacity-30"
-        onClick={() => handleScroll('right')}
-        disabled={!scrollRef.current || (scrollRef.current.scrollLeft + scrollRef.current.offsetWidth) >= (scrollRef.current.scrollWidth - 10)}
-        aria-label="Scroll right"
-        style={{ display: items.length > 2 ? 'block' : 'none' }}
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-    </div>
-  );
 };
 
-// Extracted ProductCard for reuse
+// Static persona metadata
+const getPersonaMetadata = (persona: string): Omit<PersonaData, 'items'> => {
+  const metadata: Record<string, Omit<PersonaData, 'items'>> = {
+    'minimalist-style': {
+      title: "Minimalist Style Lookbook",
+      description: "Clean lines, quality over quantity, and timeless pieces that speak to your sophisticated aesthetic.",
+      color: "from-gray-400 to-gray-600",
+      recommendations: [
+        "Invest in high-quality basics",
+        "Stick to a neutral color palette",
+        "Focus on clean silhouettes",
+        "Choose versatile pieces that mix and match"
+      ],
+      trendingStyles: ["Capsule Wardrobe", "Neutral Tones", "Clean Lines", "Quality Basics"]
+    },
+    'bohemian-style': {
+      title: "Bohemian Style Lookbook",
+      description: "Free-spirited and artistic pieces that celebrate your creative expression and love for eclectic style.",
+      color: "from-amber-400 to-orange-500",
+      recommendations: [
+        "Mix patterns and textures freely",
+        "Layer jewelry and accessories",
+        "Choose flowing, comfortable fabrics",
+        "Embrace earthy and warm tones"
+      ],
+      trendingStyles: ["Free Spirit", "Artistic Expression", "Layered Looks", "Earthy Tones"]
+    },
+    'vintage-style': {
+      title: "Vintage Style Lookbook",
+      description: "Timeless elegance and classic sophistication that reflects your appreciation for fashion history.",
+      color: "from-rose-400 to-pink-500",
+      recommendations: [
+        "Look for quality vintage pieces",
+        "Embrace classic silhouettes",
+        "Choose sophisticated accessories",
+        "Mix vintage with modern touches"
+      ],
+      trendingStyles: ["Classic Elegance", "Timeless Fashion", "Sophisticated Look", "Retro Vibes"]
+    },
+    'casual-style': {
+      title: "Casual Style Lookbook",
+      description: "Comfortable and versatile pieces that maintain style while prioritizing ease and practicality.",
+      color: "from-blue-400 to-indigo-500",
+      recommendations: [
+        "Choose comfortable, breathable fabrics",
+        "Focus on versatile, mix-and-match pieces",
+        "Keep accessories simple and practical",
+        "Prioritize comfort without sacrificing style"
+      ],
+      trendingStyles: ["Weekend Casual", "Comfort First", "Versatile Pieces", "Easy Style"]
+    },
+    'streetwear-style': {
+      title: "Streetwear Style Lookbook",
+      description: "Urban and edgy pieces that reflect your bold, contemporary fashion sense and love for street culture.",
+      color: "from-purple-400 to-pink-500",
+      recommendations: [
+        "Mix high and low fashion",
+        "Embrace bold graphics and logos",
+        "Layer pieces for depth",
+        "Choose comfortable, statement pieces"
+      ],
+      trendingStyles: ["Urban Edge", "Bold Graphics", "Layered Street Style", "Contemporary Cool"]
+    },
+    'formal-style': {
+      title: "Formal Style Lookbook",
+      description: "Sophisticated and elegant pieces that showcase your refined taste and professional demeanor.",
+      color: "from-emerald-400 to-teal-500",
+      recommendations: [
+        "Invest in quality formal pieces",
+        "Choose sophisticated accessories",
+        "Focus on tailored fits",
+        "Maintain a polished appearance"
+      ],
+      trendingStyles: ["Sophisticated Elegance", "Professional Polish", "Refined Taste", "Timeless Luxury"]
+    }
+  };
+  
+  return metadata[persona] || metadata['minimalist-style'];
+};
+
+// Product Card Component
 const ProductCard = ({ item, likedItems, favoriteItems, onLike, onFavorite, onAddToCart, user }: {
   item: LookbookItem,
-  likedItems: Set<number>,
-  favoriteItems: Set<number>,
-  onLike: (id: number) => void,
+  likedItems: Set<string>,
+  favoriteItems: Set<string>,
+  onLike: (id: string) => void,
   onFavorite: (item: LookbookItem) => void,
   onAddToCart: (item: LookbookItem) => void,
   user: any
 }) => (
-  <article
-    className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group"
-  >
+  <article className="bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1 animate-fade-in group">
     <Link to={`/products/${item.id}`} className="block">
-      <div className="h-64 bg-gradient-to-br from-primary-cream to-soft-pink flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative"></div>
+      <div className="h-64 bg-gradient-to-br from-primary-cream to-soft-pink flex items-center justify-center group-hover:scale-105 transition-transform duration-300 relative">
+        {item.image && item.image !== '/placeholder.jpg' ? (
+          <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+        ) : (
+          <div className="text-muted-foreground">No Image</div>
+        )}
+      </div>
       <div className="p-4">
         <div className="flex items-center gap-2 mb-2">
           <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-full">
@@ -345,70 +237,129 @@ const Lookbook = () => {
   const { persona } = useParams<{ persona: string }>();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [likedItems, setLikedItems] = useState<Set<number>>(new Set());
-  const [favoriteItems, setFavoriteItems] = useState<Set<number>>(new Set());
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
-  // Swipe popup state
-  const [showSwipe, setShowSwipe] = useState(false);
-  const [swipeLiked, setSwipeLiked] = useState<SwipeProduct[]>([]);
-  const [swipeSkipped, setSwipeSkipped] = useState<SwipeProduct[]>([]);
-  const [hasSwipeResults, setHasSwipeResults] = useState(false);
-  // Collapsible skipped section
-  const [showSkipped, setShowSkipped] = useState(false);
+  const [likedItems, setLikedItems] = useState<Set<string>>(new Set());
+  const [favoriteItems, setFavoriteItems] = useState<Set<string>>(new Set());
+  const [lookbookData, setLookbookData] = useState<PersonaData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showTrendSwipe, setShowTrendSwipe] = useState(false);
+  const [swipeResults, setSwipeResults] = useState<{ liked: any[]; skipped: any[]; } | null>(null);
 
-  // Restore swipe results from localStorage on mount/persona change
+  // Load lookbook data from backend
   useEffect(() => {
-    const { liked, skipped } = getSwipeResults(persona || 'minimalist-style');
-    setSwipeLiked(liked);
-    setSwipeSkipped(skipped);
-    setHasSwipeResults((liked.length > 0 || skipped.length > 0));
-  }, [persona]);
-
-  // Persist persona to localStorage if present
-  useEffect(() => {
-    if (persona) {
-      localStorage.setItem('flexora-last-persona', persona);
-    }
-  }, [persona]);
-
-  // If no persona in URL, try to restore from localStorage
-  useEffect(() => {
-    if (!persona) {
-      const lastPersona = localStorage.getItem('flexora-last-persona');
-      if (lastPersona && personaData[lastPersona]) {
-        navigate(`/lookbook/${lastPersona}`, { replace: true });
+    const loadLookbookData = async () => {
+      if (!persona) return;
+      
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // Get persona metadata
+        const metadata = getPersonaMetadata(persona);
+        
+        // Try to get or create lookbook from backend
+        let lookbook: LookbookType;
+        try {
+          if (user) {
+            lookbook = await lookbookApi.getLookbookByStyle(persona);
+          } else {
+            // If no user, fetch products directly
+            const products = await productApi.getProductsForStyle(persona);
+            const items = products.map(convertProductToLookbookItem);
+            setLookbookData({ ...metadata, items });
+            setLoading(false);
+            return;
+          }
+        } catch (error) {
+          // If lookbook doesn't exist, fetch products directly
+          const products = await productApi.getProductsForStyle(persona);
+          const items = products.map(convertProductToLookbookItem);
+          setLookbookData({ ...metadata, items });
+          setLoading(false);
+          return;
+        }
+        
+        // Convert lookbook items to display format
+        const items = lookbook.items.map(item => convertProductToLookbookItem(item.product));
+        setLookbookData({ ...metadata, items });
+        
+      } catch (err) {
+        console.error('Error loading lookbook data:', err);
+        setError('Failed to load lookbook data');
+      } finally {
+        setLoading(false);
       }
+    };
+
+    loadLookbookData();
+  }, [persona, user]);
+
+  // Load favorite items from localStorage
+  useEffect(() => {
+    if (user?.username) {
+      const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
+      const favoriteIds = new Set(savedFavorites.map((fav: any) => fav.id));
+      setFavoriteItems(favoriteIds);
     }
-  }, [persona, navigate]);
+  }, [user?.username]);
 
-  const data = personaData[persona || 'minimalist-style'];
-  
-  if (!data) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navigation />
-        <div className="flex items-center justify-center min-h-[60vh]">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-800 mb-4">Lookbook Not Found</h1>
-            <button
-              onClick={() => navigate('/')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg"
-            >
-              Go Home
-            </button>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    );
-  }
+  // Load swipe results from localStorage when component mounts
+  useEffect(() => {
+    const loadSwipeResults = async () => {
+      if (user?.username && persona) {
+        const savedSwipeResults = getStorageData(STORAGE_KEYS.SWIPE_RESULTS, user.username, null);
+        console.log('Loading swipe results for persona:', persona, savedSwipeResults);
+        
+        if (savedSwipeResults && savedSwipeResults.persona === persona) {
+          const likedProductIds = savedSwipeResults.liked || [];
+          const skippedProductIds = savedSwipeResults.skipped || [];
+          
+          console.log('Found swipe results:', { likedProductIds, skippedProductIds });
+          
+          if (likedProductIds.length > 0 || skippedProductIds.length > 0) {
+            try {
+              // Fetch all products to match against the stored IDs
+              const allProducts = await productApi.getProductsForStyle(persona);
+              console.log('Fetched products for matching:', allProducts.length);
+              
+              // Convert UUID to number for matching (same logic as homepage)
+              const likedProducts = allProducts.filter(p => {
+                const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
+                const isLiked = likedProductIds.includes(numericId);
+                if (isLiked) console.log('Found liked product:', p.name, numericId);
+                return isLiked;
+              }).map(p => convertProductToLookbookItem(p));
+              
+              const skippedProducts = allProducts.filter(p => {
+                const numericId = parseInt(p.id.replace(/-/g, '').substring(0, 8), 16);
+                const isSkipped = skippedProductIds.includes(numericId);
+                if (isSkipped) console.log('Found skipped product:', p.name, numericId);
+                return isSkipped;
+              }).map(p => convertProductToLookbookItem(p));
+              
+              console.log('Final swipe results:', { liked: likedProducts.length, skipped: skippedProducts.length });
+              
+              if (likedProducts.length > 0 || skippedProducts.length > 0) {
+                setSwipeResults({
+                  liked: likedProducts,
+                  skipped: skippedProducts
+                });
+                console.log('Set swipe results state');
+              }
+            } catch (error) {
+              console.error('Error loading swipe results:', error);
+            }
+          }
+        } else {
+          console.log('No matching swipe results found for persona:', persona);
+        }
+      }
+    };
+    
+    loadSwipeResults();
+  }, [user?.username, persona]);
 
-  const categories = ['All', ...Array.from(new Set(data.items.map(item => item.category)))];
-  const filteredItems = selectedCategory === 'All' 
-    ? data.items 
-    : data.items.filter(item => item.category === selectedCategory);
-
-  const handleLike = (itemId: number) => {
+  const handleLike = (itemId: string) => {
     setLikedItems(prev => {
       const newLiked = new Set(prev);
       if (newLiked.has(itemId)) {
@@ -470,84 +421,124 @@ const Lookbook = () => {
     window.dispatchEvent(new Event('cart-updated'));
   };
 
-  useEffect(() => {
-    // Load favorite items from localStorage (username-specific)
-    if (user?.username) {
-      const savedFavorites = getStorageData(STORAGE_KEYS.FAVORITES, user.username, []);
-      const favoriteIds = new Set(savedFavorites.map((fav: any) => fav.id).filter((id: any) => typeof id === 'number')) as Set<number>;
-      setFavoriteItems(favoriteIds);
+  const handleTrendSwipe = () => {
+    setShowTrendSwipe(true);
+  };
+
+  const handleSwipeComplete = (liked: any[], skipped: any[]) => {
+    setSwipeResults({ liked, skipped });
+    setShowTrendSwipe(false);
+    
+    // Save swipe results to localStorage
+    if (user?.username && persona) {
+      const swipeData = {
+        persona,
+        liked: liked.map(p => p.id),
+        skipped: skipped.map(p => p.id),
+        timestamp: new Date().toISOString()
+      };
+      setStorageData(STORAGE_KEYS.SWIPE_RESULTS, swipeData, user.username);
     }
-  }, [user?.username]);
+    
+    toast.success(`Trend swipe complete! You liked ${liked.length} items.`);
+  };
 
-  const swipeProducts: SwipeProduct[] = data.items.map(item => ({
-    id: item.id,
-    name: item.title,
-    images: [item.image],
-    tags: item.category ? [item.category, ...(item.sizes || []), ...(item.colors || []), ...(item.featured ? ['featured'] : [])] : [],
-  }));
-
-  // Only show main grid for products not in liked/skipped
-  const likedIds = new Set(swipeLiked.map(p => p.id));
-  const skippedIds = new Set(swipeSkipped.map(p => p.id));
-  const remainingItems = filteredItems.filter(item => !likedIds.has(item.id) && !skippedIds.has(item.id));
-
-  return (
-    <>
-      <TrendSwipePopup
-        persona={persona || 'minimalist-style'}
-        products={swipeProducts}
-        isOpen={showSwipe}
-        onClose={() => setShowSwipe(false)}
-        onComplete={(liked, skipped) => {
-          setSwipeLiked(liked);
-          setSwipeSkipped(skipped);
-          setSwipeResults(persona || 'minimalist-style', liked, skipped);
-          setShowSwipe(false);
-        }}
-      />
-      <button
-        className="fixed bottom-8 right-8 z-50 w-16 h-16 rounded-full bg-gradient-to-br from-primary to-accent shadow-lg flex items-center justify-center hover:scale-110 transition-all group"
-        style={{ boxShadow: '0 4px 24px 0 rgba(0,0,0,0.15)' }}
-        onClick={() => setShowSwipe(true)}
-        title="Try Trend Swipe"
-        aria-label="Try Trend Swipe"
-      >
-        <Sparkles className="w-8 h-8 text-primary-foreground group-hover:animate-pulse" />
-        <span className="absolute bottom-20 right-0 bg-background text-foreground text-xs rounded px-3 py-1 shadow opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">Try Trend Swipe</span>
-      </button>
+  if (loading) {
+    return (
       <div className="min-h-screen bg-background">
         <Navigation />
-        {/* Show See Your Swipe Results button if results exist and not currently shown */}
-        {hasSwipeResults && swipeLiked.length === 0 && swipeSkipped.length === 0 && (
-          <div className="flex justify-center mt-4">
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary mx-auto mb-4"></div>
+            <h1 className="text-2xl font-bold text-foreground mb-4">Loading Your Lookbook...</h1>
+            <p className="text-muted-foreground">Curating the perfect pieces for your style</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error || !lookbookData) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-foreground mb-4">
+              {error || 'Lookbook Not Found'}
+            </h1>
             <button
-              className="px-5 py-2 bg-accent text-accent-foreground rounded-lg font-medium shadow hover:scale-105 transition-all"
-              onClick={() => {
-                const { liked, skipped } = getSwipeResults(persona || 'minimalist-style');
-                setSwipeLiked(liked);
-                setSwipeSkipped(skipped);
-              }}
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
             >
-              See Your Swipe Results
+              Go Home
             </button>
           </div>
-        )}
-        {/* Liked Products Carousel (now vertical grid) */}
-        {swipeLiked.length > 0 && (
-          <section className="py-8 px-6">
-            <div className="max-w-6xl mx-auto">
-              <div className="flex items-center gap-2 mb-4">
-                <Heart className="w-6 h-6 text-primary" />
-                <h2 className="font-display text-xl font-bold text-foreground">You Liked These!</h2>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Use all items since lookbook is already personalized by quiz
+  const displayItems = lookbookData.items;
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navigation />
+      
+      {/* Hero Section */}
+      <PageHero
+        title={lookbookData.title}
+        subtitle={lookbookData.description}
+        backgroundGradient="from-pink-100 via-rose-50 to-pink-50"
+      />
+
+
+
+
+
+
+
+      {/* Trend Swipe Results */}
+      {swipeResults && (
+        <>
+          {/* Results Header with Clear Button */}
+          <section className="py-6 px-6 bg-gradient-to-r from-primary/10 to-secondary/10 border-b border-border">
+            <div className="max-w-6xl mx-auto flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-3xl font-bold text-foreground mb-2">
+                  Trend Swipe Results
+                </h2>
+                <p className="text-muted-foreground">
+                  Based on your preferences, here are your liked and skipped products
+                </p>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {swipeLiked
-                  .map(item => data.items.find(i => i.id === item.id))
-                  .filter((item): item is LookbookItem => !!item)
-                  .map(item => (
+              <button
+                onClick={() => setSwipeResults(null)}
+                className="px-4 py-2 bg-background border border-border rounded-lg hover:bg-accent transition-colors text-sm font-medium"
+              >
+                Clear Results
+              </button>
+            </div>
+          </section>
+          
+          {/* Liked Products Section */}
+          {swipeResults.liked.length > 0 && (
+            <section className="py-8 px-6 bg-green-50/50">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                  <h2 className="font-display text-2xl font-bold text-green-700">
+                    Products You Liked ({swipeResults.liked.length} items)
+                  </h2>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {swipeResults.liked.map((product: any) => (
                     <ProductCard
-                      key={item.id}
-                      item={item}
+                      key={product.id}
+                      item={product}
                       likedItems={likedItems}
                       favoriteItems={favoriteItems}
                       onLike={handleLike}
@@ -556,209 +547,143 @@ const Lookbook = () => {
                       user={user}
                     />
                   ))}
-              </div>
-            </div>
-          </section>
-        )}
-        {/* Skipped Products Collapsible (now vertical grid) */}
-        {swipeSkipped.length > 0 && (
-          <section className="py-4 px-6 mb-12">
-            <div className="max-w-6xl mx-auto">
-              <button
-                className="flex items-center gap-2 mb-2 text-muted-foreground hover:text-foreground text-sm font-medium"
-                onClick={() => setShowSkipped(v => !v)}
-                aria-expanded={showSkipped}
-              >
-                <ChevronLeft className={`w-4 h-4 transition-transform ${showSkipped ? 'rotate-[-90deg]' : 'rotate-180'}`} />
-                {showSkipped ? 'Hide' : 'Show'} Skipped Products ({swipeSkipped.length})
-              </button>
-              {showSkipped && (
-                <div className="mt-4">
-                  <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 opacity-60">
-                    {swipeSkipped
-                      .map(item => data.items.find(i => i.id === item.id))
-                      .filter((item): item is LookbookItem => !!item)
-                      .map(item => (
-                        <ProductCard
-                          key={item.id}
-                          item={item}
-                          likedItems={likedItems}
-                          favoriteItems={favoriteItems}
-                          onLike={handleLike}
-                          onFavorite={handleFavorite}
-                          onAddToCart={handleAddToCart}
-                          user={user}
-                        />
-                      ))}
-                  </div>
                 </div>
-              )}
-            </div>
-          </section>
-        )}
-        {/* Main grid: if no trend swipe, show all products as before */}
-        {(swipeLiked.length === 0 && swipeSkipped.length === 0) && (
-          <section className="py-16 px-6 bg-background">
-            <div className="max-w-6xl mx-auto">
-              <div className="text-center mb-8">
-                <h2 className="font-display text-2xl font-bold text-foreground mb-2">
-                  Your Personalized Collection
-                </h2>
-                <p className="text-muted-foreground mb-6">
-                  {filteredItems.length} products curated for your {data.title.toLowerCase().replace(' lookbook', '')} style
-                </p>
-                {/* Category Filter */}
-                <div className="flex flex-wrap justify-center gap-4">
-                  {categories.map((category) => (
-                    <button
-                      key={category}
-                      onClick={() => setSelectedCategory(category)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-colors border ${
-                        selectedCategory === category
-                          ? 'bg-primary text-primary-foreground border-primary'
-                          : 'bg-card text-muted-foreground hover:text-foreground border-border'
-                      }`}
-                    >
-                      {category} ({data.items.filter(item => category === 'All' || item.category === category).length})
-                    </button>
+              </div>
+            </section>
+          )}
+          
+          {/* Skipped Products Section */}
+          {swipeResults.skipped.length > 0 && (
+            <section className="py-8 px-6 bg-red-50/50">
+              <div className="max-w-6xl mx-auto">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+                  <h2 className="font-display text-2xl font-bold text-red-700">
+                    Products You Skipped ({swipeResults.skipped.length} items)
+                  </h2>
+                </div>
+                <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {swipeResults.skipped.map((product: any) => (
+                    <ProductCard
+                      key={product.id}
+                      item={product}
+                      likedItems={likedItems}
+                      favoriteItems={favoriteItems}
+                      onLike={handleLike}
+                      onFavorite={handleFavorite}
+                      onAddToCart={handleAddToCart}
+                      user={user}
+                    />
                   ))}
                 </div>
               </div>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredItems.map((item, index) => (
-                  <ProductCard
-                    key={item.id}
-                    item={item}
-                    likedItems={likedItems}
-                    favoriteItems={favoriteItems}
-                    onLike={handleLike}
-                    onFavorite={handleFavorite}
-                    onAddToCart={handleAddToCart}
-                    user={user}
-                  />
-                ))}
-              </div>
+            </section>
+          )}
+        </>
+      )}
+
+      {/* Products Grid - Only show when no swipe results */}
+      {!swipeResults && (
+        <section className="py-8 px-6">
+          <div className="max-w-6xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-2xl font-bold text-foreground">
+                Your Curated Collection ({displayItems.length} items)
+              </h2>
             </div>
-          </section>
-        )}
-        <PageHero 
-          title={data.title}
-          subtitle={data.description}
-          backgroundGradient="from-accent/30 to-secondary/20"
+          
+          {displayItems.length > 0 ? (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {displayItems.map(item => (
+                <ProductCard
+                  key={item.id}
+                  item={item}
+                  likedItems={likedItems}
+                  favoriteItems={favoriteItems}
+                  onLike={handleLike}
+                  onFavorite={handleFavorite}
+                  onAddToCart={handleAddToCart}
+                  user={user}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground text-lg">No items found for this category.</p>
+            </div>
+          )}
+        </div>
+      </section>
+      )}
+
+      {/* Trending Styles */}
+      <section className="py-16 px-6 bg-card/50 border-t border-border">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="font-display text-2xl font-bold text-foreground mb-6">
+            Trending in {lookbookData.title.replace(' Lookbook', '')}
+          </h2>
+          <div className="flex flex-wrap gap-3 justify-center">
+            {lookbookData.trendingStyles.map(style => (
+              <span
+                key={style}
+                className="px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium"
+              >
+                {style}
+              </span>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-16 px-6 bg-background border-t border-border">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="font-display text-3xl font-bold text-foreground mb-6">
+            Love Your Style Persona?
+          </h2>
+          <p className="text-lg text-muted-foreground mb-8">
+            Take the quiz again or explore more styles to discover new fashion possibilities
+          </p>
+          <div className="flex gap-4 justify-center">
+            <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:bg-primary/90"
+            >
+              Take Quiz Again
+            </button>
+            <button
+              onClick={() => navigate('/trending-looks')}
+              className="px-6 py-3 bg-card text-foreground border border-border rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:bg-card/80"
+            >
+              Explore Trending Styles
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
+      
+      {/* Floating Sparkle Button */}
+      <button
+        onClick={handleTrendSwipe}
+        className="fixed bottom-6 right-6 z-40 flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-secondary text-white rounded-full hover:scale-110 transition-all duration-300 shadow-lg hover:shadow-xl"
+        aria-label="Open Trend Swipe"
+      >
+        <Sparkles className="w-8 h-8" />
+      </button>
+      
+      {/* Trend Swipe Popup */}
+      {lookbookData && (
+        <TrendSwipePopup
+          persona={persona || ''}
+          products={lookbookData.items.map(convertToSwipeProduct)}
+          isOpen={showTrendSwipe}
+          onClose={() => setShowTrendSwipe(false)}
+          onComplete={handleSwipeComplete}
         />
-
-        {/* Trending Styles */}
-        <section className="py-8 px-6 bg-card/50 border-b border-border">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-xl font-bold text-foreground mb-4 text-center">
-              Trending in Your Style
-            </h2>
-            <div className="flex flex-wrap justify-center gap-3">
-              {data.trendingStyles.map((style, index) => (
-                <span
-                  key={index}
-                  className="px-4 py-2 bg-accent/20 text-primary rounded-full text-sm font-medium border border-border"
-                >
-                  {style}
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Style Recommendations */}
-        <section className="py-12 px-6 bg-background border-b border-border">
-          <div className="max-w-4xl mx-auto">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-6 text-center">
-              Style Recommendations
-            </h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {data.recommendations.map((recommendation, index) => (
-                <div
-                  key={index}
-                  className="p-4 bg-card rounded-lg border border-border text-center shadow-sm"
-                >
-                  <p className="text-sm text-muted-foreground">{recommendation}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Explore More Products Section */}
-        <section className="py-16 px-6 bg-card/50 border-t border-border">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="font-display text-2xl font-bold text-foreground mb-4">
-              Explore More Products
-            </h2>
-            <p className="text-muted-foreground mb-8">
-              Discover our full collection of products across all categories and styles
-            </p>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-              <Link
-                to="/products"
-                className="p-4 bg-background rounded-lg border border-border hover:border-primary transition-colors group"
-              >
-                <div className="text-2xl mb-2">👕</div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">All Products</h3>
-                <p className="text-xs text-muted-foreground">{products.length} items</p>
-              </Link>
-              <Link
-                to="/trending-looks"
-                className="p-4 bg-background rounded-lg border border-border hover:border-primary transition-colors group"
-              >
-                <div className="text-2xl mb-2">🔥</div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Trending</h3>
-                <p className="text-xs text-muted-foreground">Latest styles</p>
-              </Link>
-              <Link
-                to="/categories"
-                className="p-4 bg-background rounded-lg border border-border hover:border-primary transition-colors group"
-              >
-                <div className="text-2xl mb-2">📂</div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Categories</h3>
-                <p className="text-xs text-muted-foreground">Browse by style</p>
-              </Link>
-              <Link
-                to="/collections"
-                className="p-4 bg-background rounded-lg border border-border hover:border-primary transition-colors group"
-              >
-                <div className="text-2xl mb-2">🎨</div>
-                <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors">Collections</h3>
-                <p className="text-xs text-muted-foreground">Curated sets</p>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-16 px-6 bg-background border-t border-border">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="font-display text-3xl font-bold text-foreground mb-6">
-              Love Your Style Persona?
-            </h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Take the quiz again or explore more styles to discover new fashion possibilities
-            </p>
-            <div className="flex gap-4 justify-center">
-              <button
-                onClick={() => navigate('/')}
-                className="px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:bg-primary/90"
-              >
-                Take Quiz Again
-              </button>
-              <button
-                onClick={() => navigate('/trending-looks')}
-                className="px-6 py-3 bg-card text-foreground border border-border rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:bg-card/80"
-              >
-                Explore Trending Styles
-              </button>
-            </div>
-          </div>
-        </section>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
-export default Lookbook; 
+export default Lookbook;

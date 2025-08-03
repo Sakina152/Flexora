@@ -166,7 +166,21 @@ const TrendSwipePopup = ({ persona, products, isOpen, onClose, onComplete }: Tre
                       whileDrag={{ scale: 1.05 }}
                       ref={cardRef}
                     >
-                      <div className={`h-48 w-full bg-gradient-to-br ${currentProduct.images[0]} flex items-center justify-center rounded-lg mb-4`}></div>
+                      <div className="h-48 w-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center rounded-lg mb-4 overflow-hidden">
+                        {currentProduct.images[0] && currentProduct.images[0] !== '/placeholder.jpg' ? (
+                          <img 
+                            src={currentProduct.images[0]} 
+                            alt={currentProduct.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                              e.currentTarget.parentElement!.innerHTML = '<div class="text-gray-400 text-sm">No Image Available</div>';
+                            }}
+                          />
+                        ) : (
+                          <div className="text-gray-400 text-sm">No Image Available</div>
+                        )}
+                      </div>
                       <h3 className="font-display text-xl font-semibold mb-2 text-center">{currentProduct.name}</h3>
                       <div className="flex flex-wrap gap-2 mb-2 justify-center">
                         {currentProduct.tags.map(tag => (

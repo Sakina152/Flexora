@@ -147,6 +147,48 @@ class Blog(models.Model):
             return "Just now"
 
 
+class Lookbook(models.Model):
+    STYLE_CHOICES = [
+        ('minimalist-style', 'Minimalist Style'),
+        ('bohemian-style', 'Bohemian Style'),
+        ('vintage-style', 'Vintage Style'),
+        ('casual-style', 'Casual Style'),
+        ('streetwear-style', 'Streetwear Style'),
+        ('formal-style', 'Formal Style'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='lookbooks')
+    title = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    style_persona = models.CharField(max_length=50, choices=STYLE_CHOICES)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        unique_together = ['user', 'style_persona']  # One lookbook per style per user
+    
+    def __str__(self):
+        return f"{self.title} - {self.user.username}"
+
+
+class LookbookItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    lookbook = models.ForeignKey(Lookbook, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
+    order = models.PositiveIntegerField(default=0)  # For ordering items in lookbook
+    
+    class Meta:
+        ordering = ['order', 'added_at']
+        unique_together = ['lookbook', 'product']  # Prevent duplicate products in same lookbook
+    
+    def __str__(self):
+        return f"{self.product.name} in {self.lookbook.title}"
+
+
 class CommunityMember(models.Model):
     FASHION_INTEREST_CHOICES = [
         ('Streetwear', 'Streetwear'),

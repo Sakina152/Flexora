@@ -4,7 +4,8 @@ from .views import (
     DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView,
     ProductListView, ProductDetailView, ProductCategoriesView,
     BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView,
-    JoinCommunityView, CommunityMemberCheckView
+    JoinCommunityView, CommunityMemberCheckView,
+    LookbookListView, LookbookDetailView, LookbookByStyleView, LookbookItemView
 )
 
 urlpatterns = [
@@ -30,4 +31,11 @@ urlpatterns = [
     path('blogs/categories/', BlogCategoriesView.as_view(), name='blog-categories'),
     path('blogs/<str:blog_slug>/', BlogDetailView.as_view(), name='blog-detail'),
     path('blogs/<str:blog_id>/engagement/', BlogEngagementView.as_view(), name='blog-engagement'),
+    
+    # Lookbook API endpoints
+    path('lookbooks/', LookbookListView.as_view(), name='lookbook-list'),
+    path('lookbooks/<str:lookbook_id>/', LookbookDetailView.as_view(), name='lookbook-detail'),
+    path('lookbooks/style/<str:style_persona>/', LookbookByStyleView.as_view(), name='lookbook-by-style'),
+    path('lookbooks/<str:lookbook_id>/items/', LookbookItemView.as_view(), name='lookbook-add-item'),
+    path('lookbooks/<str:lookbook_id>/items/<str:item_id>/', LookbookItemView.as_view(), name='lookbook-remove-item'),
 ]

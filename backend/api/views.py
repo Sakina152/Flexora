@@ -11,7 +11,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 import json
-from .models import UserProfile, Product, Blog, CommunityMember
+from .models import UserProfile, Product, Blog, CommunityMember, Lookbook, LookbookItem
 from django.contrib.auth import authenticate
 from django.core.mail import send_mail
 from django.conf import settings
@@ -24,6 +24,9 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'name', 'price', 'description', 'image_url', 'image', 'category', 'brand', 'stock_quantity', 'sku', 'is_active', 'created_at', 'updated_at']
+
+# Import additional serializers
+from .serializers import LookbookSerializer, LookbookListSerializer, LookbookItemSerializer
 
 # Blog Serializer
 class BlogSerializer(serializers.ModelSerializer):
@@ -655,5 +658,254 @@ class JoinCommunityView(APIView):
         except Exception as e:
             return Response({
                 'error': 'Failed to check membership status.',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+# Lookbook API Views
+class LookbookListView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        """Get all lookbooks for the authenticated user"""
+        try:
+            lookbooks = Lookbook.objects.filter(user=request.user, is_active=True)
+            serializer = LookbookListSerializer(lookbooks, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch lookbooks',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def post(self, request):
+        """Create a new lookbook"""
+        try:
+            serializer = LookbookSerializer(data=request.data, context={'request': request})
+            if serializer.is_valid():
+                lookbook = serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to create lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LookbookDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, lookbook_id):
+        """Get a specific lookbook with its items"""
+        try:
+            lookbook = Lookbook.objects.get(id=lookbook_id, user=request.user, is_active=True)
+            serializer = LookbookSerializer(lookbook)
+            return Response(serializer.data)
+        except Lookbook.DoesNotExist:
+            return Response({
+                'error': 'Lookbook not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to fetch lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def put(self, request, lookbook_id):
+        """Update a lookbook"""
+        try:
+            lookbook = Lookbook.objects.get(id=lookbook_id, user=request.user, is_active=True)
+            serializer = LookbookSerializer(lookbook, data=request.data, partial=True, context={'request': request})
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Lookbook.DoesNotExist:
+            return Response({
+                'error': 'Lookbook not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to update lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def delete(self, request, lookbook_id):
+        """Delete a lookbook (soft delete)"""
+        try:
+            lookbook = Lookbook.objects.get(id=lookbook_id, user=request.user, is_active=True)
+            lookbook.is_active = False
+            lookbook.save()
+            return Response({'message': 'Lookbook deleted successfully'})
+        except Lookbook.DoesNotExist:
+            return Response({
+                'error': 'Lookbook not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to delete lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class LookbookByStyleView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request, style_persona):
+        """Get or create a lookbook for a specific style persona"""
+        try:
+            # Try to get existing lookbook
+            try:
+                lookbook = Lookbook.objects.get(
+                    user=request.user, 
+                    style_persona=style_persona, 
+                    is_active=True
+                )
+                serializer = LookbookSerializer(lookbook)
+                return Response(serializer.data)
+            except Lookbook.DoesNotExist:
+                # Create new lookbook with auto-populated products
+                style_titles = {
+                    'minimalist-style': 'Minimalist Style Lookbook',
+                    'bohemian-style': 'Bohemian Style Lookbook',
+                    'vintage-style': 'Vintage Style Lookbook',
+                    'casual-style': 'Casual Style Lookbook',
+                    'streetwear-style': 'Streetwear Style Lookbook',
+                    'formal-style': 'Formal Style Lookbook',
+                }
+                
+                style_descriptions = {
+                    'minimalist-style': 'Clean lines, quality over quantity, and timeless pieces that speak to your sophisticated aesthetic.',
+                    'bohemian-style': 'Free-spirited, artistic, and effortlessly chic pieces that celebrate your creative soul.',
+                    'vintage-style': 'Timeless classics and retro-inspired pieces that showcase your appreciation for enduring style.',
+                    'casual-style': 'Comfortable, versatile, and effortlessly stylish pieces for your everyday adventures.',
+                    'streetwear-style': 'Urban, edgy, and contemporary pieces that reflect your street-smart style.',
+                    'formal-style': 'Elegant, sophisticated, and polished pieces for your most important occasions.',
+                }
+                
+                # Create the lookbook
+                lookbook_data = {
+                    'title': style_titles.get(style_persona, f'{style_persona.replace("-", " ").title()} Lookbook'),
+                    'description': style_descriptions.get(style_persona, f'Curated collection for {style_persona} style.'),
+                    'style_persona': style_persona
+                }
+                
+                serializer = LookbookSerializer(data=lookbook_data, context={'request': request})
+                if serializer.is_valid():
+                    lookbook = serializer.save()
+                    
+                    # Auto-populate with matching products
+                    self._populate_lookbook_with_products(lookbook, style_persona)
+                    
+                    # Return the populated lookbook
+                    updated_serializer = LookbookSerializer(lookbook)
+                    return Response(updated_serializer.data, status=status.HTTP_201_CREATED)
+                else:
+                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                    
+        except Exception as e:
+            return Response({
+                'error': 'Failed to get or create lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def _populate_lookbook_with_products(self, lookbook, style_persona):
+        """Auto-populate lookbook with products matching the style persona"""
+        try:
+            # Define style mappings
+            style_mappings = {
+                'minimalist-style': ['Minimalist'],
+                'bohemian-style': ['Bohemian'],
+                'vintage-style': ['Vintage'],
+                'casual-style': ['Casual'],
+                'streetwear-style': ['Streetwear'],
+                'formal-style': ['Formal'],
+            }
+            
+            categories = style_mappings.get(style_persona, [])
+            
+            # Get products matching the style
+            products = Product.objects.filter(
+                category__in=categories,
+                is_active=True,
+                stock_quantity__gt=0
+            )[:12]  # Limit to 12 products
+            
+            # Add products to lookbook
+            for index, product in enumerate(products):
+                LookbookItem.objects.get_or_create(
+                    lookbook=lookbook,
+                    product=product,
+                    defaults={'order': index}
+                )
+                
+        except Exception as e:
+            print(f"Error populating lookbook: {str(e)}")
+
+
+class LookbookItemView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, lookbook_id):
+        """Add a product to a lookbook"""
+        try:
+            lookbook = Lookbook.objects.get(id=lookbook_id, user=request.user, is_active=True)
+            
+            # Check if product exists
+            product_id = request.data.get('product_id')
+            if not product_id:
+                return Response({
+                    'error': 'product_id is required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                product = Product.objects.get(id=product_id, is_active=True)
+            except Product.DoesNotExist:
+                return Response({
+                    'error': 'Product not found'
+                }, status=status.HTTP_404_NOT_FOUND)
+            
+            # Create lookbook item
+            item_data = {
+                'product_id': product_id,
+                'order': request.data.get('order', 0)
+            }
+            
+            serializer = LookbookItemSerializer(data=item_data)
+            if serializer.is_valid():
+                serializer.save(lookbook=lookbook, product=product)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            
+        except Lookbook.DoesNotExist:
+            return Response({
+                'error': 'Lookbook not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to add item to lookbook',
+                'details': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def delete(self, request, lookbook_id, item_id):
+        """Remove a product from a lookbook"""
+        try:
+            lookbook = Lookbook.objects.get(id=lookbook_id, user=request.user, is_active=True)
+            item = LookbookItem.objects.get(id=item_id, lookbook=lookbook)
+            item.delete()
+            return Response({'message': 'Item removed from lookbook'})
+            
+        except Lookbook.DoesNotExist:
+            return Response({
+                'error': 'Lookbook not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except LookbookItem.DoesNotExist:
+            return Response({
+                'error': 'Item not found in lookbook'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': 'Failed to remove item from lookbook',
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
