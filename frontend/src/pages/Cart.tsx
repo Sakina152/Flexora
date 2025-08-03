@@ -127,7 +127,7 @@ const Cart = () => {
       }
     } catch (error) {
       console.error('Payment verification error:', error);
-      toast.error('Payment verification failed. Please contact support.');
+      toast.error('Payment verification failed, Please contact support.');
       setIsProcessingPayment(false);
     }
   };
