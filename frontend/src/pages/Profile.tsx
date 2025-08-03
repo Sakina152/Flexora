@@ -128,8 +128,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem('accessToken');
       console.log('🔑 Token exists:', !!token);
-      
-      const res = await fetch('http://127.0.0.1:8000/api/community-member-check/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const res = await fetch('${baseURL}/api/community-member-check/', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -212,7 +212,7 @@ const Profile = () => {
       try {
         const token = localStorage.getItem('accessToken');
         const baseURL = import.meta.env.VITE_BACKEND_URL;
-        const res = await fetch('http://127.0.0.1:8000/api/profile/', {
+        const res = await fetch('${baseURL}/api/profile/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },

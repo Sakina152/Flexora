@@ -3,7 +3,7 @@ from .views import (
     hello, RegisterView, QuizSubmissionView, ProfileView, ChangePasswordView, 
     DeleteAccountView, CustomTokenObtainPairView, UsernameSuggestionsView,
     ProductListView, ProductDetailView, ProductCategoriesView,
-    BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView,
+    BlogListView, BlogDetailView, BlogCategoriesView, BlogEngagementView, BlogCreateView,
     JoinCommunityView, CommunityMemberCheckView,
     LookbookListView, LookbookDetailView, LookbookByStyleView, LookbookItemView,
     CreateRazorpayOrderView, VerifyRazorpayPaymentView
@@ -29,6 +29,7 @@ urlpatterns = [
     
     # Blog API endpoints
     path('blogs/', BlogListView.as_view(), name='blog-list'),
+    path('blogs/create/', BlogCreateView.as_view(), name='blog-create'),
     path('blogs/categories/', BlogCategoriesView.as_view(), name='blog-categories'),
     path('blogs/<str:blog_slug>/', BlogDetailView.as_view(), name='blog-detail'),
     path('blogs/<str:blog_id>/engagement/', BlogEngagementView.as_view(), name='blog-engagement'),

@@ -285,7 +285,8 @@ const FashionStyleQuiz = ({ isOpen, onClose }: FashionStyleQuizProps) => {
     
     setIsSubmitting(true);
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/quiz/submit/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch('${baseURL}/api/quiz/submit/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -120,7 +120,8 @@ const WriteBlog: React.FC = () => {
     // Test with a simple authenticated endpoint
     console.log('Testing with profile endpoint...');
     try {
-      const response = await fetch('http://127.0.0.1:8000/api/profile/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch('${baseURL}/api/profile/', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

@@ -238,6 +238,86 @@ class BlogEngagementView(APIView):
                 'details': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class BlogCreateView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request):
+        """
+        Create a new blog post
+        """
+        try:
+            # Get form data
+            title = request.data.get('title')
+            content = request.data.get('content')
+            excerpt = request.data.get('excerpt', '')
+            category = request.data.get('category', 'General')
+            cover_image = request.FILES.get('cover_image')
+            cover_image_url = request.data.get('cover_image_url', '')
+            meta_title = request.data.get('meta_title', '')
+            meta_description = request.data.get('meta_description', '')
+            tags = request.data.get('tags', '')
+            is_published = request.data.get('is_published', 'false').lower() == 'true'
+            is_featured = request.data.get('is_featured', 'false').lower() == 'true'
+            is_trending = request.data.get('is_trending', 'false').lower() == 'true'
+            
+            # Validate required fields
+            if not title or not content:
+                return Response({
+                    'error': 'Title and content are required'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Generate unique slug from title
+            from django.utils.text import slugify
+            import uuid
+            base_slug = slugify(title)
+            slug = base_slug
+            counter = 1
+            while Blog.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            
+            # Create blog post
+            blog_data = {
+                'title': title,
+                'slug': slug,
+                'author': request.user.username,
+                'content': content,
+                'excerpt': excerpt,
+                'category': category,
+                'meta_title': meta_title or title,
+                'meta_description': meta_description or excerpt,
+                'tags': tags,
+                'is_published': is_published,
+                'is_featured': is_featured,
+                'is_trending': is_trending,
+            }
+            
+            # Handle cover image
+            if cover_image:
+                blog_data['cover_image'] = cover_image
+            elif cover_image_url:
+                blog_data['cover_image_url'] = cover_image_url
+            
+            # Set published_at if publishing
+            if is_published:
+                blog_data['published_at'] = datetime.now()
+            
+            # Create the blog
+            blog = Blog.objects.create(**blog_data)
+            
+            # Serialize the response
+            serializer = BlogSerializer(blog)
+            
+            return Response({
+                'message': 'Blog created successfully',
+                'blog': serializer.data
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Failed to create blog: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 def hello(request):
     return JsonResponse({"message": "Hello from Django backend!"})
 
@@ -449,7 +529,7 @@ class DeleteAccountView(APIView):
             return Response({'error': 'Password is required to delete account.'}, status=status.HTTP_400_BAD_REQUEST)
         
         if not user.check_password(password):
-            return Response({'error': 'Incorrect password.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Invalid action'}, status=status.HTTP_400_BAD_REQUEST)
         
         # Delete profile picture if exists
         profile = getattr(user, 'profile', None)

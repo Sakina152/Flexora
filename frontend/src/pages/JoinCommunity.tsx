@@ -78,7 +78,8 @@ const JoinCommunity = () => {
         const token = localStorage.getItem('accessToken');
         
         // Fetch user profile
-        const profileResponse = await fetch('http://127.0.0.1:8000/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL;
+        const profileResponse = await fetch('${baseURL}/api/profile/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -98,7 +99,8 @@ const JoinCommunity = () => {
         }
         
         // Check if user is already a community member
-        const membershipResponse = await fetch('http://127.0.0.1:8000/api/join-community/', {
+        
+        const membershipResponse = await fetch('${baseURL}/api/join-community/', {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -152,8 +154,8 @@ const JoinCommunity = () => {
         setLoading(false);
         return;
       }
-      
-      const response = await fetch('http://127.0.0.1:8000/api/join-community/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL;
+      const response = await fetch('${baseURL}/api/join-community/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
