@@ -28,25 +28,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "casual",
         text: "Comfortable jeans and cozy sweater",
-        image: "casual-outfit",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754154778/646d928413c6e394cd40fdeab818e5fc_zvrnqy.jpg",
         style: "Casual"
       },
       {
         id: "vintage",
         text: "Vintage dress with retro accessories",
-        image: "vintage-outfit",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155029/99df76713a040ed34222b072d584cdfc_poh1tu.jpg",
         style: "Vintage"
       },
       {
         id: "minimalist",
         text: "Clean lines and neutral colors",
-        image: "minimalist-outfit",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155099/b6ebc0f4d1809d72521b24a5b71ed844_cngxgi.jpg",
         style: "Minimalist"
       },
       {
         id: "bohemian",
         text: "Flowing layers and earthy tones",
-        image: "bohemian-outfit",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155230/4fda83157619dc0fe2b0d49e486a117b_kxhqb5.jpg",
         style: "Bohemian"
       }
     ]
@@ -58,25 +58,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "neutral",
         text: "Neutrals and earth tones",
-        image: "neutral-palette",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155396/1f838370eace05f06a624e979489ae88_wtreky.jpg",
         style: "Minimalist"
       },
       {
         id: "vibrant",
         text: "Bold and bright colors",
-        image: "vibrant-palette",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155494/cbe91140fc05ac99691b7a1e01062511_ff6ctl.jpg",
         style: "Bohemian"
       },
       {
         id: "pastel",
         text: "Soft pastels and muted tones",
-        image: "pastel-palette",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155666/8c8620d4e64edfbb1e08beb848c00cfe_znvdch.jpg",
         style: "Casual"
       },
       {
         id: "monochrome",
         text: "Black, white, and grays",
-        image: "monochrome-palette",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754155834/6b8480b7d5f3453bd1e5349f9db8ced4_f5ptuy.jpg",
         style: "Vintage"
       }
     ]
@@ -88,25 +88,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "smooth",
         text: "Silk and satin finishes",
-        image: "smooth-fabric",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754156032/f454d4f6c7e5678c149b3e1c63a63d4d_qdofmm.jpg",
         style: "Minimalist"
       },
       {
         id: "textured",
         text: "Linen and natural fibers",
-        image: "textured-fabric",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754156631/853026b8af79b0dcaa4236d0a988b93a_ji1oe6.jpg",
         style: "Bohemian"
       },
       {
         id: "soft",
         text: "Cotton and cozy knits",
-        image: "soft-fabric",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754156842/f5c86db5b9a96d6ebf6ac8d27eac14e8_kzxauc.jpg",
         style: "Casual"
       },
       {
         id: "structured",
         text: "Wool and tailored fabrics",
-        image: "structured-fabric",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754156974/58b05e9ff077a136a2c369d3e9dfbaf5_has7ij.jpg",
         style: "Vintage"
       }
     ]
@@ -118,25 +118,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "minimal",
         text: "Simple, understated pieces",
-        image: "minimal-accessories",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754157170/398c2fd670035ef76dd7d20881461ad3_nzjlib.jpg",
         style: "Minimalist"
       },
       {
         id: "layered",
         text: "Multiple layers and textures",
-        image: "layered-accessories",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754157338/18109f89f2df74c79dfa48bc75d05d51_wzqxkw.jpg",
         style: "Bohemian"
       },
       {
         id: "classic",
         text: "Timeless, elegant pieces",
-        image: "classic-accessories",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754158418/f97ca063954ed4d723a72fc5660623a5_lq2tbf.jpg",
         style: "Vintage"
       },
       {
         id: "trendy",
         text: "Current fashion statements",
-        image: "trendy-accessories",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754158524/eabf02a94951b8425feec9b4866d3131_lihqo0.jpg",
         style: "Casual"
       }
     ]
@@ -148,25 +148,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "boutique",
         text: "Curated, intimate boutiques",
-        image: "boutique-shopping",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754158819/581d889921b7350710818294050ca65e_i6tciz.jpg",
         style: "Vintage"
       },
       {
         id: "thrift",
         text: "Thrift stores and vintage markets",
-        image: "thrift-shopping",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754158925/775a3c5d2f6299d2b30ba552c7f3363d_zckowt.jpg",
         style: "Bohemian"
       },
       {
         id: "department",
         text: "Department stores and malls",
-        image: "department-shopping",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159032/471389da900a7105c53555eb6802379d_hl7bzg.jpg",
         style: "Casual"
       },
       {
         id: "online",
         text: "Online shopping and minimalism",
-        image: "online-shopping",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159098/9429ac3cfb894d1de30c5d178b8856bc_lcpate.jpg",
         style: "Minimalist"
       }
     ]
@@ -178,25 +178,25 @@ const quizQuestions: QuizQuestion[] = [
       {
         id: "capsule",
         text: "Capsule wardrobe essentials",
-        image: "capsule-wardrobe",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159225/430b5e3c6ce0b470144f1e88c201525c_u59j5m.jpg",
         style: "Minimalist"
       },
       {
         id: "sustainable",
         text: "Sustainable and eco-friendly fashion",
-        image: "sustainable-fashion",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159330/e910aa301a3dfd7850f5c45937318496_j2ncyx.jpg",
         style: "Bohemian"
       },
       {
         id: "streetwear",
         text: "Street style and urban fashion",
-        image: "street-style",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159400/1afc965aafe18c1e8d66f83b19d2995d_adg7ql.jpg",
         style: "Casual"
       },
       {
         id: "retro",
         text: "Retro and vintage revival",
-        image: "retro-style",
+        image: "https://res.cloudinary.com/dlpuuekkl/image/upload/v1754159477/452cfb6dda25c883296dc2f0bd68bc2a_jy4rz2.jpg",
         style: "Vintage"
       }
     ]
@@ -384,13 +384,28 @@ const FashionStyleQuiz = ({ isOpen, onClose }: FashionStyleQuizProps) => {
                       onClick={() => handleOptionSelect(option.id)}
                       className="group p-6 text-left bg-gradient-to-br from-gray-50 to-gray-100 hover:from-gray-100 hover:to-gray-200 border-2 border-gray-200 hover:border-amber-300 rounded-2xl transition-all duration-300 hover:shadow-lg hover:-translate-y-1"
                     >
-                      {/* Image Placeholder Grid */}
-                      <div className="h-32 mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-                        <div className="grid grid-cols-2 gap-1 w-16 h-16">
-                          <div className="bg-gradient-to-br from-amber-200 to-rose-200 rounded"></div>
-                          <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded"></div>
-                          <div className="bg-gradient-to-br from-green-200 to-teal-200 rounded"></div>
-                          <div className="bg-gradient-to-br from-pink-200 to-orange-200 rounded"></div>
+                      {/* Option Image */}
+                      <div className="h-32 mb-4 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden group-hover:scale-105 transition-transform duration-300">
+                        <img 
+                          src={option.image} 
+                          alt={option.text}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to gradient placeholder if image fails to load
+                            e.currentTarget.style.display = 'none';
+                            const fallbackDiv = e.currentTarget.nextElementSibling as HTMLElement;
+                            if (fallbackDiv) {
+                              fallbackDiv.style.display = 'flex';
+                            }
+                          }}
+                        />
+                        <div className="w-full h-full hidden items-center justify-center">
+                          <div className="grid grid-cols-2 gap-1 w-16 h-16">
+                            <div className="bg-gradient-to-br from-amber-200 to-rose-200 rounded"></div>
+                            <div className="bg-gradient-to-br from-blue-200 to-purple-200 rounded"></div>
+                            <div className="bg-gradient-to-br from-green-200 to-teal-200 rounded"></div>
+                            <div className="bg-gradient-to-br from-pink-200 to-orange-200 rounded"></div>
+                          </div>
                         </div>
                       </div>
                       
