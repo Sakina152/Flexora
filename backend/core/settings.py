@@ -26,7 +26,7 @@ SECRET_KEY = "django-insecure-8(^-e9gp&i)(dhlss7r7p=mdo4mc(+ync4wi9+-s+k=r^uib=&
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv("flexora-ri89.onrender.com", "localhost,127.0.0.1,0.0.0.0").split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1,0.0.0.0,flexora-ri89.onrender.com").split(",")
 
 
 
