@@ -125,23 +125,37 @@ print(auto_crop_url)
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 import os
+import dj_database_url
 from decouple import config
 
-# Default database configuration with fallback to SQLite for development
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='flexora_db'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'CONN_MAX_AGE': 600,  # Keep database connections alive for 10 minutes
-        'OPTIONS': {
-            'connect_timeout': 5,  # 5 seconds connection timeout
-        },
+# Try to get the database URL from environment (for Render)
+DATABASE_URL = os.environ.get('DATABASE_URL')
+
+if DATABASE_URL:
+    # Use the database URL if available (Render provides this)
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    # Fall back to individual database settings
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': config('DB_NAME', default='flexora_db'),
+            'USER': config('DB_USER', default='postgres'),
+            'PASSWORD': config('DB_PASSWORD', default=''),
+            'HOST': config('DB_HOST', default='localhost'),
+            'PORT': config('DB_PORT', default='5432'),
+            'CONN_MAX_AGE': 600,
+            'OPTIONS': {
+                'connect_timeout': 5,
+            },
+        }
+    }
 
 # For local development with SQLite
 if os.environ.get('USE_SQLITE', '').lower() == 'true':
