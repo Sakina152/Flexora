@@ -127,19 +127,28 @@ print(auto_crop_url)
 import os
 from decouple import config
 
+# Default database configuration with fallback to SQLite for development
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT'),
+        'NAME': config('DB_NAME', default='flexora_db'),
+        'USER': config('DB_USER', default='postgres'),
+        'PASSWORD': config('DB_PASSWORD', default=''),
+        'HOST': config('DB_HOST', default='localhost'),
+        'PORT': config('DB_PORT', default='5432'),
+        'CONN_MAX_AGE': 600,  # Keep database connections alive for 10 minutes
+        'OPTIONS': {
+            'connect_timeout': 5,  # 5 seconds connection timeout
+        },
     }
 }
 
-
-
+# For local development with SQLite
+if os.environ.get('USE_SQLITE', '').lower() == 'true':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+    }
 
 
 # Password validation
