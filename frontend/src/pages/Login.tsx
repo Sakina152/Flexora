@@ -25,13 +25,15 @@ const Login = () => {
       return;
     }
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const response = await fetch('${baseURL}/api/token/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseURL}/api/token/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
       });
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       if (response.ok && data.access) {
         login(username, data.access, data.refresh);
         setError('');

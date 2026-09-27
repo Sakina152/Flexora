@@ -120,8 +120,8 @@ const WriteBlog: React.FC = () => {
     // Test with a simple authenticated endpoint
     console.log('Testing with profile endpoint...');
     try {
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const response = await fetch('${baseURL}/api/profile/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseURL}/api/profile/`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -133,16 +133,22 @@ const WriteBlog: React.FC = () => {
       console.log('Profile endpoint response headers:', Object.fromEntries(response.headers.entries()));
       
       if (response.status === 401) {
-        const errorData = await response.json().catch(() => ({}));
+        const text = await response.text().catch(() => '');
+        let errorData: any = {};
+        try { if (text) errorData = JSON.parse(text); } catch (_) {}
         console.log('401 Error details:', errorData);
         setSubmitError(`Token is invalid or expired. Error: ${JSON.stringify(errorData)}. Please log in again.`);
       } else if (response.ok) {
-        const data = await response.json();
+        const text = await response.text();
+        let data: any = {};
+        try { if (text) data = JSON.parse(text); } catch (_) {}
         console.log('Profile data:', data);
         setSubmitError('');
         alert('Authentication test successful! Token is valid.');
       } else {
-        const errorData = await response.json().catch(() => ({}));
+        const text = await response.text().catch(() => '');
+        let errorData: any = {};
+        try { if (text) errorData = JSON.parse(text); } catch (_) {}
         console.log('Other error:', errorData);
         setSubmitError(`Unexpected error: ${response.status} - ${JSON.stringify(errorData)}`);
       }

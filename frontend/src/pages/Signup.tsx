@@ -80,8 +80,8 @@ const Signup = () => {
     
     try {
       console.log('Sending registration request with data:', { username, email, phone, address });
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const response = await fetch('${baseURL}/api/register/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseURL}/api/register/`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -92,7 +92,9 @@ const Signup = () => {
       
       console.log('Registration response status:', response.status);
       
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       console.log('Registration response data:', data);
       
       if (response.ok) {

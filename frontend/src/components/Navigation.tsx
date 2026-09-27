@@ -15,6 +15,7 @@ const Navigation = () => {
   const [lookbookPersona, setLookbookPersona] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<string>('');
   const [selectedAvatar, setSelectedAvatar] = useState<string>('');
+  const [isAdmin, setIsAdmin] = useState(false);
 
   // Default avatar options
   const defaultAvatars = [
@@ -63,15 +64,17 @@ const Navigation = () => {
             return;
           }
           
-          const baseURL = import.meta.env.VITE_BACKEND_URL;
-          const res = await fetch('${baseURL}/api/profile/', {
+          const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+          const res = await fetch(`${baseURL}/api/profile/`, {
             headers: {
               'Authorization': `Bearer ${token}`,
             },
           });
           
           if (res.ok) {
-            const data = await res.json();
+            const text = await res.text();
+            let data: any = {};
+            try { if (text) data = JSON.parse(text); } catch (_) {}
             console.log('Profile data received:', data);
             if (data.profile_picture) {
               console.log('Setting profile picture:', data.profile_picture);
@@ -84,6 +87,11 @@ const Navigation = () => {
               setSelectedAvatar(data.selected_avatar);
             } else {
               setSelectedAvatar('');
+            }
+            if (data.is_staff || data.is_superuser) {
+              setIsAdmin(true);
+            } else {
+              setIsAdmin(false);
             }
           } else {
             console.error('Failed to fetch profile:', res.status);
@@ -115,17 +123,24 @@ const Navigation = () => {
           try {
             const token = localStorage.getItem('accessToken');
             if (!token) return;
-            const baseURL = import.meta.env.VITE_BACKEND_URL;
-            const res = await fetch('${baseURL}/api/profile/', {
+            const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+            const res = await fetch(`${baseURL}/api/profile/`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
               },
             });
             
             if (res.ok) {
-              const data = await res.json();
+              const text = await res.text();
+              let data: any = {};
+              try { if (text) data = JSON.parse(text); } catch (_) {}
               if (data.profile_picture) {
                 setProfilePicture(data.profile_picture);
+              }
+              if (data.is_staff || data.is_superuser) {
+                setIsAdmin(true);
+              } else {
+                setIsAdmin(false);
               }
             }
           } catch (error) {
@@ -305,6 +320,11 @@ const Navigation = () => {
                     <>
                       <DropdownMenuItem disabled>Signed in as <b className="ml-1">{user.username}</b></DropdownMenuItem>
                       <DropdownMenuSeparator />
+                      {isAdmin && (
+                        <DropdownMenuItem asChild>
+                          <NavLink to="/admin" className="text-primary font-bold">Admin Panel</NavLink>
+                        </DropdownMenuItem>
+                      )}
                       <DropdownMenuItem asChild>
                         <NavLink to="/profile">Profile</NavLink>
                       </DropdownMenuItem>
@@ -475,6 +495,11 @@ const Navigation = () => {
                   <>
                     <DropdownMenuItem disabled>Signed in as <b>{user.username}</b></DropdownMenuItem>
                     <DropdownMenuSeparator />
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <NavLink to="/admin" className="text-primary font-bold">Admin Panel</NavLink>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem asChild>
                       <NavLink to="/profile">Profile</NavLink>
                     </DropdownMenuItem>

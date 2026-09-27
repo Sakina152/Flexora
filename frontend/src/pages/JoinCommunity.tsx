@@ -78,15 +78,17 @@ const JoinCommunity = () => {
         const token = localStorage.getItem('accessToken');
         
         // Fetch user profile
-        const baseURL = import.meta.env.VITE_BACKEND_URL;
-        const profileResponse = await fetch('${baseURL}/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+        const profileResponse = await fetch(`${baseURL}/api/profile/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
         
         if (profileResponse.ok) {
-          const profileData = await profileResponse.json();
+          const text = await profileResponse.text();
+          let profileData: any = {};
+          try { if (text) profileData = JSON.parse(text); } catch (_) {}
           setUserProfile(profileData);
           
           // Auto-fill form with user data
@@ -100,14 +102,16 @@ const JoinCommunity = () => {
         
         // Check if user is already a community member
         
-        const membershipResponse = await fetch('${baseURL}/api/join-community/', {
+        const membershipResponse = await fetch(`${baseURL}/api/join-community/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
         });
         
         if (membershipResponse.ok) {
-          const membershipData = await membershipResponse.json();
+          const text = await membershipResponse.text();
+          let membershipData: any = {};
+          try { if (text) membershipData = JSON.parse(text); } catch (_) {}
           if (membershipData.is_member) {
             setIsAlreadyMember(true);
             setMemberData(membershipData.member);
@@ -154,8 +158,8 @@ const JoinCommunity = () => {
         setLoading(false);
         return;
       }
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const response = await fetch('${baseURL}/api/join-community/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const response = await fetch(`${baseURL}/api/join-community/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -167,7 +171,9 @@ const JoinCommunity = () => {
       console.log('Response status:', response.status);
       console.log('Response headers:', response.headers);
       
-      const data = await response.json();
+      const text = await response.text();
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       console.log('Response data:', data);
 
       if (response.ok) {

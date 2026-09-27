@@ -28,6 +28,7 @@ const Cart = () => {
     phone: ''
   });
   const [formError, setFormError] = useState('');
+  const [paymentMethod, setPaymentMethod] = useState<'online' | 'cod'>('online');
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
 
@@ -104,7 +105,8 @@ const Cart = () => {
 
   const verifyPayment = async (paymentResponse: any, receipt: string) => {
     try {
-      const verifyResponse = await fetch('/api/verify-razorpay-payment/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const verifyResponse = await fetch(`${baseURL}/api/verify-razorpay-payment/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +120,9 @@ const Cart = () => {
         })
       });
 
-      const verifyData = await verifyResponse.json();
+      const text = await verifyResponse.text();
+      let verifyData: any = {};
+      try { if (text) verifyData = JSON.parse(text); } catch (_) {}
       
       if (verifyResponse.ok && verifyData.success) {
         handlePaymentSuccess(paymentResponse.razorpay_payment_id, paymentResponse.razorpay_order_id);
@@ -140,6 +144,7 @@ const Cart = () => {
     const newOrder = {
       id: orderId,
       paymentId: paymentId,
+      paymentMethod: paymentMethod,
       items: cartItems,
       total: total,
       customerInfo: form,
@@ -172,6 +177,15 @@ const Cart = () => {
       return;
     }
 
+    if (paymentMethod === 'cod') {
+      setIsProcessingPayment(true);
+      // Simulate brief processing delay
+      setTimeout(() => {
+        handlePaymentSuccess('COD', `order_cod_${Date.now()}`);
+      }, 1000);
+      return;
+    }
+
     console.log('Starting checkout process...');
     console.log('Razorpay loaded:', razorpayLoaded);
     console.log('Window.Razorpay available:', !!window.Razorpay);
@@ -191,7 +205,8 @@ const Cart = () => {
       let useBackend = true;
       
       try {
-        const orderResponse = await fetch('/api/create-razorpay-order/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+        const orderResponse = await fetch(`${baseURL}/api/create-razorpay-order/`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -207,7 +222,8 @@ const Cart = () => {
         });
 
         if (orderResponse.ok) {
-          orderData = await orderResponse.json();
+          const text = await orderResponse.text();
+          try { if (text) orderData = JSON.parse(text); } catch (_) {}
           console.log('Order created via backend:', orderData);
         } else {
           throw new Error('Backend order creation failed');
@@ -425,6 +441,37 @@ const Cart = () => {
                         />
                       </div>
                     </div>
+                    
+                    <div className="pt-4 border-t border-border">
+                      <label className="block text-sm font-medium text-foreground mb-3">Payment Method</label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <label className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-colors ${paymentMethod === 'online' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border hover:bg-muted'}`}>
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="online" 
+                            checked={paymentMethod === 'online'} 
+                            onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
+                            className="sr-only" 
+                          />
+                          <span className="font-medium">Online Payment</span>
+                          <span className="text-xs text-muted-foreground text-center">Credit Card, UPI, Net Banking</span>
+                        </label>
+                        <label className={`cursor-pointer border rounded-lg p-4 flex flex-col items-center justify-center gap-2 transition-colors ${paymentMethod === 'cod' ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-border hover:bg-muted'}`}>
+                          <input 
+                            type="radio" 
+                            name="paymentMethod" 
+                            value="cod" 
+                            checked={paymentMethod === 'cod'} 
+                            onChange={(e) => setPaymentMethod(e.target.value as 'online' | 'cod')}
+                            className="sr-only" 
+                          />
+                          <span className="font-medium">Cash on Delivery</span>
+                          <span className="text-xs text-muted-foreground text-center">Pay when your order arrives</span>
+                        </label>
+                      </div>
+                    </div>
+                    
                     {formError && <div className="text-red-500 text-sm text-center">{formError}</div>}
                     <button
                       type="submit"

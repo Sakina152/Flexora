@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://flexora-ri89.onrender.com/api';
+export const BASE_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+export const API_BASE_URL = `${BASE_URL}/api`;
 
 export interface Product {
   id: string;
@@ -63,15 +64,19 @@ class ApiService {
       console.log(`API Response Status: ${response.status}`);
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const text = await response.text().catch(() => '');
+        let errorData: any = {};
+        try { if (text) errorData = JSON.parse(text); } catch (_) {}
         console.error('API Error Response:', errorData);
         return {
-          error: errorData.error || `HTTP error! status: ${response.status}`,
+          error: errorData.error || errorData.detail || `HTTP error! status: ${response.status}`,
           details: errorData.details,
         };
       }
 
-      const data = await response.json();
+      const text = await response.text().catch(() => '');
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       console.log('API Success Response:', data);
       return { data };
     } catch (error) {
@@ -182,14 +187,18 @@ class ApiService {
       console.log('Blog creation - Response headers:', Object.fromEntries(response.headers.entries()));
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
+        const text = await response.text().catch(() => '');
+        let errorData: any = {};
+        try { if (text) errorData = JSON.parse(text); } catch (_) {}
         return {
-          error: errorData.error || `HTTP error! status: ${response.status}`,
+          error: errorData.error || errorData.detail || `HTTP error! status: ${response.status}`,
           details: errorData.details,
         };
       }
 
-      const data = await response.json();
+      const text = await response.text().catch(() => '');
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       return { data };
     } catch (error) {
       return {

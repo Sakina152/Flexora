@@ -74,12 +74,14 @@ const EditProfile = () => {
       setError('');
       try {
         const token = localStorage.getItem('accessToken');
-        const baseURL = import.meta.env.VITE_BACKEND_URL;
-        const res = await fetch('${baseURL}/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+        const res = await fetch(`${baseURL}/api/profile/`, {
           headers: { 'Authorization': `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Failed to fetch profile');
-        const data = await res.json();
+        const text = await res.text();
+        let data: any = {};
+        try { if (text) data = JSON.parse(text); } catch (_) {}
         setForm({
           username: data.username || '',
           email: data.email || '',
@@ -159,8 +161,8 @@ const EditProfile = () => {
       if (form.accountType) {
         formData.append('account_type', form.accountType);
       }
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const res = await fetch('${baseURL}/api/profile/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${baseURL}/api/profile/`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -168,7 +170,9 @@ const EditProfile = () => {
         body: formData,
       });
       if (!res.ok) {
-        const data = await res.json();
+        const text = await res.text();
+        let data: any = {};
+        try { if (text) data = JSON.parse(text); } catch (_) {}
         throw new Error(data.error || 'Failed to update profile');
       }
       // Update AuthContext and localStorage if username changed
@@ -201,8 +205,8 @@ const EditProfile = () => {
     setPasswordSuccess('');
     try {
       const token = localStorage.getItem('accessToken');
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const res = await fetch('${baseURL}/api/change-password/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${baseURL}/api/change-password/`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -210,7 +214,9 @@ const EditProfile = () => {
         },
         body: JSON.stringify(passwordForm),
       });
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       if (!res.ok) throw new Error(data.error || 'Failed to change password');
       setPasswordSuccess('Password changed successfully!');
       setPasswordForm({ current_password: '', new_password: '', confirm_password: '' });

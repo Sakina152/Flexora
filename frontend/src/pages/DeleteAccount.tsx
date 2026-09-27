@@ -26,8 +26,8 @@ const DeleteAccount = () => {
     
     try {
       const token = localStorage.getItem('accessToken');
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const res = await fetch('${baseURL}/api/delete-account/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${baseURL}/api/delete-account/`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +36,9 @@ const DeleteAccount = () => {
         body: JSON.stringify({ password }),
       });
       
-      const data = await res.json();
+      const text = await res.text();
+      let data: any = {};
+      try { if (text) data = JSON.parse(text); } catch (_) {}
       
       if (!res.ok) {
         throw new Error(data.error || 'Failed to delete account');

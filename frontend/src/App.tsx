@@ -25,6 +25,7 @@ import EditProfile from "./pages/EditProfile";
 import DeleteAccount from "./pages/DeleteAccount";
 import PastOrders from "./pages/PastOrders";
 import WriteBlog from "./pages/WriteBlog";
+import AdminPanel from "./pages/AdminPanel";
 
 // Trending pages
 import ParisianChic from "./pages/trending/ParisianChic";
@@ -129,6 +130,9 @@ const App = () => {
               {/* Auth pages */}
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              
+              {/* Admin Panel */}
+              <Route path="/admin" element={<AdminPanel />} />
               
               {/* Product routes */}
               <Route path="/products" element={<Products />} />

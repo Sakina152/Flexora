@@ -128,8 +128,8 @@ const Profile = () => {
     try {
       const token = localStorage.getItem('accessToken');
       console.log('🔑 Token exists:', !!token);
-      const baseURL = import.meta.env.VITE_BACKEND_URL;
-      const res = await fetch('${baseURL}/api/community-member-check/', {
+      const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+      const res = await fetch(`${baseURL}/api/community-member-check/`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -139,7 +139,9 @@ const Profile = () => {
       console.log('📡 API Response status:', res.status);
       
       if (res.ok) {
-        const data = await res.json();
+        const text = await res.text();
+        let data: any = {};
+        try { if (text) data = JSON.parse(text); } catch (_) {}
         console.log('✅ API Response data:', data);
         const isMember = data.is_community_member || false;
         console.log('👤 Is community member:', isMember);
@@ -211,8 +213,8 @@ const Profile = () => {
       setError('');
       try {
         const token = localStorage.getItem('accessToken');
-        const baseURL = import.meta.env.VITE_BACKEND_URL;
-        const res = await fetch('${baseURL}/api/profile/', {
+        const baseURL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+        const res = await fetch(`${baseURL}/api/profile/`, {
           headers: {
             'Authorization': `Bearer ${token}`,
           },
@@ -220,7 +222,9 @@ const Profile = () => {
         if (!res.ok) {
           throw new Error('Failed to fetch profile');
         }
-        const data = await res.json();
+        const text = await res.text();
+        let data: any = {};
+        try { if (text) data = JSON.parse(text); } catch (_) {}
         console.log('Profile data received:', data);
         setProfile(data);
       } catch (err: any) {
